@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+    <ImageUploader />
   </div>
 </template>
 
@@ -38,6 +39,4 @@ defineOgImageComponent('NuxtSeo', { theme: '#ff0000', colorMode: 'dark' })
 
 </script>
 
-<style lang="scss" scoped>
-.main {}
-</style>
+<style lang="scss" scoped></style>
