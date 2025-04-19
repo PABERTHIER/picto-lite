@@ -11,6 +11,7 @@
 .header-container {
   padding: 10px;
   background-color: $header-background-color;
+  border-radius: 15px;
 
   .title {
     text-align: center;
