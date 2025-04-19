@@ -1,0 +1,21 @@
+{
+  "app": {
+    "name": "PictoLite",
+    "meta": {
+      "description": "Un outil d'optimisation d'images en masse avec conversion WebP."
+    }
+  },
+  "links": {},
+  "components": {},
+  "pages": {
+    "main": {
+      "tab_name": "PictoLite",
+      "meta": {
+        "content": "PictoLite"
+      }
+    }
+  },
+  "about": {
+    "author": "P-A"
+  }
+}
