@@ -19,12 +19,8 @@ const authorName = computed(() => t('about.author'))
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 10px 20px;
   background-color: $footer-background-color;
-
-  .left-part {
-    margin-left: 10px;
-  }
 
   .right-part {
     font-size: 12px;
