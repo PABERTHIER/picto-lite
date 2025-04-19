@@ -22,14 +22,14 @@ useSeoMeta({
   ogImage: `${baseUrl.value}/${ogImageEndPath}`,
   ogImageSecureUrl: `${baseUrl.value}/${ogImageEndPath}`,
   ogImageAlt: computed(() => t('app.meta.description')),
-  ogImageType: 'image/jpeg',
+  ogImageType: 'image/png',
   ogImageWidth: '1200',
   ogImageHeight: '600',
   twitterTitle: '%siteName',
   twitterDescription: computed(() => t('app.meta.description')),
   twitterImage: `${baseUrl.value}/${ogImageEndPath}`,
   twitterImageAlt: computed(() => t('app.meta.description')),
-  twitterImageType: 'image/jpeg',
+  twitterImageType: 'image/png',
   appleMobileWebAppTitle: '%siteName',
   msapplicationTileImage: `${baseUrl.value}/${ogImageEndPath}`
 })

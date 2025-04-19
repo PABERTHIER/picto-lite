@@ -46,7 +46,7 @@ useSeoMeta({
   ogImage: `${baseUrl.value}/${ogImageEndPath}`,
   ogImageSecureUrl: `${baseUrl.value}/${ogImageEndPath}`,
   ogImageAlt: computed(() => t('app.meta.description')),
-  ogImageType: 'image/jpeg',
+  ogImageType: 'image/png',
   ogImageWidth: '1200',
   ogImageHeight: '600',
   ogUrl: `${baseUrl.value}`,
@@ -58,7 +58,7 @@ useSeoMeta({
   twitterDescription: computed(() => t('app.meta.description')),
   twitterImage: `${baseUrl.value}/${ogImageEndPath}`,
   twitterImageAlt: computed(() => t('app.meta.description')),
-  twitterImageType: 'image/jpeg',
+  twitterImageType: 'image/png',
   author: computed(() => t('about.author')),
   creator: computed(() => t('about.author')),
   articleTag: computed(() => [
