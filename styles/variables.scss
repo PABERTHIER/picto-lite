@@ -1,0 +1,48 @@
+// colors
+$primary-text-color: #000000;
+$white-color: #FFFFFF;
+$red-color: #FF0000;
+$dark-red-color: #A00000;
+$green-color: #008000;
+$light-grey-color: #CBD5E0;
+$grey-color: #808080;
+$dark-grey-color: #4A5568;
+$light-blue-color: #63B3ED;
+$grey-blue-color: #7A9FF0;
+
+
+// background-color
+$background: linear-gradient(45deg, $grey-blue-color 0%, $dark-red-color 50%, $grey-blue-color 100%);
+$background-color: $white-color;
+$animation-background-color: #53647A;
+$mobile-menu-background-color: #2D3748;
+$primary-color: rgb(245, 245, 247);
+$secondary-color: rgb(1, 42, 53);
+$header-background-color: #F5F5F5;
+$footer-background-color: #F5F5F5;
+
+
+// border-color
+$mobile-menu-border-color: $dark-grey-color;
+
+
+// box-shadow-color
+$box-shadow-color: rgba(0, 0, 0, 0.1);
+
+
+// z-index
+$welcome-animation-z-index: 9999;
+$menu-z-index: 50;
+$footer-z-index: 30;
+
+
+// height
+$header-height-desktop: 70px;
+$header-height-mobile: 45px;
+$footer-height: 44px;
+
+
+// breakpoints
+$sm: 640px;
+$md: 768px;
+$lg: 1024px;
