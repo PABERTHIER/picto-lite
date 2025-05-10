@@ -49,13 +49,13 @@ body {
   background-color: $background-color;
 
   #header-container {
-    max-height: calc($header-height-desktop + 20px);
+    max-height: calc($header-height + 20px);
     top: 0;
-    padding: 20px 20px 0px 20px;
+    padding: 20px 20px 20px 20px;
   }
 
   #page-container {
-    height: calc(100vh - $header-height-desktop - $footer-height - 20px);
+    height: calc(100vh - $header-height - $footer-height - 65px);
     flex: 1;
     padding: 20px;
     overflow-y: auto;
@@ -70,11 +70,11 @@ body {
 
   @media (max-width: $sm) {
     #header-container {
-      max-height: calc($header-height-mobile + 20px);
+      max-height: calc($header-height + 20px);
     }
 
     #page-container {
-      height: calc(100vh - $header-height-mobile - $footer-height - 20px);
+      height: calc(100vh - $header-height - $footer-height - 65px);
     }
   }
 }

@@ -6,8 +6,11 @@ $dark-red-color: #A00000;
 $green-color: #008000;
 $light-grey-color: #CBD5E0;
 $grey-color: #808080;
+$grey-color-2: #718096;
 $dark-grey-color: #4A5568;
 $light-blue-color: #63B3ED;
+$blue-color: #3B82F6;
+$blue-color-2: #2563EB;
 $grey-blue-color: #7A9FF0;
 
 
@@ -23,7 +26,7 @@ $footer-background-color: #F5F5F5;
 
 
 // border-color
-$mobile-menu-border-color: $dark-grey-color;
+$drop-zone-border-color: $dark-grey-color;
 
 
 // box-shadow-color
@@ -37,8 +40,7 @@ $footer-z-index: 30;
 
 
 // height
-$header-height-desktop: 70px;
-$header-height-mobile: 45px;
+$header-height: 70px;
 $footer-height: 44px;
 
 

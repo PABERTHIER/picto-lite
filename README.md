@@ -9,7 +9,7 @@ It uses Vercel for deployment and hosting.
 ## Features
 
 - Drag-&-drop or file‑selector input for multiple pictures
-- Option to preserve original formats or convert to WebP
+- Option to preserve original formats or to convert to WebP format
 - Adaptive quality control to target a maximum size of ~1 MB without visual loss
 
 ## Nuxt 3 Minimal Starter
