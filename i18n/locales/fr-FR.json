@@ -6,7 +6,14 @@
     }
   },
   "links": {},
-  "components": {},
+  "components": {
+    "image_uploader": {
+      "drop_zone_description": "Glisser et déposer les images ici, ou cliquer pour sélectionner",
+      "webp_option_checkbox_name": "Convertir au format WebP",
+      "image_reduction_wording": "en moins",
+      "download_image_wording": "Télécharger"
+    }
+  },
   "pages": {
     "main": {
       "tab_name": "PictoLite",

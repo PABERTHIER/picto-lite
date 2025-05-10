@@ -1,35 +1,39 @@
 <template>
-  <div class="uploader">
+  <div class="uploader-container">
     <input type="file" multiple accept="image/*" ref="input" @change="handleFiles($event.target.files)" hidden />
 
-    <div class="drop-zone" @dragover.prevent @drop.prevent="handleFiles($event.dataTransfer.files)" @click="() => input.click()">
-      <p>Drag & drop images here, or click to select</p>
+    <div
+      class="drop-zone"
+      :class="{ 'drag-hover': isDragOver }"
+      @dragover.prevent="onDragOver"
+      @dragleave.prevent="onDragLeave"
+      @drop.prevent="handleFiles($event.dataTransfer.files)"
+      @click="() => input.click()">
+      <div v-t="'components.image_uploader.drop_zone_description'" />
     </div>
 
-    <label class="mt-4 inline-flex items-center">
-      <input type="checkbox" v-model="convertToWebp" class="mr-2" /> Convert to WebP
-    </label>
+    <div class="webp-option-container">
+      <input type="checkbox" v-model="convertToWebp" />
+      <div class="name" v-t="'components.image_uploader.webp_option_checkbox_name'" />
+    </div>
 
-    <ul class="mt-4 space-y-2">
-      <li v-for="(item, idx) in results" :key="idx" class="flex justify-between items-center p-2 border rounded">
-        <div>
-          <p class="font-medium">{{ item.name }}</p>
-          <p class="text-sm text-gray-600">
+    <div class="results-list">
+      <div v-for="(item, idx) in results" :key="idx" class="results-list-item">
+        <div class="item-details">
+          <div class="item-name">{{ item.name }}</div>
+          <div class="item-size">
             {{ formatSize(item.originalSize) }} → {{ formatSize(item.optimizedSize) }}
-            ({{ reductionPercent(item) }}% reduction)
-          </p>
+            ({{ reductionPercent(item) }}% {{ imageReductionWording }})
+          </div>
         </div>
-        <button @click="downloadImage(item)" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
-          Download
-        </button>
-      </li>
-    </ul>
+        <button @click="downloadImage(item)" class="download-button" v-t="'components.image_uploader.download_image_wording'" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { optimizeImage } from '~/composables/useImageOptimizer'
+const { t } = useI18n()
 
 type ResultItem = {
   name: string
@@ -38,9 +42,22 @@ type ResultItem = {
   optimizedSize: number
 }
 
+const imageReductionWording = computed(() => t('components.image_uploader.image_reduction_wording'))
+
 const input = ref<HTMLInputElement>()
 const convertToWebp = ref(false)
 const results = ref<ResultItem[]>([])
+
+const isDragOver = ref(false)
+
+const onDragOver = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = true
+}
+
+const onDragLeave = () => {
+  isDragOver.value = false
+}
 
 async function handleFiles(files: FileList) {
   results.value = []
@@ -101,12 +118,74 @@ async function downloadImage(item: ResultItem) {
 }
 </script>
 
-<style scoped>
-.drop-zone {
-  border: 2px dashed #ccc;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 0.5rem;
+<style lang="scss" scoped>
+.uploader-container {
+  .drop-zone {
+    padding: 50px 0px;
+    margin-bottom: 15px;
+    text-align: center;
+    border: 2px dashed $drop-zone-border-color;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover {
+      border-style: solid;
+    }
+
+    &.drag-hover {
+      border-style: solid;
+    }
+  }
+
+  .webp-option-container {
+    display: flex;
+    align-items: center;
+
+    .name {
+      margin-left: 5px;
+    }
+  }
+
+  .results-list {
+    margin-top: 16px;
+
+    .results-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid $light-grey-color;
+      border-radius: 4px;
+      margin-bottom: 8px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .item-details {
+        .item-name {
+          font-weight: 500;
+        }
+
+        .item-size {
+          font-size: 14px;
+          color: $grey-blue-color;
+        }
+      }
+
+      .download-button {
+        padding: 4px 12px;
+        background-color: $blue-color;
+        color: $white-color;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $blue-color-2;
+        }
+      }
+    }
+  }
 }
 </style>
