@@ -12,24 +12,24 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore ."
   },
-  "devDependencies": {
-    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+  "dependencies": {
+    "@nuxt/fonts": "^0.11.1",
+    "@nuxt/ui": "^3.0.2",
     "@nuxtjs/i18n": "^9.5.6",
+    "@nuxtjs/seo": "^3.1.0",
+    "nuxt": "^3.17.6",
+    "sass": "^1.89.2"
+  },
+  "devDependencies": {
+    "@nuxt/types": "^2.18.1",
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@types/node": "^24.0.13",
     "@typescript-eslint/parser": "^8.36.0",
     "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",
-    "nuxt": "^3.17.6",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
     "vite-svg-loader": "^5.1.0"
-  },
-  "dependencies": {
-    "@nuxt/fonts": "^0.11.1",
-    "@nuxt/types": "^2.18.1",
-    "@nuxt/ui": "^3.0.2",
-    "@nuxtjs/seo": "^3.1.0",
-    "@types/node": "^24.0.13",
-    "sass": "^1.89.2"
   }
 }
