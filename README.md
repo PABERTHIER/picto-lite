@@ -18,9 +18,16 @@ Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introdu
 
 ### Setup
 
-Try to use the latest version of Node.js (using the 20.18.0 for Nuxt 3.16.2 for example).
+Try to use the latest version of Node.js (using the 22.17.0 for Nuxt 3.17.6 for example).
 
 Install the Volar VSCode extension.
+
+Install Yarn:
+
+```bash
+# enable corepack
+corepack enable
+```
 
 Make sure to install the dependencies:
 
