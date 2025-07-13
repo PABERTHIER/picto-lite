@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "P-A",
   "private": true,
-  "packageManager": "yarn@4.5.1",
+  "packageManager": "yarn@4.9.2",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
