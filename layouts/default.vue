@@ -49,15 +49,14 @@ body {
   background-color: $background-color;
 
   #header-container {
-    max-height: calc($header-height + 20px);
-    top: 0;
-    padding: 20px 20px 20px 20px;
+    max-height: $header-height;
+    padding: 20px;
   }
 
   #page-container {
-    height: calc(100vh - $header-height - $footer-height - 65px);
+    height: calc(100vh - $header-height - $footer-height - 20px);
     flex: 1;
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
     overflow-y: auto;
   }
 
@@ -70,17 +69,18 @@ body {
 
   @media (max-width: $sm) {
     #header-container {
-      max-height: calc($header-height + 20px);
+      max-height: $header-height;
     }
 
     #page-container {
-      height: calc(100vh - $header-height - $footer-height - 65px);
+      height: calc(100vh - $header-height - $footer-height - 20px);
     }
   }
 }
 
 #page-container::-webkit-scrollbar {
   width: 7px;
+  height: 7px;
   border-radius: 10px;
 }
 
