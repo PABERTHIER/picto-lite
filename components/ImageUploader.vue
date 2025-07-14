@@ -13,8 +13,17 @@
     </div>
 
     <div class="webp-option-container">
-      <input type="checkbox" v-model="convertToWebp" />
+      <input id="webp-convert" type="checkbox" v-model="convertToWebp" />
       <div class="name" v-t="'components.image_uploader.webp_option_checkbox_name'" />
+    </div>
+
+    <div v-if="totalFiles > 0" class="progress-container">
+      <div class="progress-bar-container">
+        <div class="progress-bar" :style="progressStyle" />
+      </div>
+      <div class="progress-text">
+        {{ processedFiles }} / {{ totalFiles }}
+      </div>
     </div>
 
     <div class="results-list">
@@ -35,6 +44,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
+const imageReductionWording = computed(() => t('components.image_uploader.image_reduction_wording'))
+
 type ResultItem = {
   name: string
   blob: Blob
@@ -42,13 +53,24 @@ type ResultItem = {
   optimizedSize: number
 }
 
-const imageReductionWording = computed(() => t('components.image_uploader.image_reduction_wording'))
-
 const input = ref<HTMLInputElement>()
-const convertToWebp = ref(false)
 const results = ref<ResultItem[]>([])
 
+const convertToWebp = ref(false)
 const isDragOver = ref(false)
+const totalFiles = ref(0)
+const processedFiles = ref(0)
+
+const progressPercent = computed(() => totalFiles.value > 0 ? Math.round((processedFiles.value / totalFiles.value) * 100) : 0)
+const progressStyle = computed(() => {
+  const minimalFileRequired: number = 1
+  return ({
+    width: `${progressPercent.value}%`,
+    transition: totalFiles.value <= minimalFileRequired
+      ? 'none'
+      : 'width 0.1s ease'
+  })
+})
 
 const onDragOver = (event: DragEvent) => {
   event.preventDefault()
@@ -60,17 +82,18 @@ const onDragLeave = () => {
 }
 
 async function handleFiles(files: FileList) {
+  processedFiles.value = 0
+  totalFiles.value = 0
+
   results.value = []
+  totalFiles.value = files.length
+
   for (const file of Array.from(files)) {
     const blob = await optimizeImage(file, convertToWebp.value)
     const ext = convertToWebp.value ? 'webp' : file.name.split('.').pop()!
     const name = `${file.name.replace(/\.[^/.]+$/, '')}.${ext}`
-    results.value.push({
-      name,
-      blob,
-      originalSize: file.size,
-      optimizedSize: blob.size,
-    })
+    results.value.push({ name, blob, originalSize: file.size, optimizedSize: blob.size })
+    processedFiles.value++
   }
 }
 
@@ -86,7 +109,7 @@ function reductionPercent(item: ResultItem): number {
 
 async function downloadImage(item: ResultItem) {
   try {
-    // Use File System Access API if available
+    // File System Access API
     // @ts-ignore
     if (window.showSaveFilePicker) {
       // @ts-ignore
@@ -102,8 +125,8 @@ async function downloadImage(item: ResultItem) {
       await writable.close()
       return
     }
-  } catch (e) {
-    console.warn('File System Access API not supported, falling back to download')
+  } catch {
+    console.warn('File System Access API not supported, fallback to link')
   }
 
   // Fallback for browsers without FS Access API
@@ -128,10 +151,7 @@ async function downloadImage(item: ResultItem) {
     border-radius: 8px;
     cursor: pointer;
 
-    &:hover {
-      border-style: solid;
-    }
-
+    &:hover,
     &.drag-hover {
       border-style: solid;
     }
@@ -140,15 +160,31 @@ async function downloadImage(item: ResultItem) {
   .webp-option-container {
     display: flex;
     align-items: center;
+    margin-bottom: 15px;
 
     .name {
       margin-left: 5px;
     }
   }
 
-  .results-list {
-    margin-top: 16px;
+  .progress-container {
+    margin-bottom: 15px;
 
+    .progress-bar-container {
+      height: 8px;
+      background: $light-grey-color;
+      border-radius: 4px;
+      margin-bottom: 5px;
+
+      .progress-bar {
+        height: 100%;
+        background: $blue-color;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .results-list {
     .results-list-item {
       display: flex;
       justify-content: space-between;
