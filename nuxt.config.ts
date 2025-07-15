@@ -45,7 +45,13 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
-  modules: ['@nuxtjs/i18n', '@nuxtjs/seo', '@nuxt/ui', '@nuxt/fonts'],
+  modules: [
+    '@nuxtjs/i18n',
+    '@nuxtjs/seo',
+    '@nuxt/ui',
+    '@nuxt/fonts',
+    '@nuxt/test-utils/module',
+  ],
   imports: {
     dirs: [],
   },
@@ -79,7 +85,7 @@ export default defineNuxtConfig({
     ],
     bundle: {
       optimizeTranslationDirective: false,
-    }
+    },
   },
   vite: {
     css: {
