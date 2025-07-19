@@ -25,7 +25,7 @@
     "sourceMap": true,
     "strict": true,
     "target": "esnext",
-    "types": ["@nuxt/types", "@nuxtjs/i18n", "node"],
+    "types": ["@nuxt/types", "@nuxtjs/i18n", "node", "vitest/globals"],
     "useDefineForClassFields": true,
     "useUnknownInCatchVariables": true,
     "lib": ["esnext", "dom"]

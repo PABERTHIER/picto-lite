@@ -6,6 +6,10 @@
 .cache
 dist
 
+# Vitest output files
+coverage
+tests_output
+
 # Node dependencies
 node_modules
 .yarn
