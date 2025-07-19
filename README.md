@@ -1,5 +1,9 @@
 # picto-lite
 
+[![Build & Test][build-badge]][build-link]
+[![Release][release-badge]][release-link]
+[![Coverage Status][coverage-status-badge]][coverage-status-link]
+
 A tool for bulk image optimization and optional WebP conversion.
 
 Here it is: [pictolite](https://pictolite.vercel.app/)
@@ -65,3 +69,19 @@ yarn preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## Code coverage :bar_chart:
+
+[![codecov][codecov-badge]][codecov-link]
+
+[build-badge]: https://github.com/PABERTHIER/picto-lite/actions/workflows/ci.yml/badge.svg
+[build-link]: https://github.com/PABERTHIER/picto-lite/actions/workflows/ci.yml
+
+[release-badge]: https://deploy-badge.vercel.app/?url=https://pictolite.vercel.app/&name=website
+[release-link]: https://pictolite.vercel.app
+
+[coverage-status-badge]: https://codecov.io/github/paberthier/picto-lite/graph/badge.svg?token=CCE9CLN58S
+[coverage-status-link]: https://codecov.io/github/paberthier/picto-lite
+
+[codecov-badge]: https://codecov.io/github/paberthier/picto-lite/graphs/sunburst.svg?token=CCE9CLN58S
+[codecov-link]: https://codecov.io/github/PABERTHIER/picto-lite
