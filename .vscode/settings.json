@@ -1,4 +1,10 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": false,
+  "eslint.useFlatConfig": true,
   "i18n-ally.localesPaths": ["lang"],
   "i18n-ally.displayLanguage": "fr-FR",
   "i18n-ally.sourceLanguage": "fr",
