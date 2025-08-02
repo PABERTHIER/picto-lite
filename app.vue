@@ -12,14 +12,18 @@ const ogImageEndPath = 'logo.png'
 
 const availableLocaleAlternates = computed(() => {
   const localesFiltered = locales.value.filter(l => l.code !== locale.value)
-  const localesFilteredUpdated = localesFiltered.map((x) => x.language?.replace('-', '_') ?? 'en_US')
-  return localesFilteredUpdated.filter((item, index) => localesFilteredUpdated.indexOf(item) === index)
+  const localesFilteredUpdated = localesFiltered.map(
+    x => x.language?.replace('-', '_') ?? 'en_US'
+  )
+  return localesFilteredUpdated.filter(
+    (item, index) => localesFilteredUpdated.indexOf(item) === index
+  )
 })
 
 useHead({
   titleTemplate: '%siteName',
   meta: [
-    { name: 'description', content: computed(() => t('app.meta.description')) }
+    { name: 'description', content: computed(() => t('app.meta.description')) },
   ],
   link: [
     { rel: 'canonical', href: `${baseUrl.value}/${locale.value}` },
@@ -27,12 +31,16 @@ useHead({
     { rel: 'alternate', href: `${baseUrl.value}/fr`, hreflang: 'fr-FR' },
     { rel: 'alternate', href: `${baseUrl.value}/en`, hreflang: 'en-US' },
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap', crossorigin: '' },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap',
+      crossorigin: '',
+    },
     { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     { rel: 'apple-touch-icon', href: 'apple-icon.png' },
     { rel: 'apple-touch-icon-precomposed', href: 'apple-icon.png' },
     { rel: 'apple-touch-startup-image', href: 'apple-icon.png' },
-    { rel: 'mask-icon', href: 'apple-icon.png', color: '#000000' }
+    { rel: 'mask-icon', href: 'apple-icon.png', color: '#000000' },
   ],
 })
 
@@ -50,7 +58,7 @@ useSeoMeta({
   ogImageWidth: '1200',
   ogImageHeight: '600',
   ogUrl: `${baseUrl.value}`,
-  ogType: 'product',
+  ogType: 'website',
   ogLocale: locale.value,
   ogLocaleAlternate: availableLocaleAlternates.value,
   twitterCard: 'summary_large_image',
@@ -63,7 +71,7 @@ useSeoMeta({
   creator: computed(() => t('about.author')),
   articleTag: computed(() => [
     computed(() => t('about.author')).value,
-    computed(() => t('app.name')).value
+    computed(() => t('app.name')).value,
   ]),
   profileFirstName: computed(() => t('about.author')),
   profileLastName: computed(() => t('about.author')),
@@ -76,7 +84,7 @@ useSeoMeta({
   appleMobileWebAppStatusBarStyle: 'default',
   appleMobileWebAppTitle: computed(() => t('app.name')),
   msapplicationTileImage: `${baseUrl.value}/${ogImageEndPath}`,
-  msapplicationTileColor: '#ff0000'
+  msapplicationTileColor: '#ff0000',
 })
 </script>
 
