@@ -50,7 +50,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov
-          flags: unittests
+          flags: unit-tests
           name: codecov-coverage-ubuntu-latest
           verbose: true
           fail_ci_if_error: true
