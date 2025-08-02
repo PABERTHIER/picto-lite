@@ -32,11 +32,10 @@ useSeoMeta({
   twitterImageAlt: computed(() => t('app.meta.description')),
   twitterImageType: 'image/png',
   appleMobileWebAppTitle: '%siteName',
-  msapplicationTileImage: `${baseUrl.value}/${ogImageEndPath}`
+  msapplicationTileImage: `${baseUrl.value}/${ogImageEndPath}`,
 })
 
 defineOgImageComponent('NuxtSeo', { theme: '#ff0000', colorMode: 'dark' })
-
 </script>
 
 <style lang="scss" scoped></style>

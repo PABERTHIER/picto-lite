@@ -1,6 +1,12 @@
 <template>
   <div class="uploader-container">
-    <input type="file" multiple accept="image/*" ref="input" @change="handleFiles($event.target.files)" hidden />
+    <input
+      ref="input"
+      type="file"
+      multiple
+      accept="image/*"
+      hidden
+      @change="handleFiles($event.target.files)" />
 
     <div
       class="drop-zone"
@@ -13,17 +19,17 @@
     </div>
 
     <div class="webp-option-container">
-      <input id="webp-convert" type="checkbox" v-model="convertToWebp" />
-      <div class="name" v-t="'components.image_uploader.webp_option_checkbox_name'" />
+      <input id="webp-convert" v-model="convertToWebp" type="checkbox" />
+      <div
+        v-t="'components.image_uploader.webp_option_checkbox_name'"
+        class="name" />
     </div>
 
     <div v-if="totalFiles > 0" class="progress-container">
       <div class="progress-bar-container">
         <div class="progress-bar" :style="progressStyle" />
       </div>
-      <div class="progress-text">
-        {{ processedFiles }} / {{ totalFiles }}
-      </div>
+      <div class="progress-text">{{ processedFiles }} / {{ totalFiles }}</div>
     </div>
 
     <div class="results-list">
@@ -31,11 +37,15 @@
         <div class="item-details">
           <div class="item-name">{{ item.name }}</div>
           <div class="item-size">
-            {{ formatSize(item.originalSize) }} → {{ formatSize(item.optimizedSize) }}
-            ({{ reductionPercent(item) }}% {{ imageReductionWording }})
+            {{ formatSize(item.originalSize) }} →
+            {{ formatSize(item.optimizedSize) }} ({{ reductionPercent(item) }}%
+            {{ imageReductionWording }})
           </div>
         </div>
-        <button @click="downloadImage(item)" class="download-button" v-t="'components.image_uploader.download_image_wording'" />
+        <button
+          v-t="'components.image_uploader.download_image_wording'"
+          class="download-button"
+          @click="downloadImage(item)" />
       </div>
     </div>
   </div>
@@ -44,7 +54,9 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
-const imageReductionWording = computed(() => t('components.image_uploader.image_reduction_wording'))
+const imageReductionWording = computed(() =>
+  t('components.image_uploader.image_reduction_wording')
+)
 
 type ResultItem = {
   name: string
@@ -61,15 +73,18 @@ const isDragOver = ref(false)
 const totalFiles = ref(0)
 const processedFiles = ref(0)
 
-const progressPercent = computed(() => totalFiles.value > 0 ? Math.round((processedFiles.value / totalFiles.value) * 100) : 0)
+const progressPercent = computed(() =>
+  totalFiles.value > 0
+    ? Math.round((processedFiles.value / totalFiles.value) * 100)
+    : 0
+)
 const progressStyle = computed(() => {
   const minimalFileRequired: number = 1
-  return ({
+  return {
     width: `${progressPercent.value}%`,
-    transition: totalFiles.value <= minimalFileRequired
-      ? 'none'
-      : 'width 0.1s ease'
-  })
+    transition:
+      totalFiles.value <= minimalFileRequired ? 'none' : 'width 0.1s ease',
+  }
 })
 
 const onDragOver = (event: DragEvent) => {
@@ -92,7 +107,12 @@ async function handleFiles(files: FileList) {
     const blob = await optimizeImage(file, convertToWebp.value)
     const ext = convertToWebp.value ? 'webp' : file.name.split('.').pop()!
     const name = `${file.name.replace(/\.[^/.]+$/, '')}.${ext}`
-    results.value.push({ name, blob, originalSize: file.size, optimizedSize: blob.size })
+    results.value.push({
+      name,
+      blob,
+      originalSize: file.size,
+      optimizedSize: blob.size,
+    })
     processedFiles.value++
   }
 }
@@ -115,10 +135,12 @@ async function downloadImage(item: ResultItem) {
       // @ts-ignore
       const handle = await window.showSaveFilePicker({
         suggestedName: item.name,
-        types: [{
-          description: 'Image file',
-          accept: { [item.blob.type]: ['.' + item.name.split('.').pop()] },
-        }],
+        types: [
+          {
+            description: 'Image file',
+            accept: { [item.blob.type]: ['.' + item.name.split('.').pop()] },
+          },
+        ],
       })
       const writable = await handle.createWritable()
       await writable.write(item.blob)

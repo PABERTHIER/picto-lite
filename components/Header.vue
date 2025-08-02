@@ -1,11 +1,10 @@
 <template>
   <div class="header-container">
-    <div class="title" v-t="'app.name'" />
+    <div v-t="'app.name'" class="title" />
   </div>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style lang="scss" scoped>
 .header-container {

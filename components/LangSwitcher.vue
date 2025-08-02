@@ -1,13 +1,18 @@
 <template>
   <div class="lang-switcher">
-    <NuxtLink v-for="availableLocale in availableLocales" :key="availableLocale.code"
-      :to="switchLocalePath(availableLocale.code)" @click="setLanguagePreference(availableLocale.code)">
+    <NuxtLink
+      v-for="availableLocale in availableLocales"
+      :key="availableLocale.code"
+      :to="switchLocalePath(availableLocale.code)"
+      @click="setLanguagePreference(availableLocale.code)">
       {{ availableLocale.name }}
     </NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
+type localesType = 'fr' | 'en'
+
 const { locale, locales } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 
@@ -24,20 +29,22 @@ const updateDirAttribute = (newLocale: string) => {
   document.documentElement.setAttribute('dir', currentLocale?.dir || 'ltr')
 }
 
-watch(locale, (newLocale) => {
+watch(locale, newLocale => {
   updateDirAttribute(newLocale)
 })
 
 onMounted(() => {
-  const savedLanguage = localStorage.getItem('preferredLanguage')
+  const savedLanguage = localStorage.getItem('preferredLanguage') as localesType
 
-  if (savedLanguage && locales.value.some(locale => locale.code === savedLanguage)) {
+  if (
+    savedLanguage &&
+    locales.value.some(locale => locale.code === savedLanguage)
+  ) {
     locale.value = savedLanguage
   }
 
   updateDirAttribute(locale.value)
 })
-
 </script>
 
 <style lang="scss" scoped></style>
