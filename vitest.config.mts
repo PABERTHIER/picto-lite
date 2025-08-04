@@ -36,7 +36,7 @@ export default defineVitestConfig({
             subdir: './html-spa',
           },
         ], // Generates a HTML report at coverage/html-spa, you can view in your browser
-        ['html', { verbose: true, subdir: './html' }], // Generates a HTML report at coverage/html, you can view in your browser
+        ['html', { verbose: true }], // Generates a HTML report at coverage/html, you can view in your browser and inside the Vitest UI
         ['json-summary', { file: 'json-summary' }], // Generates a file at coverage/json-summary.json
         ['json', { file: 'json' }], // Generates a file at coverage/coverage-final.json
         ['lcov', { projectRoot: 'lcov', file: 'lcov' }], // Same as lcovonly, but also generates a HTML report at coverage/Icov.info, you can view in your browser
