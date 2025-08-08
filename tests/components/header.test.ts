@@ -24,8 +24,9 @@ describe('Header component', () => {
   it('displays the translated title', async () => {
     const wrapper = await mountSuspended(Header)
     const titleElement = wrapper.find('.title')
+    const title = useNuxtApp().$i18n.t('app.name')
 
     expect(titleElement.exists()).toBe(true)
-    expect(titleElement.text()).toBe('PictoLite')
+    expect(titleElement.text()).toBe(title)
   })
 })

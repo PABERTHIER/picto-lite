@@ -60,7 +60,8 @@ describe('Footer component', () => {
     const wrapper = await mountSuspended(Footer)
     const right = wrapper.find('.right-part')
     const currentYear = new Date().getFullYear()
+    const author = useNuxtApp().$i18n.t('about.author')
 
-    expect(right.text()).toBe(`P-A © ${currentYear}`)
+    expect(right.text()).toBe(`${author} © ${currentYear}`)
   })
 })
