@@ -55,6 +55,7 @@ export default defineVitestConfig({
         '**/composables/**',
         '**/layouts/**',
         '**/pages/**',
+        '**/app.vue',
       ],
     },
     environmentOptions: {
