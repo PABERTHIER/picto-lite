@@ -20,6 +20,10 @@ const availableLocaleAlternates = computed(() => {
   )
 })
 
+defineExpose({
+  availableLocaleAlternates,
+})
+
 useHead({
   titleTemplate: '%siteName',
   meta: [

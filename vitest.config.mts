@@ -3,6 +3,7 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 export default defineVitestConfig({
   test: {
     environment: 'nuxt',
+    setupFiles: ['tests/setup.ts'],
     globals: true,
     name: { label: 'PictoLite Tests', color: 'red' },
     server: {
@@ -54,6 +55,7 @@ export default defineVitestConfig({
         '**/composables/**',
         '**/layouts/**',
         '**/pages/**',
+        '**/app.vue',
       ],
     },
     environmentOptions: {
