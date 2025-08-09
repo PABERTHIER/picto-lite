@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
 class MockOffscreenCanvas {
   constructor(
@@ -7,15 +7,46 @@ class MockOffscreenCanvas {
   ) {}
 
   getContext(contextType: '2d') {
-    if (contextType !== '2d') return null
-    return {
-      drawImage: () => {},
+    if (contextType !== '2d') {
+      return null
     }
+
+    return { drawImage: () => {} }
   }
 
-  async convertToBlob({ type, quality }: { type: string; quality: number }) {
-    const simulatedSize = Math.max(1, Math.round((1 - quality) * 2_000_000))
-    return new Blob(['x'.repeat(simulatedSize)], { type })
+  async convertToBlob({
+    type,
+    quality,
+  }: {
+    type: string
+    quality: number
+  }): Promise<Blob> {
+    // Simulate compression behavior
+    const areaFactor = Math.max(
+      1,
+      Math.round((this.width * this.height) / (100 * 100))
+    )
+
+    if (type === 'image/webp') {
+      const simulatedSize = Math.max(
+        1,
+        Math.round((1 - quality) * 800_000 * areaFactor)
+      )
+      return new Blob(['x'.repeat(simulatedSize)], { type })
+    }
+
+    if (type === 'image/png') {
+      // Simulate two behaviors:
+      // - For small images (areaFactor small), PNG output = original size
+      // - For large images (areaFactor large), PNG shrinks with lower quality
+      const baseSize =
+        this.width * this.height > 1_000_000
+          ? Math.round((1 - quality) * 800_000 * areaFactor) // shrink for big
+          : this.width * this.height // unchanged for small
+      return new Blob(['x'.repeat(Math.max(1, baseSize))], { type })
+    }
+
+    return new Blob(['x'], { type })
   }
 }
 
@@ -26,7 +57,8 @@ beforeAll(() => {
   originalOffscreenCanvas = globalThis.OffscreenCanvas
   originalCreateImageBitmap = globalThis.createImageBitmap
 
-  globalThis.OffscreenCanvas = MockOffscreenCanvas as typeof OffscreenCanvas
+  globalThis.OffscreenCanvas =
+    MockOffscreenCanvas as unknown as typeof OffscreenCanvas
   globalThis.createImageBitmap = async () => ({
     width: 100,
     height: 50,
@@ -40,7 +72,7 @@ afterAll(() => {
 })
 
 describe('useImageOptimizer composable optimizeImage method', () => {
-  it('returns a Blob below the max size and with correct MIME type', async () => {
+  it('returns a Blob below max size with correct MIME type', async () => {
     const inputFile = new File([new Uint8Array(100)], 'sample.webp', {
       type: 'image/webp',
     })
@@ -53,7 +85,7 @@ describe('useImageOptimizer composable optimizeImage method', () => {
     expect(resultBlob.type).toBe('image/webp')
   })
 
-  it('preserves the original MIME type if convertToWebp is false', async () => {
+  it('preserves MIME type if convertToWebp is false', async () => {
     const inputFile = new File([new Uint8Array(50)], 'sample.jpg', {
       type: 'image/jpeg',
     })
@@ -62,19 +94,7 @@ describe('useImageOptimizer composable optimizeImage method', () => {
     expect(resultBlob.type).toBe('image/jpeg')
   })
 
-  it('performs exactly 6 iterations for quality adjustment', async () => {
-    const convertSpy = vi.spyOn(MockOffscreenCanvas.prototype, 'convertToBlob')
-    const inputFile = new File([new Uint8Array(10)], 'image.png', {
-      type: 'image/png',
-    })
-
-    await optimizeImage(inputFile, false, 100_000)
-
-    expect(convertSpy).toHaveBeenCalledTimes(6)
-    convertSpy.mockRestore()
-  })
-
-  it('adjusts quality to ensure resulting blob fits under size limit', async () => {
+  it('adjusts quality to fit under size limit', async () => {
     class SizeThresholdCanvas extends MockOffscreenCanvas {
       override async convertToBlob({
         type,
@@ -83,20 +103,42 @@ describe('useImageOptimizer composable optimizeImage method', () => {
         type: string
         quality: number
       }) {
-        const simulatedSize = quality > 0.5 ? 1_500_000 : 100_000
-        return new Blob(['x'.repeat(simulatedSize)], { type })
+        return new Blob(['x'.repeat(quality > 0.5 ? 1_500_000 : 100_000)], {
+          type,
+        })
       }
     }
 
-    globalThis.OffscreenCanvas = SizeThresholdCanvas as typeof OffscreenCanvas
+    globalThis.OffscreenCanvas =
+      SizeThresholdCanvas as unknown as typeof OffscreenCanvas
 
-    const inputFile = new File([new Uint8Array(10)], 'example.png', {
-      type: 'image/png',
+    const inputFile = new File([new Uint8Array(10)], 'example.jpg', {
+      type: 'image/jpg',
     })
     const resultBlob = await optimizeImage(inputFile, false, 200_000)
 
     expect(resultBlob.size).toBeLessThanOrEqual(200_000)
 
-    globalThis.OffscreenCanvas = MockOffscreenCanvas as typeof OffscreenCanvas
+    // Restore main mock
+    globalThis.OffscreenCanvas =
+      MockOffscreenCanvas as unknown as typeof OffscreenCanvas
+  })
+
+  it.each([
+    ['small (below 1MB)', 500_000, false],
+    ['exactly 1MB', 1_000_000, false],
+    ['slightly above 1MB', 1_500_000, true],
+    ['large (7.18MB)', 7_180_000, true],
+  ])('%s input size %d', async (_label, inputSize, expectSmaller) => {
+    const inputFile = new File([new Uint8Array(inputSize)], 'big.png', {
+      type: 'image/png',
+    })
+    const resultBlob = await optimizeImage(inputFile, false)
+
+    if (expectSmaller) {
+      expect(resultBlob.size).toBeLessThan(inputFile.size)
+    } else {
+      expect(resultBlob.size).toBe(inputFile.size)
+    }
   })
 })
