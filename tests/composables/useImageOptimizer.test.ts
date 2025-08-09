@@ -231,4 +231,93 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       }
     }
   )
+
+  it('ignores errors when closing imageBitmap', async () => {
+    globalThis.createImageBitmap = async () => ({
+      width: 100,
+      height: 50,
+      close: () => {
+        throw new Error('close fail')
+      },
+    })
+
+    const inputFile = new File([new Uint8Array(1_500_000)], 'image.jpg', {
+      type: 'image/jpeg',
+    })
+    const result = await optimizeImage(inputFile, false, 1_000_000)
+    expect(result).toBeInstanceOf(Blob)
+  })
+
+  it('uses final forced attempt if all compressImageAtScale attempts fail', async () => {
+    class AlwaysNullCanvas extends MockOffscreenCanvas {
+      override async convertToBlob() {
+        return new Blob(['x'.repeat(1_000_000)], { type: 'image/jpeg' })
+      }
+    }
+    globalThis.OffscreenCanvas =
+      AlwaysNullCanvas as unknown as typeof OffscreenCanvas
+
+    const inputFile = new File([new Uint8Array(2_000_000)], 'image.jpg', {
+      type: 'image/jpeg',
+    })
+    const result = await optimizeImage(inputFile, false, 500_000)
+    expect(result).toBeInstanceOf(Blob)
+    expect(result.size).toBeLessThan(inputFile.size)
+  })
+
+  it('skips compression if getContext returns null', async () => {
+    class NullContextCanvas extends MockOffscreenCanvas {
+      override getContext(_contextType: '2d') {
+        return null
+      }
+    }
+
+    globalThis.OffscreenCanvas =
+      NullContextCanvas as unknown as typeof OffscreenCanvas
+
+    const inputFile = new File([new Uint8Array(1_500_000)], 'image.jpg', {
+      type: 'image/jpeg',
+    })
+    const result = await optimizeImage(inputFile, false, 1_000_000)
+
+    expect(result).toBe(inputFile)
+  })
+
+  it('falls back to original if final forced compressed blob cannot be decoded', async () => {
+    let callCount = 0
+
+    globalThis.createImageBitmap = (async (
+      image: ImageBitmapSource,
+      _options?: ImageBitmapOptions
+    ): Promise<ImageBitmap> => {
+      callCount++
+      if (
+        callCount > 1 &&
+        image instanceof Blob &&
+        image.type === 'image/webp'
+      ) {
+        throw new Error('Decode fail')
+      }
+      return {
+        width: 100,
+        height: 50,
+        close: () => {},
+      } as unknown as ImageBitmap
+    }) as typeof createImageBitmap
+
+    const inputFile = new File([new Uint8Array(2_000_000)], 'large.webp', {
+      type: 'image/webp',
+    })
+    const result = await optimizeImage(inputFile, true, 1_000_000)
+
+    expect(result).toBe(inputFile)
+  })
+
+  it('handle empty jpg image', async () => {
+    const tinyFile = new File([], 'tiny.jpg', { type: 'image/jpg' })
+
+    const result = await optimizeImage(tinyFile, false, 0)
+
+    expect(result.size).toEqual(0)
+  })
 })
