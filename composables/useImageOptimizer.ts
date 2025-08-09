@@ -1,161 +1,204 @@
+// Compression tuning constants
+const MIN_INITIAL_COMPRESSION_RATIO = 0.2 // Never compress below 20% scale initially
+const MAX_INITIAL_COMPRESSION_RATIO = 1 // Max 100% scale (original size)
+const BINARY_SEARCH_ITERATIONS = 6 // Fixed iterations to find best quality
+const DOWNSCALE_STEP_FACTOR = 0.85 // Reduce size by 15% per attempt progressively
+const MAX_DOWNSCALE_ATTEMPTS = 6 // Number of progressive downscale tries, 6 attempts give a precision of 0.0129 (1.3% of quality granularity), increase this value for finer control (cost time)
+const MIN_ALLOWED_SCALE = 0.05 // Minimum scale on final forced attempt
+const FINAL_FORCED_QUALITY = 0.05 // Very low quality for final aggressive compression attempt
+const QUALITY_LOWER_BOUND = 0.1 // Min compression quality (10%), image degradation becomes noticeable
+const QUALITY_UPPER_BOUND = 0.92 // Max compression quality (92%), most browsers cap this quality to 0.92
+
 export async function optimizeImage(
-  file: File,
-  convertToWebp: boolean,
-  maxSizeBytes = 1_000_000
+  inputFile: File,
+  shouldConvertToWebp: boolean,
+  maxAllowedFileSize = 1_000_000 // 1MB default max size
 ): Promise<Blob> {
-  // Quick accept if it already fits for png (to prevent text being unreadable)
-  if (file.size <= maxSizeBytes && file.type === 'image/png') {
-    return file
+  // Early exit: If PNG already small enough, return it as-is to preserve quality (e.g., for text readability)
+  if (inputFile.size <= maxAllowedFileSize && inputFile.type === 'image/png') {
+    return inputFile
   }
 
-  const imgBitmap = await createImageBitmap(file)
-  const originalWidth = imgBitmap.width
-  const originalHeight = imgBitmap.height
+  const imageBitmap = await createImageBitmap(inputFile)
+  const originalWidth = imageBitmap.width
+  const originalHeight = imageBitmap.height
 
-  const mime = convertToWebp ? 'image/webp' : file.type || 'image/jpeg'
+  const outputMimeType = shouldConvertToWebp
+    ? 'image/webp'
+    : inputFile.type || 'image/jpeg'
 
-  // Heuristic parameters (tune if you want more/less aggressive behavior)
-  const initialRatio = Math.max(
-    0.2,
-    Math.min(1, Math.sqrt(maxSizeBytes / file.size))
-  )
-  const downscaleFactor = 0.85
-  const maxDownscaleAttempts = 6 // number of progressive attempts before final aggressive attempt
-  const minScale = 0.05 // minimal allowed scale for final forced attempt
-  const forcedFinalQuality = 0.05 // final attempt's quality to force shrinking
+  // Progressive compression attempts with gradually decreasing scale
+  for (
+    let attemptIndex = 0;
+    attemptIndex <= MAX_DOWNSCALE_ATTEMPTS;
+    attemptIndex++
+  ) {
+    const scaleFactor =
+      Math.max(
+        MIN_INITIAL_COMPRESSION_RATIO,
+        Math.min(
+          MAX_INITIAL_COMPRESSION_RATIO,
+          Math.sqrt(maxAllowedFileSize / inputFile.size)
+        )
+      ) * Math.pow(DOWNSCALE_STEP_FACTOR, attemptIndex)
 
-  // Utility to attempt compression on one canvas scale
-  async function compressAtScale(scale: number): Promise<Blob | null> {
-    const canvasWidth = Math.max(1, Math.round(originalWidth * scale))
-    const canvasHeight = Math.max(1, Math.round(originalHeight * scale))
-
-    const canvas = new OffscreenCanvas(canvasWidth, canvasHeight)
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      return null
-    }
-    ctx.drawImage(imgBitmap, 0, 0, canvasWidth, canvasHeight)
-
-    // Exactly 6 iterations binary search (keeps per-attempt behavior stable)
-    let low = 0.1
-    let high = 0.92
-    let candidate: Blob | null = null
-
-    for (let i = 0; i < 6; i += 1) {
-      const q = (low + high) / 2
-      candidate = await (
-        canvas as unknown as {
-          convertToBlob: (opts: {
-            type: string
-            quality: number
-          }) => Promise<Blob>
-        }
-      ).convertToBlob({ type: mime, quality: q })
-
-      if (candidate.size > maxSizeBytes) {
-        high = q
-      } else {
-        low = q
-      }
-    }
-
-    if (candidate === null) {
-      return null
-    }
-
-    // Validate candidate decodes (avoid corrupted output)
-    try {
-      await createImageBitmap(candidate)
-    } catch {
-      return null
-    }
-
-    return candidate
-  }
-
-  // Progressive attempts
-  for (let attempt = 0; attempt <= maxDownscaleAttempts; attempt += 1) {
-    const scale = initialRatio * Math.pow(downscaleFactor, attempt)
-    if (scale <= 0) {
+    if (scaleFactor <= 0) {
       break
     }
 
-    const candidate = await compressAtScale(scale)
-    if (candidate === null) {
-      // try next attempt
+    const compressedCandidate = await compressImageAtScale(
+      originalWidth,
+      originalHeight,
+      scaleFactor,
+      imageBitmap,
+      outputMimeType,
+      maxAllowedFileSize
+    )
+    if (!compressedCandidate) {
       continue
     }
 
-    // Accept only if strictly smaller
-    if (candidate.size < file.size) {
-      if (typeof imgBitmap.close === 'function') {
+    // Accept only if the new file is smaller than original
+    if (compressedCandidate.size < inputFile.size) {
+      if (typeof imageBitmap.close === 'function') {
         try {
-          imgBitmap.close()
+          imageBitmap.close()
         } catch {
-          // continue regardless of error
+          // Ignore errors closing bitmap
         }
       }
-      return candidate
+      return compressedCandidate
     }
-
-    // else try next (smaller scale)
   }
 
-  // Final forced attempt (most aggressive): minScale and forced low quality
-  const finalScale = Math.max(
-    minScale,
-    initialRatio * Math.pow(downscaleFactor, maxDownscaleAttempts + 1)
+  // Final forced attempt with minimal scale and quality (most aggressive)
+  const finalScaleFactor = Math.max(
+    MIN_ALLOWED_SCALE,
+    Math.sqrt(maxAllowedFileSize / inputFile.size) *
+      Math.pow(DOWNSCALE_STEP_FACTOR, MAX_DOWNSCALE_ATTEMPTS + 1)
   )
-  const canvasFinal = new OffscreenCanvas(
-    Math.max(1, Math.round(originalWidth * finalScale)),
-    Math.max(1, Math.round(originalHeight * finalScale))
-  )
-  const ctxFinal = canvasFinal.getContext('2d')
-  if (ctxFinal) {
-    ctxFinal.drawImage(imgBitmap, 0, 0, canvasFinal.width, canvasFinal.height)
 
-    let forcedBlob: Blob | null = null
+  const finalCanvasWidth = Math.max(
+    1,
+    Math.round(originalWidth * finalScaleFactor)
+  )
+  const finalCanvasHeight = Math.max(
+    1,
+    Math.round(originalHeight * finalScaleFactor)
+  )
+
+  const finalCanvas = new OffscreenCanvas(finalCanvasWidth, finalCanvasHeight)
+  const finalContext = finalCanvas.getContext('2d')
+  if (finalContext) {
+    finalContext.drawImage(
+      imageBitmap,
+      0,
+      0,
+      finalCanvasWidth,
+      finalCanvasHeight
+    )
+
+    let forcedCompressedBlob: Blob | null = null
     try {
-      forcedBlob = await (
-        canvasFinal as unknown as {
+      forcedCompressedBlob = await (
+        finalCanvas as unknown as {
           convertToBlob: (opts: {
             type: string
             quality: number
           }) => Promise<Blob>
         }
-      ).convertToBlob({ type: mime, quality: forcedFinalQuality })
+      ).convertToBlob({ type: outputMimeType, quality: FINAL_FORCED_QUALITY })
     } catch {
-      forcedBlob = null
+      forcedCompressedBlob = null
     }
 
-    if (forcedBlob !== null) {
+    if (forcedCompressedBlob) {
       try {
-        await createImageBitmap(forcedBlob)
+        await createImageBitmap(forcedCompressedBlob)
       } catch {
-        forcedBlob = null
+        forcedCompressedBlob = null
       }
     }
 
-    if (forcedBlob !== null && forcedBlob.size < file.size) {
-      if (typeof imgBitmap.close === 'function') {
+    if (forcedCompressedBlob && forcedCompressedBlob.size < inputFile.size) {
+      if (typeof imageBitmap.close === 'function') {
         try {
-          imgBitmap.close()
+          imageBitmap.close()
         } catch {
-          // continue regardless of error
+          // Ignore errors closing bitmap
         }
       }
-      return forcedBlob
+      return forcedCompressedBlob
     }
   }
 
-  // Give up: close resources and return original. This path is extremely unlikely
-  if (typeof imgBitmap.close === 'function') {
+  // Cleanup and fallback: close bitmap and return original file as last resort
+  if (typeof imageBitmap.close === 'function') {
     try {
-      imgBitmap.close()
+      imageBitmap.close()
     } catch {
-      // continue regardless of error
+      // Ignore errors closing bitmap
     }
   }
 
-  return file
+  return inputFile
+}
+
+// Helper: Try compressing image at given scale, returning compressed Blob or null if fails
+async function compressImageAtScale(
+  originalWidth: number,
+  originalHeight: number,
+  scaleFactor: number,
+  imageBitmap: ImageBitmap,
+  outputMimeType: string,
+  maxAllowedFileSize: number
+): Promise<Blob | null> {
+  const targetWidth = Math.max(1, Math.round(originalWidth * scaleFactor))
+  const targetHeight = Math.max(1, Math.round(originalHeight * scaleFactor))
+
+  const offscreenCanvas = new OffscreenCanvas(targetWidth, targetHeight)
+  const context = offscreenCanvas.getContext('2d')
+  if (!context) {
+    return null
+  }
+
+  context.drawImage(imageBitmap, 0, 0, targetWidth, targetHeight)
+
+  // Binary search to find highest quality under maxAllowedFileSize
+  let qualityLow = QUALITY_LOWER_BOUND
+  let qualityHigh = QUALITY_UPPER_BOUND
+  let bestCandidate: Blob | null = null
+
+  for (let i = 0; i < BINARY_SEARCH_ITERATIONS; i++) {
+    const testQuality = (qualityLow + qualityHigh) / 2
+    // convertToBlob is experimental API, forced cast used here
+    const candidateBlob = await (
+      offscreenCanvas as unknown as {
+        convertToBlob: (opts: {
+          type: string
+          quality: number
+        }) => Promise<Blob>
+      }
+    ).convertToBlob({ type: outputMimeType, quality: testQuality })
+
+    if (candidateBlob.size > maxAllowedFileSize) {
+      qualityHigh = testQuality
+    } else {
+      qualityLow = testQuality
+      bestCandidate = candidateBlob
+    }
+  }
+
+  // Validate blob can be decoded to avoid corrupted output
+  if (!bestCandidate) {
+    return null
+  }
+
+  try {
+    await createImageBitmap(bestCandidate)
+  } catch {
+    return null
+  }
+
+  return bestCandidate
 }

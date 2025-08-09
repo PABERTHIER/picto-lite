@@ -1,10 +1,15 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, afterAll } from 'vitest'
 
 class MockOffscreenCanvas {
+  inputFileSize: number
+
   constructor(
     public width: number,
-    public height: number
-  ) {}
+    public height: number,
+    inputFileSize = 1_000_000
+  ) {
+    this.inputFileSize = inputFileSize
+  }
 
   getContext(contextType: '2d') {
     if (contextType !== '2d') {
@@ -27,38 +32,69 @@ class MockOffscreenCanvas {
       Math.round((this.width * this.height) / (100 * 100))
     )
 
-    if (type === 'image/webp') {
-      const simulatedSize = Math.max(
-        1,
-        Math.round((1 - quality) * 800_000 * areaFactor)
-      )
-      return new Blob(['x'.repeat(simulatedSize)], { type })
-    }
+    // Use the inputFileSize to influence the simulated size,
+    // e.g. scale output size proportionally but reduce with quality
+    // Assume inputFileSize is in bytes
 
-    if (type === 'image/png') {
+    // Clamp quality for safe behavior:
+    const clampedQuality = Math.min(Math.max(quality, 0), 1)
+
+    let simulatedSize = 0
+
+    if (type === 'image/webp') {
+      simulatedSize = Math.max(
+        1,
+        Math.round(
+          (this.inputFileSize / 10) * (1 - clampedQuality) * areaFactor
+        )
+      )
+    } else if (type === 'image/png') {
+      // PNG less compressible: mostly depends on area, slightly on quality for big images
       // Simulate two behaviors:
       // - For small images (areaFactor small), PNG output = original size
       // - For large images (areaFactor large), PNG shrinks with lower quality
-      const baseSize =
-        this.width * this.height > 1_000_000
-          ? Math.round((1 - quality) * 800_000 * areaFactor) // shrink for big
+      simulatedSize =
+        this.inputFileSize > 1_000_000
+          ? Math.max(
+              1,
+              Math.round(
+                (this.inputFileSize / 15) * (1 - clampedQuality) * areaFactor
+              ) // shrink for big
+            )
           : this.width * this.height // unchanged for small
-      return new Blob(['x'.repeat(Math.max(1, baseSize))], { type })
+    } else if (type === 'image/jpg' || type === 'image/jpeg') {
+      simulatedSize = Math.max(
+        1,
+        Math.round(
+          (this.inputFileSize / 12) * (1 - clampedQuality) * areaFactor
+        )
+      )
+    } else {
+      // Fallback: small constant size
+      simulatedSize = 1000
     }
 
-    return new Blob(['x'], { type })
+    return new Blob(['x'.repeat(simulatedSize)], { type })
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+class OffscreenCanvasFactory {
+  constructor(width: number, height: number) {
+    return new MockOffscreenCanvas(width, height, lastInputFileSize)
   }
 }
 
 let originalOffscreenCanvas: typeof globalThis.OffscreenCanvas
 let originalCreateImageBitmap: typeof globalThis.createImageBitmap
+let lastInputFileSize = 1_000_000
 
-beforeAll(() => {
+beforeEach(() => {
+  globalThis.OffscreenCanvas =
+    OffscreenCanvasFactory as unknown as typeof OffscreenCanvas
   originalOffscreenCanvas = globalThis.OffscreenCanvas
   originalCreateImageBitmap = globalThis.createImageBitmap
 
-  globalThis.OffscreenCanvas =
-    MockOffscreenCanvas as unknown as typeof OffscreenCanvas
   globalThis.createImageBitmap = async () => ({
     width: 100,
     height: 50,
@@ -69,6 +105,7 @@ beforeAll(() => {
 afterAll(() => {
   globalThis.OffscreenCanvas = originalOffscreenCanvas
   globalThis.createImageBitmap = originalCreateImageBitmap
+  lastInputFileSize = 1_000_000
 })
 
 describe('useImageOptimizer composable optimizeImage method', () => {
@@ -125,20 +162,73 @@ describe('useImageOptimizer composable optimizeImage method', () => {
   })
 
   it.each([
-    ['small (below 1MB)', 500_000, false],
-    ['exactly 1MB', 1_000_000, false],
-    ['slightly above 1MB', 1_500_000, true],
-    ['large (7.18MB)', 7_180_000, true],
-  ])('%s input size %d', async (_label, inputSize, expectSmaller) => {
-    const inputFile = new File([new Uint8Array(inputSize)], 'big.png', {
-      type: 'image/png',
+    ['small (below 1MB)', 500_000, 3_867],
+    ['exactly 1MB', 1_000_000, 7_734],
+    ['slightly above 1MB', 1_500_000, 11_602],
+    ['large (7.18MB)', 7_180_000, 55_533],
+  ])('JPG %s input size %d', async (_label, inputSize, expectedSize) => {
+    lastInputFileSize = inputSize
+    const inputFile = new File([new Uint8Array(inputSize)], 'image.jpg', {
+      type: 'image/jpg',
     })
+
     const resultBlob = await optimizeImage(inputFile, false)
 
-    if (expectSmaller) {
-      expect(resultBlob.size).toBeLessThan(inputFile.size)
-    } else {
-      expect(resultBlob.size).toBe(inputFile.size)
-    }
+    expect(resultBlob.size).toBe(expectedSize)
   })
+
+  it.each([
+    ['small (below 1MB)', 500_000, 3_867],
+    ['exactly 1MB', 1_000_000, 7_734],
+    ['slightly above 1MB', 1_500_000, 11_602],
+    ['large (7.18MB)', 7_180_000, 55_533],
+  ])('JPEG %s input size %d', async (_label, inputSize, expectedSize) => {
+    lastInputFileSize = inputSize
+    const inputFile = new File([new Uint8Array(inputSize)], 'image.jpeg', {
+      type: 'image/jpeg',
+    })
+
+    const resultBlob = await optimizeImage(inputFile, false)
+
+    expect(resultBlob.size).toBe(expectedSize)
+  })
+
+  it.each([
+    ['small (below 1MB)', 500_000, 4_641],
+    ['exactly 1MB', 1_000_000, 9_281],
+    ['slightly above 1MB', 1_500_000, 13_922],
+    ['large (7.18MB)', 7_180_000, 66_639],
+  ])('WEBP %s input size %d', async (_label, inputSize, expectedSize) => {
+    lastInputFileSize = inputSize
+    const inputFile = new File([new Uint8Array(inputSize)], 'image.webp', {
+      type: 'image/webp',
+    })
+
+    const resultBlob = await optimizeImage(inputFile, true)
+
+    expect(resultBlob.size).toBe(expectedSize)
+  })
+
+  it.each([
+    ['small (below 1MB)', 500_000, false, 500_000],
+    ['exactly 1MB', 1_000_000, false, 1_000_000],
+    ['slightly above 1MB', 1_500_000, true, 9_281],
+    ['large (7.18MB)', 7_180_000, true, 44_426],
+  ])(
+    'PNG %s input size %d',
+    async (_label, inputSize, expectSmaller, expectedSize) => {
+      lastInputFileSize = inputSize
+      const inputFile = new File([new Uint8Array(inputSize)], 'image.png', {
+        type: 'image/png',
+      })
+
+      const resultBlob = await optimizeImage(inputFile, false)
+
+      if (expectSmaller) {
+        expect(resultBlob.size).toBe(expectedSize)
+      } else {
+        expect(resultBlob.size).toBe(inputFile.size)
+      }
+    }
+  )
 })
