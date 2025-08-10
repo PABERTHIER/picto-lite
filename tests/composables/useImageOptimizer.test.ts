@@ -109,57 +109,100 @@ afterAll(() => {
 })
 
 describe('useImageOptimizer composable optimizeImage method', () => {
-  it('returns a Blob below max size with correct MIME type', async () => {
-    const inputFile = new File([new Uint8Array(100)], 'sample.webp', {
-      type: 'image/webp',
-    })
-    const maxBytes = 1_000_000
+  it.each([
+    ['webp'],
+    ['png'],
+    ['jpg'],
+    ['jpeg'],
+    ['WEBP'],
+    ['PNG'],
+    ['JPG'],
+    ['JPEG'],
+  ])(
+    'returns a compressed Blob with preserved MIME type (%s)',
+    async extension => {
+      const inputFile = new File(
+        [new Uint8Array(1_000_000)],
+        `image.${extension}`,
+        {
+          type: `image/${extension}`,
+        }
+      )
 
-    const resultBlob = await optimizeImage(inputFile, true, maxBytes)
+      const resultBlob = await optimizeImage(inputFile, false)
+
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.size).toBeLessThanOrEqual(inputFile.size)
+      expect(resultBlob.type).toBe(`image/${extension.toLowerCase()}`)
+    }
+  )
+
+  it.each([
+    ['webp'],
+    ['png'],
+    ['jpg'],
+    ['jpeg'],
+    ['WEBP'],
+    ['PNG'],
+    ['JPG'],
+    ['JPEG'],
+  ])('returns a compressed Blob with webp MIME type (%s)', async extension => {
+    const inputFile = new File(
+      [new Uint8Array(1_000_000)],
+      `image.${extension}`,
+      {
+        type: `image/${extension}`,
+      }
+    )
+
+    const resultBlob = await optimizeImage(inputFile, true)
 
     expect(resultBlob).toBeInstanceOf(Blob)
-    expect(resultBlob.size).toBeLessThanOrEqual(maxBytes)
+    expect(resultBlob.size).toBeLessThanOrEqual(inputFile.size)
     expect(resultBlob.type).toBe('image/webp')
   })
 
-  it('preserves MIME type if convertToWebp is false', async () => {
-    const inputFile = new File([new Uint8Array(50)], 'sample.jpg', {
-      type: 'image/jpeg',
-    })
-    const resultBlob = await optimizeImage(inputFile, false)
-
-    expect(resultBlob.type).toBe('image/jpeg')
-  })
-
-  it('adjusts quality to fit under size limit', async () => {
-    class SizeThresholdCanvas extends MockOffscreenCanvas {
-      override async convertToBlob({
-        type,
-        quality,
-      }: {
-        type: string
-        quality: number
-      }) {
-        return new Blob(['x'.repeat(quality > 0.5 ? 1_500_000 : 100_000)], {
+  it.each([
+    [true, 'webp'],
+    [false, 'jpg'],
+  ])(
+    'adjusts quality to fit under size limit (output %s)',
+    async (shouldConvertToWebp, expectedExtension) => {
+      class SizeThresholdCanvas extends MockOffscreenCanvas {
+        override async convertToBlob({
           type,
-        })
+          quality,
+        }: {
+          type: string
+          quality: number
+        }) {
+          return new Blob(['x'.repeat(quality > 0.5 ? 1_500_000 : 100_000)], {
+            type,
+          })
+        }
       }
+
+      globalThis.OffscreenCanvas =
+        SizeThresholdCanvas as unknown as typeof OffscreenCanvas
+
+      const inputFile = new File([new Uint8Array(1_000_000)], 'example.jpg', {
+        type: 'image/jpg',
+      })
+      const resultBlob = await optimizeImage(
+        inputFile,
+        shouldConvertToWebp,
+        200_000
+      )
+
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.size).toBeLessThanOrEqual(200_000)
+      expect(resultBlob.type).toBe(`image/${expectedExtension}`)
+
+      // Restore main mock
+      globalThis.OffscreenCanvas =
+        MockOffscreenCanvas as unknown as typeof OffscreenCanvas
     }
-
-    globalThis.OffscreenCanvas =
-      SizeThresholdCanvas as unknown as typeof OffscreenCanvas
-
-    const inputFile = new File([new Uint8Array(10)], 'example.jpg', {
-      type: 'image/jpg',
-    })
-    const resultBlob = await optimizeImage(inputFile, false, 200_000)
-
-    expect(resultBlob.size).toBeLessThanOrEqual(200_000)
-
-    // Restore main mock
-    globalThis.OffscreenCanvas =
-      MockOffscreenCanvas as unknown as typeof OffscreenCanvas
-  })
+  )
 
   it.each([
     ['small (below 1MB)', 500_000, 3_867],
@@ -175,7 +218,28 @@ describe('useImageOptimizer composable optimizeImage method', () => {
     const resultBlob = await optimizeImage(inputFile, false)
 
     expect(resultBlob.size).toBe(expectedSize)
+    expect(resultBlob.type).toBe('image/jpg')
   })
+
+  it.each([
+    ['small (below 1MB)', 500_000, 4_641],
+    ['exactly 1MB', 1_000_000, 9_281],
+    ['slightly above 1MB', 1_500_000, 13_922],
+    ['large (7.18MB)', 7_180_000, 66_639],
+  ])(
+    'JPG %s input size %d with webp conversion',
+    async (_label, inputSize, expectedSize) => {
+      lastInputFileSize = inputSize
+      const inputFile = new File([new Uint8Array(inputSize)], 'image.jpg', {
+        type: 'image/jpg',
+      })
+
+      const resultBlob = await optimizeImage(inputFile, true)
+
+      expect(resultBlob.size).toBe(expectedSize)
+      expect(resultBlob.type).toBe('image/webp')
+    }
+  )
 
   it.each([
     ['small (below 1MB)', 500_000, 3_867],
@@ -191,7 +255,28 @@ describe('useImageOptimizer composable optimizeImage method', () => {
     const resultBlob = await optimizeImage(inputFile, false)
 
     expect(resultBlob.size).toBe(expectedSize)
+    expect(resultBlob.type).toBe('image/jpeg')
   })
+
+  it.each([
+    ['small (below 1MB)', 500_000, 4_641],
+    ['exactly 1MB', 1_000_000, 9_281],
+    ['slightly above 1MB', 1_500_000, 13_922],
+    ['large (7.18MB)', 7_180_000, 66_639],
+  ])(
+    'JPEG %s input size %d with webp conversion',
+    async (_label, inputSize, expectedSize) => {
+      lastInputFileSize = inputSize
+      const inputFile = new File([new Uint8Array(inputSize)], 'image.jpeg', {
+        type: 'image/jpeg',
+      })
+
+      const resultBlob = await optimizeImage(inputFile, true)
+
+      expect(resultBlob.size).toBe(expectedSize)
+      expect(resultBlob.type).toBe('image/webp')
+    }
+  )
 
   it.each([
     ['small (below 1MB)', 500_000, 4_641],
@@ -204,10 +289,31 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/webp',
     })
 
-    const resultBlob = await optimizeImage(inputFile, true)
+    const resultBlob = await optimizeImage(inputFile, false)
 
     expect(resultBlob.size).toBe(expectedSize)
+    expect(resultBlob.type).toBe('image/webp')
   })
+
+  it.each([
+    ['small (below 1MB)', 500_000, 4_641],
+    ['exactly 1MB', 1_000_000, 9_281],
+    ['slightly above 1MB', 1_500_000, 13_922],
+    ['large (7.18MB)', 7_180_000, 66_639],
+  ])(
+    'WEBP %s input size %d with webp conversion',
+    async (_label, inputSize, expectedSize) => {
+      lastInputFileSize = inputSize
+      const inputFile = new File([new Uint8Array(inputSize)], 'image.webp', {
+        type: 'image/webp',
+      })
+
+      const resultBlob = await optimizeImage(inputFile, true)
+
+      expect(resultBlob.size).toBe(expectedSize)
+      expect(resultBlob.type).toBe('image/webp')
+    }
+  )
 
   it.each([
     ['small (below 1MB)', 500_000, false, 500_000],
@@ -229,6 +335,28 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       } else {
         expect(resultBlob.size).toBe(inputFile.size)
       }
+
+      expect(resultBlob.type).toBe('image/png')
+    }
+  )
+
+  it.each([
+    ['small (below 1MB)', 500_000, 4_000],
+    ['exactly 1MB', 1_000_000, 8_000],
+    ['slightly above 1MB', 1_500_000, 13_922],
+    ['large (7.18MB)', 7_180_000, 66_639],
+  ])(
+    'PNG %s input size %d with webp conversion',
+    async (_label, inputSize, expectedSize) => {
+      lastInputFileSize = inputSize
+      const inputFile = new File([new Uint8Array(inputSize)], 'image.png', {
+        type: 'image/png',
+      })
+
+      const resultBlob = await optimizeImage(inputFile, true)
+
+      expect(resultBlob.size).toBe(expectedSize)
+      expect(resultBlob.type).toBe('image/webp')
     }
   )
 

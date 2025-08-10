@@ -14,8 +14,10 @@ export async function optimizeImage(
   shouldConvertToWebp: boolean,
   maxAllowedFileSize = 1_000_000 // 1MB default max size
 ): Promise<Blob> {
+  const isSmallPngFile =
+    inputFile.size <= maxAllowedFileSize && inputFile.type === 'image/png'
   // Early exit: If PNG already small enough, return it as-is to preserve quality (e.g., for text readability)
-  if (inputFile.size <= maxAllowedFileSize && inputFile.type === 'image/png') {
+  if (isSmallPngFile && !shouldConvertToWebp) {
     return inputFile
   }
 
@@ -26,6 +28,24 @@ export async function optimizeImage(
   const outputMimeType = shouldConvertToWebp
     ? 'image/webp'
     : inputFile.type || 'image/jpeg'
+
+  if (isSmallPngFile) {
+    const canvas = new OffscreenCanvas(originalWidth, originalHeight)
+    const ctx = canvas.getContext('2d')
+
+    if (ctx) {
+      ctx.drawImage(imageBitmap, 0, 0, originalWidth, originalHeight)
+
+      return await (
+        canvas as unknown as {
+          convertToBlob: (opts: {
+            type: string
+            quality: number
+          }) => Promise<Blob>
+        }
+      ).convertToBlob({ type: outputMimeType, quality: QUALITY_UPPER_BOUND })
+    }
+  }
 
   // Progressive compression attempts with gradually decreasing scale
   for (
@@ -171,7 +191,6 @@ async function compressImageAtScale(
 
   for (let i = 0; i < BINARY_SEARCH_ITERATIONS; i++) {
     const testQuality = (qualityLow + qualityHigh) / 2
-    // convertToBlob is experimental API, forced cast used here
     const candidateBlob = await (
       offscreenCanvas as unknown as {
         convertToBlob: (opts: {
