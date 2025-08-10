@@ -27,13 +27,13 @@ describe('integration (webp): optimizeImage on real WEBP fixtures', () => {
       })
 
       const fileNameExtension = fileName.split('.').pop()?.toLowerCase()
-      expect(fileNameExtension === 'webp').toBe(true)
+      expect(fileNameExtension).toBe('webp')
 
       mock.setLastInputFileSize(inputFile.size)
 
       const result = await optimizeImage(inputFile, false)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'webp').toBe(true)
+      expect(resultExtension).toBe('webp')
       expect(result.type).toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)
@@ -52,13 +52,13 @@ describe('integration (webp): optimizeImage on real WEBP fixtures', () => {
       })
 
       const fileNameExtension = fileName.split('.').pop()?.toLowerCase()
-      expect(fileNameExtension === 'webp').toBe(true)
+      expect(fileNameExtension).toBe('webp')
 
       mock.setLastInputFileSize(inputFile.size)
 
       const result = await optimizeImage(inputFile, true)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'webp').toBe(true)
+      expect(resultExtension).toBe('webp')
       expect(result.type).toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)

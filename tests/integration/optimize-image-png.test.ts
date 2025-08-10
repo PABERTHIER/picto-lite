@@ -28,13 +28,13 @@ describe('integration (png): optimizeImage on real PNG fixtures', () => {
       })
 
       const fileNameExtension = fileName.split('.').pop()?.toLowerCase()
-      expect(fileNameExtension === 'png').toBe(true)
+      expect(fileNameExtension).toBe('png')
 
       mock.setLastInputFileSize(inputFile.size)
 
       const result = await optimizeImage(inputFile, false)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'png').toBe(true)
+      expect(resultExtension).toBe('png')
       expect(result.type).toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)
@@ -58,13 +58,13 @@ describe('integration (png): optimizeImage on real PNG fixtures', () => {
       })
 
       const fileNameExtension = fileName.split('.').pop()?.toLowerCase()
-      expect(fileNameExtension === 'png').toBe(true)
+      expect(fileNameExtension).toBe('png')
 
       mock.setLastInputFileSize(inputFile.size)
 
       const result = await optimizeImage(inputFile, true)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'webp').toBe(true)
+      expect(resultExtension).toBe('webp')
       expect(result.type).not.toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)

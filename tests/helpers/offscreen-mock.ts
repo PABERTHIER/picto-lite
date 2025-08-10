@@ -1,6 +1,5 @@
-/* Helper to install a typed OffscreenCanvas + createImageBitmap mock
-   The mock simulates convertToBlob sizes based on canvas area, mime and quality.
-*/
+// Helper to install a typed OffscreenCanvas + createImageBitmap mock
+// The mock simulates convertToBlob sizes based on canvas area, mime and quality
 
 export type RestoreFn = () => void
 
@@ -51,9 +50,7 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
       if (type === 'image/webp') {
         simulatedSize = Math.max(
           1,
-          Math.round(
-            (lastInputFileSize / 10) * (1 - clampedQuality) * areaFactor
-          )
+          Math.round((lastInputFileSize / 10) * (1 - clampedQuality))
         )
       } else if (type === 'image/png') {
         simulatedSize =
@@ -68,9 +65,7 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
       } else if (type === 'image/jpeg' || type === 'image/jpg') {
         simulatedSize = Math.max(
           1,
-          Math.round(
-            (lastInputFileSize / 12) * (1 - clampedQuality) * areaFactor
-          )
+          Math.round((lastInputFileSize / 12) * (1 - clampedQuality))
         )
       } else {
         simulatedSize = 1000

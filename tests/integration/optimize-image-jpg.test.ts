@@ -35,7 +35,8 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       const result = await optimizeImage(inputFile, false)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'jpg').toBe(true)
+      expect(resultExtension).toBe('jpg')
+
       expect(result.type).toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)
@@ -62,7 +63,7 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       const result = await optimizeImage(inputFile, false)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'jpeg').toBe(true)
+      expect(resultExtension).toBe('jpeg')
       expect(result.type).toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)
@@ -89,7 +90,7 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       const result = await optimizeImage(inputFile, true)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'webp').toBe(true)
+      expect(resultExtension).toBe('webp')
       expect(result.type).not.toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)
@@ -116,7 +117,7 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       const result = await optimizeImage(inputFile, true)
       const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension === 'webp').toBe(true)
+      expect(resultExtension).toBe('webp')
       expect(result.type).not.toEqual(inputFile.type)
 
       expect(result).toBeInstanceOf(Blob)
