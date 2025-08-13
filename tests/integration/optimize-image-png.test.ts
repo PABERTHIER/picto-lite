@@ -32,18 +32,21 @@ describe('integration (png): optimizeImage on real PNG fixtures', () => {
 
       mock.setLastInputFileSize(inputFile.size)
 
-      const result = await optimizeImage(inputFile, false)
-      const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension).toBe('png')
-      expect(result.type).toEqual(inputFile.type)
+      const fileResult = await optimizeImage(inputFile, false)
+      const resultBlob = fileResult.file
+      const resultExtension = resultBlob.type.split('/').pop()?.toLowerCase()
 
-      expect(result).toBeInstanceOf(Blob)
+      expect(resultExtension).toBe('png')
+
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.type).toEqual(inputFile.type)
+      expect(fileResult.success).toBe(true)
 
       if (inputFile.size <= PNG_SIZE_LIMIT) {
-        expect(result.size).toEqual(inputFile.size)
+        expect(resultBlob.size).toEqual(inputFile.size)
       } else {
-        expect(result.size).toBeLessThan(inputFile.size)
-        expect(result.size).toBeGreaterThan(0)
+        expect(resultBlob.size).toBeLessThan(inputFile.size)
+        expect(resultBlob.size).toBeGreaterThan(0)
       }
     }
   )
@@ -62,20 +65,23 @@ describe('integration (png): optimizeImage on real PNG fixtures', () => {
 
       mock.setLastInputFileSize(inputFile.size)
 
-      const result = await optimizeImage(inputFile, true)
-      const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension).toBe('webp')
-      expect(result.type).not.toEqual(inputFile.type)
+      const fileResult = await optimizeImage(inputFile, true)
+      const resultBlob = fileResult.file
+      const resultExtension = resultBlob.type.split('/').pop()?.toLowerCase()
 
-      expect(result).toBeInstanceOf(Blob)
+      expect(resultExtension).toBe('webp')
+
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.type).not.toEqual(inputFile.type)
+      expect(fileResult.success).toBe(true)
 
       if (inputFile.size <= PNG_SIZE_LIMIT) {
-        expect(result.size).not.toEqual(inputFile.size)
-        expect(result.size).toBeLessThan(PNG_SIZE_LIMIT)
-        expect(result.size).toBeGreaterThan(0)
+        expect(resultBlob.size).not.toEqual(inputFile.size)
+        expect(resultBlob.size).toBeLessThan(PNG_SIZE_LIMIT)
+        expect(resultBlob.size).toBeGreaterThan(0)
       } else {
-        expect(result.size).toBeLessThan(inputFile.size)
-        expect(result.size).toBeGreaterThan(0)
+        expect(resultBlob.size).toBeLessThan(inputFile.size)
+        expect(resultBlob.size).toBeGreaterThan(0)
       }
     }
   )

@@ -16,6 +16,9 @@
       @drop.prevent="handleFiles($event.dataTransfer.files)"
       @click="() => input.click()">
       <div v-t="'components.image_uploader.drop_zone_description'" />
+      <div
+        v-t="'components.image_uploader.drop_zone_supported_formats'"
+        class="supported-formats" />
     </div>
 
     <div class="webp-option-container">
@@ -41,6 +44,10 @@
             {{ formatSize(item.optimizedSize) }} ({{ reductionPercent(item) }}%
             {{ imageReductionWording }})
           </div>
+          <div
+            v-if="!item.success"
+            v-t="'components.image_uploader.unsupported_format'"
+            class="unsupported-format" />
         </div>
         <button
           v-t="'components.image_uploader.download_image_wording'"
@@ -63,6 +70,7 @@ type ResultItem = {
   blob: Blob
   originalSize: number
   optimizedSize: number
+  success: boolean
 }
 
 const input = ref<HTMLInputElement>()
@@ -104,14 +112,18 @@ async function handleFiles(files: FileList) {
   totalFiles.value = files.length
 
   for (const file of Array.from(files)) {
-    const blob = await optimizeImage(file, convertToWebp.value)
-    const ext = convertToWebp.value ? 'webp' : file.name.split('.').pop()!
+    const fileResult = await optimizeImage(file, convertToWebp.value)
+    const ext =
+      fileResult.success && convertToWebp.value
+        ? 'webp'
+        : file.name.split('.').pop()!
     const name = `${file.name.replace(/\.[^/.]+$/, '')}.${ext}`
     results.value.push({
       name,
-      blob,
+      blob: fileResult.file,
       originalSize: file.size,
-      optimizedSize: blob.size,
+      optimizedSize: fileResult.file.size,
+      success: fileResult.success,
     })
     processedFiles.value++
   }
@@ -173,6 +185,10 @@ async function downloadImage(item: ResultItem) {
     border-radius: 8px;
     cursor: pointer;
 
+    .supported-formats {
+      color: $blue-color;
+    }
+
     &:hover,
     &.drag-hover {
       border-style: solid;
@@ -228,6 +244,10 @@ async function downloadImage(item: ResultItem) {
         .item-size {
           font-size: 14px;
           color: $grey-blue-color;
+        }
+
+        .unsupported-format {
+          color: $dark-red-color;
         }
       }
 
