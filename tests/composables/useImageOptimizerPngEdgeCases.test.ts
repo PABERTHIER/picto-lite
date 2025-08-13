@@ -85,7 +85,7 @@ function createImageBitmapMock(
 
   function mock(..._args: unknown[]): Promise<ImageBitmap> {
     const bitmap = {
-      width: 1000,
+      width: 1_000,
       height: 800,
       close,
     } as unknown as ImageBitmap
@@ -147,11 +147,15 @@ describe('useImageOptimizer composable optimizeImage method (png edge cases)', (
       }
     )
 
-    const result = await optimizeImage(inputFile, true)
+    const fileResult = await optimizeImage(inputFile, true)
+    const resultBlob = fileResult.file
 
     // Convert failed -> chooseBest with null -> should return original file
-    expect(result).toBeInstanceOf(File)
-    expect(result).toBe(inputFile)
+    expect(resultBlob).toBeInstanceOf(File)
+    expect(resultBlob).toBe(inputFile)
+    expect(resultBlob.size).toBe(inputFile.size)
+    expect(resultBlob.type).toBe('image/png')
+    expect(fileResult.success).toBe(false)
   })
 
   it('continues when compressImageAtScale returns null (ctx missing) and falls back to original', async () => {
@@ -184,10 +188,15 @@ describe('useImageOptimizer composable optimizeImage method (png edge cases)', (
       }
     )
 
-    const result = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
     // Nothing could be compressed (no ctx) -> final fallback returns original file
-    expect(result).toBe(inputFile)
+    expect(resultBlob).toBeInstanceOf(Blob)
+    expect(resultBlob).toBe(inputFile)
+    expect(resultBlob.size).toBe(inputFile.size)
+    expect(resultBlob.type).toBe('image/png')
+    expect(fileResult.success).toBe(true)
   })
 
   it('uses final forced compression and returns a smaller blob; ignores close() errors', async () => {
@@ -205,9 +214,12 @@ describe('useImageOptimizer composable optimizeImage method (png edge cases)', (
       }
     )
 
-    const result = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
-    expect(result).toBeInstanceOf(Blob)
-    expect(result.size).toBeLessThan(inputFile.size)
+    expect(resultBlob).toBeInstanceOf(Blob)
+    expect(resultBlob.size).toBeLessThan(inputFile.size)
+    expect(resultBlob.type).toBe('image/png')
+    expect(fileResult.success).toBe(true)
   })
 })

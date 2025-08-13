@@ -33,15 +33,17 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       mock.setLastInputFileSize(inputFile.size)
 
-      const result = await optimizeImage(inputFile, false)
-      const resultExtension = result.type.split('/').pop()?.toLowerCase()
+      const fileResult = await optimizeImage(inputFile, false)
+      const resultBlob = fileResult.file
+      const resultExtension = resultBlob.type.split('/').pop()?.toLowerCase()
+
       expect(resultExtension).toBe('jpg')
 
-      expect(result.type).toEqual(inputFile.type)
-
-      expect(result).toBeInstanceOf(Blob)
-      expect(result.size).toBeLessThan(inputFile.size)
-      expect(result.size).toBeGreaterThan(0)
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.type).toEqual(inputFile.type)
+      expect(resultBlob.size).toBeLessThan(inputFile.size)
+      expect(resultBlob.size).toBeGreaterThan(0)
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -61,14 +63,17 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       mock.setLastInputFileSize(inputFile.size)
 
-      const result = await optimizeImage(inputFile, false)
-      const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension).toBe('jpeg')
-      expect(result.type).toEqual(inputFile.type)
+      const fileResult = await optimizeImage(inputFile, false)
+      const resultBlob = fileResult.file
+      const resultExtension = resultBlob.type.split('/').pop()?.toLowerCase()
 
-      expect(result).toBeInstanceOf(Blob)
-      expect(result.size).toBeLessThan(inputFile.size)
-      expect(result.size).toBeGreaterThan(0)
+      expect(resultExtension).toBe('jpeg')
+
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.type).toEqual(inputFile.type)
+      expect(resultBlob.size).toBeLessThan(inputFile.size)
+      expect(resultBlob.size).toBeGreaterThan(0)
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -88,14 +93,17 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       mock.setLastInputFileSize(inputFile.size)
 
-      const result = await optimizeImage(inputFile, true)
-      const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension).toBe('webp')
-      expect(result.type).not.toEqual(inputFile.type)
+      const fileResult = await optimizeImage(inputFile, true)
+      const resultBlob = fileResult.file
+      const resultExtension = resultBlob.type.split('/').pop()?.toLowerCase()
 
-      expect(result).toBeInstanceOf(Blob)
-      expect(result.size).toBeLessThan(inputFile.size)
-      expect(result.size).toBeGreaterThan(0)
+      expect(resultExtension).toBe('webp')
+
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.type).not.toEqual(inputFile.type)
+      expect(resultBlob.size).toBeLessThan(inputFile.size)
+      expect(resultBlob.size).toBeGreaterThan(0)
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -115,14 +123,17 @@ describe('integration (jpg): optimizeImage on real JPG fixtures', () => {
 
       mock.setLastInputFileSize(inputFile.size)
 
-      const result = await optimizeImage(inputFile, true)
-      const resultExtension = result.type.split('/').pop()?.toLowerCase()
-      expect(resultExtension).toBe('webp')
-      expect(result.type).not.toEqual(inputFile.type)
+      const fileResult = await optimizeImage(inputFile, true)
+      const resultBlob = fileResult.file
+      const resultExtension = resultBlob.type.split('/').pop()?.toLowerCase()
 
-      expect(result).toBeInstanceOf(Blob)
-      expect(result.size).toBeLessThan(inputFile.size)
-      expect(result.size).toBeGreaterThan(0)
+      expect(resultExtension).toBe('webp')
+
+      expect(resultBlob).toBeInstanceOf(Blob)
+      expect(resultBlob.type).not.toEqual(inputFile.type)
+      expect(resultBlob.size).toBeLessThan(inputFile.size)
+      expect(resultBlob.size).toBeGreaterThan(0)
+      expect(fileResult.success).toBe(true)
     }
   )
 })

@@ -39,7 +39,7 @@ class MockOffscreenCanvas {
         1,
         Math.round((this.inputFileSize / 10) * (1 - clampedQuality))
       )
-    } else if (type === 'image/png') {
+    } else if (type === 'image/png' || type === 'image/gif') {
       // PNG less compressible: mostly depends on area, slightly on quality for big images
       // Simulate two behaviors:
       // - For small images (areaFactor small), PNG output = original size
@@ -57,8 +57,9 @@ class MockOffscreenCanvas {
         Math.round((this.inputFileSize / 12) * (1 - clampedQuality))
       )
     } else {
-      // Fallback: small constant size
-      simulatedSize = 1000
+      throw new Error(
+        `convertToBlob: unsupported/failed to convert type "${type}"`
+      )
     }
 
     return new Blob(['x'.repeat(simulatedSize)], { type })
@@ -116,11 +117,13 @@ describe('useImageOptimizer composable optimizeImage method', () => {
         }
       )
 
-      const resultBlob = await optimizeImage(inputFile, false)
+      const fileResult = await optimizeImage(inputFile, false)
+      const resultBlob = fileResult.file
 
       expect(resultBlob).toBeInstanceOf(Blob)
       expect(resultBlob.size).toBeLessThanOrEqual(inputFile.size)
       expect(resultBlob.type).toBe(`image/${extension.toLowerCase()}`)
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -142,11 +145,13 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       }
     )
 
-    const resultBlob = await optimizeImage(inputFile, true)
+    const fileResult = await optimizeImage(inputFile, true)
+    const resultBlob = fileResult.file
 
     expect(resultBlob).toBeInstanceOf(Blob)
     expect(resultBlob.size).toBeLessThanOrEqual(inputFile.size)
     expect(resultBlob.type).toBe('image/webp')
+    expect(fileResult.success).toBe(true)
   })
 
   it.each([
@@ -175,11 +180,14 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       const inputFile = new File([new Uint8Array(1_000_000)], 'example.jpg', {
         type: 'image/jpg',
       })
-      const resultBlob = await optimizeImage(inputFile, shouldConvertToWebp)
+
+      const fileResult = await optimizeImage(inputFile, shouldConvertToWebp)
+      const resultBlob = fileResult.file
 
       expect(resultBlob).toBeInstanceOf(Blob)
       expect(resultBlob.size).toBeLessThanOrEqual(200_000)
       expect(resultBlob.type).toBe(`image/${expectedExtension}`)
+      expect(fileResult.success).toBe(true)
 
       // Restore main mock
       globalThis.OffscreenCanvas =
@@ -198,10 +206,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/jpg',
     })
 
-    const resultBlob = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
     expect(resultBlob.size).toBe(expectedSize)
     expect(resultBlob.type).toBe('image/jpg')
+    expect(fileResult.success).toBe(true)
   })
 
   it.each([
@@ -217,10 +227,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
         type: 'image/jpg',
       })
 
-      const resultBlob = await optimizeImage(inputFile, true)
+      const fileResult = await optimizeImage(inputFile, true)
+      const resultBlob = fileResult.file
 
       expect(resultBlob.size).toBe(expectedSize)
       expect(resultBlob.type).toBe('image/webp')
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -235,10 +247,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/jpeg',
     })
 
-    const resultBlob = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
     expect(resultBlob.size).toBe(expectedSize)
     expect(resultBlob.type).toBe('image/jpeg')
+    expect(fileResult.success).toBe(true)
   })
 
   it.each([
@@ -254,10 +268,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
         type: 'image/jpeg',
       })
 
-      const resultBlob = await optimizeImage(inputFile, true)
+      const fileResult = await optimizeImage(inputFile, true)
+      const resultBlob = fileResult.file
 
       expect(resultBlob.size).toBe(expectedSize)
       expect(resultBlob.type).toBe('image/webp')
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -272,10 +288,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/webp',
     })
 
-    const resultBlob = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
     expect(resultBlob.size).toBe(expectedSize)
     expect(resultBlob.type).toBe('image/webp')
+    expect(fileResult.success).toBe(true)
   })
 
   it.each([
@@ -291,10 +309,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
         type: 'image/webp',
       })
 
-      const resultBlob = await optimizeImage(inputFile, true)
+      const fileResult = await optimizeImage(inputFile, true)
+      const resultBlob = fileResult.file
 
       expect(resultBlob.size).toBe(expectedSize)
       expect(resultBlob.type).toBe('image/webp')
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -311,7 +331,8 @@ describe('useImageOptimizer composable optimizeImage method', () => {
         type: 'image/png',
       })
 
-      const resultBlob = await optimizeImage(inputFile, false)
+      const fileResult = await optimizeImage(inputFile, false)
+      const resultBlob = fileResult.file
 
       if (expectSmaller) {
         expect(resultBlob.size).toBe(expectedSize)
@@ -320,6 +341,7 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       }
 
       expect(resultBlob.type).toBe('image/png')
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -336,10 +358,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
         type: 'image/png',
       })
 
-      const resultBlob = await optimizeImage(inputFile, true)
+      const fileResult = await optimizeImage(inputFile, true)
+      const resultBlob = fileResult.file
 
       expect(resultBlob.size).toBe(expectedSize)
       expect(resultBlob.type).toBe('image/webp')
+      expect(fileResult.success).toBe(true)
     }
   )
 
@@ -356,9 +380,11 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/jpeg',
     })
 
-    const result = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
-    expect(result).toBeInstanceOf(Blob)
+    expect(resultBlob).toBeInstanceOf(Blob)
+    expect(fileResult.success).toBe(true)
   })
 
   it('uses final forced attempt if all compressImageAtScale attempts fail', async () => {
@@ -374,10 +400,12 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/jpeg',
     })
 
-    const result = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
-    expect(result).toBeInstanceOf(Blob)
-    expect(result.size).toBeLessThan(inputFile.size)
+    expect(resultBlob).toBeInstanceOf(Blob)
+    expect(resultBlob.size).toBeLessThan(inputFile.size)
+    expect(fileResult.success).toBe(true)
   })
 
   it('skips compression if getContext returns null', async () => {
@@ -394,9 +422,10 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/jpeg',
     })
 
-    const result = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
 
-    expect(result).toBe(inputFile)
+    expect(fileResult.file).toBe(inputFile)
+    expect(fileResult.success).toBe(false)
   })
 
   it.skip('falls back to original if final forced compressed blob cannot be decoded', async () => {
@@ -425,61 +454,92 @@ describe('useImageOptimizer composable optimizeImage method', () => {
       type: 'image/webp',
     })
 
-    const result = await optimizeImage(inputFile, true)
+    const fileResult = await optimizeImage(inputFile, true)
 
-    expect(result).toBe(inputFile)
+    expect(fileResult.file).toBe(inputFile)
+    expect(fileResult.success).toBe(false)
   })
 
   it('handles empty jpg image', async () => {
+    lastInputFileSize = 0
     const tinyFile = new File([], 'tiny.jpg', { type: 'image/jpg' })
 
-    const result = await optimizeImage(tinyFile, false)
+    const fileResult = await optimizeImage(tinyFile, false)
 
-    expect(result.size).toEqual(0)
+    expect(fileResult.file.size).toEqual(0)
+    expect(fileResult.success).toBe(true)
   })
 
-  it('returns original not handled image format', async () => {
-    const inputFile = new File([new Uint8Array(1_500_000)], 'image.heic', {
+  it('returns static gif image', async () => {
+    lastInputFileSize = 1_000
+    const inputFile = new File([new Uint8Array(1_000)], 'image.gif', {
+      type: 'image/gif',
+    })
+
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
+
+    expect(resultBlob.size).toEqual(1_000)
+    expect(resultBlob.type).toBe('image/gif')
+    expect(fileResult.success).toBe(true)
+  })
+
+  it('returns original unsupported image format', async () => {
+    const heicBytes = new Uint8Array(1_000)
+
+    for (let i = 0; i < heicBytes.length; i++) {
+      heicBytes[i] = (i % 7) + 1
+    }
+
+    const inputFile = new File([heicBytes], 'image.heic', {
       type: 'image/heic',
     })
 
-    const result = await optimizeImage(inputFile, false)
+    const fileResult = await optimizeImage(inputFile, false)
+    const resultBlob = fileResult.file
 
-    expect(result.size).toEqual(1000)
-    expect(result.type).toBe('image/heic')
+    expect(resultBlob.size).toEqual(1_000)
+    expect(resultBlob.type).toBe('image/heic')
+    expect(fileResult.success).toBe(false)
   })
 
   it.each([
-    [30_500_000, 53_663],
-    [20_500_000, 53_663],
+    [30_500_000, 227_956],
+    [20_500_000, 153_216],
   ])(
     'handles very large jpg files (%s MB)',
     async (inputSize, expectedSize) => {
+      lastInputFileSize = inputSize
       const inputFile = new File([new Uint8Array(inputSize)], 'image.jpg', {
         type: 'image/jpg',
       })
 
-      const result = await optimizeImage(inputFile, false)
+      const fileResult = await optimizeImage(inputFile, false)
+      const resultBlob = fileResult.file
 
-      expect(result.size).toEqual(expectedSize)
-      expect(result.type).toBe('image/jpg')
+      expect(resultBlob.size).toEqual(expectedSize)
+      expect(resultBlob.type).toBe('image/jpg')
+      expect(fileResult.success).toBe(true)
     }
   )
 
   it.each([
-    [30_500_000, 41_435],
-    [20_500_000, 41_435],
+    [30_500_000, 176_010],
+    [20_500_000, 118_302],
   ])(
     'handles very large png files (%s MB)',
     async (inputSize, expectedSize) => {
+      lastInputFileSize = inputSize
       const inputFile = new File([new Uint8Array(inputSize)], 'image.png', {
         type: 'image/png',
       })
 
-      const result = await optimizeImage(inputFile, false)
+      const fileResult = await optimizeImage(inputFile, false)
+      const resultBlob = fileResult.file
 
-      expect(result.size).toEqual(expectedSize)
-      expect(result.type).toBe('image/png')
+      expect(resultBlob.size).toEqual(expectedSize)
+      expect(resultBlob.type).toBe('image/png')
+      expect(fileResult.success).toBe(true)
     }
   )
 })

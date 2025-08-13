@@ -52,7 +52,7 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
           1,
           Math.round((lastInputFileSize / 10) * (1 - clampedQuality))
         )
-      } else if (type === 'image/png') {
+      } else if (type === 'image/png' || type === 'image/gif') {
         simulatedSize =
           lastInputFileSize > 1_000_000
             ? Math.max(
@@ -68,7 +68,9 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
           Math.round((lastInputFileSize / 12) * (1 - clampedQuality))
         )
       } else {
-        simulatedSize = 1000
+        throw new Error(
+          `convertToBlob: unsupported/failed to convert type "${type}"`
+        )
       }
 
       // create a blob with that many bytes
@@ -87,10 +89,15 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
 
     try {
       if (input instanceof Blob) {
+        if (input.type === 'image/heic') {
+          throw new Error(
+            `convertToBlob: unsupported/failed to convert type "${input.type}"`
+          )
+        }
         // infer size roughly from blob: tiny -> small dims, large -> larger dims
         // NOTE: Blob.size is available in test env
         const size = (input as Blob).size
-        const width = Math.max(1, Math.round(Math.min(1000, Math.sqrt(size))))
+        const width = Math.max(1, Math.round(Math.min(1_000, Math.sqrt(size))))
         const height = Math.max(1, Math.round(width / 2))
         return {
           width,
@@ -104,7 +111,7 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
           input instanceof ArrayBuffer
             ? input.byteLength
             : (input as unknown as Uint8Array).byteLength
-        const width = Math.max(1, Math.round(Math.min(1000, Math.sqrt(size))))
+        const width = Math.max(1, Math.round(Math.min(1_000, Math.sqrt(size))))
         const height = Math.max(1, Math.round(width / 2))
         return { width, height, close: () => {} } as unknown as ImageBitmap
       }
@@ -115,12 +122,8 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
         height: fallback.height,
         close: () => {},
       } as unknown as ImageBitmap
-    } catch {
-      return {
-        width: fallback.width,
-        height: fallback.height,
-        close: () => {},
-      } as unknown as ImageBitmap
+    } catch (e) {
+      throw new Error(`${e}`)
     }
   }) as unknown as typeof createImageBitmap
   ;(globalThis as unknown as { OffscreenCanvas?: unknown }).OffscreenCanvas =

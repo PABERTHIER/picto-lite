@@ -9,8 +9,10 @@
   "components": {
     "image_uploader": {
       "drop_zone_description": "Drag & drop images here, or click to select",
+      "drop_zone_supported_formats": "JPG / JPEG / PNG / WebP",
       "webp_option_checkbox_name": "Convert to WebP format",
       "image_reduction_wording": "reduction",
+      "unsupported_format": "Unsupported format",
       "download_image_wording": "Download"
     }
   },
