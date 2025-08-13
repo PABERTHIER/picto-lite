@@ -107,7 +107,7 @@ describe('integration (other formats): optimizeImage on real misc fixtures', () 
     }
   )
 
-  it.only.each([...heicfileNames])(
+  it.each([...heicfileNames])(
     `[Heic] does not optimize %s, does not convert to WebP format and returns same Blob than original`,
     async fileName => {
       const fullpath = path.join(FIXTURES_IMG_DIR, fileName)
