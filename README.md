@@ -1,22 +1,37 @@
 # picto-lite
 
+![PictoLite][app-icon]
+
 [![Build & Test][build-badge]][build-link]
 [![Release][release-badge]][release-link]
 [![Coverage Status][coverage-status-badge]][coverage-status-link]
 
 A tool for bulk image optimization and optional WebP conversion.
 
-Here it is: [pictolite](https://pictolite.vercel.app/)
+Here it is: [PictoLite](https://pictolite.vercel.app/)
 
 It uses Vercel for deployment and hosting.
 
-## Features
+## Features :newspaper:
 
+- Support for JPG, JPEG, PNG and WebP formats
 - Drag-&-drop or file‑selector input for multiple pictures
 - Option to preserve original formats or to convert to WebP format
-- Adaptive quality control to target a maximum size of ~1 MB without visual loss
+- Adaptive quality control to target the best minimal size without visual loss
 
-## Nuxt 3 Minimal Starter
+For PNG images that contain text, a visual loss can appear and some text can become unreadable.
+To prevent this from happening, PNG images that are 1MB or smaller will be ignored.
+The issue is not happening for JPG / JPEG images.
+
+For Gif format, it will remove the animation (not recommanded).
+
+## Privacy :handshake:
+
+This tool has been created to optimise the images locally.
+Nothing is sent to a server, the browser will handled the optimisation.
+Everything is handled on the client-side.
+
+## Nuxt 3 Minimal Starter :man_technologist:
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
@@ -73,6 +88,8 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 ## Code coverage :bar_chart:
 
 [![codecov][codecov-badge]][codecov-link]
+
+[app-icon]: public/icon.ico
 
 [build-badge]: https://github.com/PABERTHIER/picto-lite/actions/workflows/ci.yml/badge.svg
 [build-link]: https://github.com/PABERTHIER/picto-lite/actions/workflows/ci.yml
