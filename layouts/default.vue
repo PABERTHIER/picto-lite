@@ -12,6 +12,25 @@
   </div>
 </template>
 
+<script setup lang="ts">
+function setVh() {
+  // set --vh to 1% of the current viewport height
+  document.documentElement.style.setProperty(
+    '--vh',
+    `${window.innerHeight * 0.01}px`
+  )
+}
+
+onMounted(() => {
+  setVh()
+  window.addEventListener('resize', setVh, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', setVh)
+})
+</script>
+
 <style lang="scss">
 @use '~/styles/default.scss' as *;
 
@@ -46,7 +65,8 @@ body {
 }
 
 #layoutContainer {
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  min-height: 100%;
   background-color: $background-color;
 
   #header-container {
@@ -55,10 +75,13 @@ body {
   }
 
   #page-container {
-    height: calc(100vh - $header-height - $footer-height - 20px);
+    height: calc(
+      var(--vh, 1vh) * 100 - #{$header-height} - #{$footer-height} - 20px
+    );
     flex: 1;
     padding: 0px 20px 20px 20px;
     overflow-y: auto;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
   }
 
   #footer-container {
@@ -74,7 +97,9 @@ body {
     }
 
     #page-container {
-      height: calc(100vh - $header-height - $footer-height - 20px);
+      height: calc(
+        var(--vh, 1vh) * 100 - #{$header-height} - #{$footer-height} - 20px
+      );
     }
   }
 }
