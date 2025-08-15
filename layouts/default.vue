@@ -89,7 +89,6 @@ body {
     height: $footer-height;
     position: fixed;
     bottom: 0;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   @media (max-width: $sm) {
