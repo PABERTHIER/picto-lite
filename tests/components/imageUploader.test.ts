@@ -208,7 +208,7 @@ describe('ImageUploader component', () => {
     expect(name?.textContent).toBe('image.jpg')
     expect(size?.className).toBe('item-size')
     expect(size?.textContent).toBe(
-      `19.84 MB → 9.63 MB (51% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')}) `
+      `19.84 MB → 9.63 MB (51% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(downloadButton?.className).toBe('download-button')
@@ -330,7 +330,7 @@ describe('ImageUploader component', () => {
     expect(namePng?.textContent).toBe('image.png')
     expect(sizePng?.className).toBe('item-size')
     expect(sizePng?.textContent).toBe(
-      `2.9 KB → 1.5 KB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')}) `
+      `2.9 KB → 1.5 KB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(downloadButtonPng?.className).toBe('download-button')
@@ -356,7 +356,7 @@ describe('ImageUploader component', () => {
     expect(nameHeic?.textContent).toBe('image.heic')
     expect(sizeHeic?.className).toBe('item-size')
     expect(sizeHeic?.textContent).toBe(
-      `3.4 KB → 3.4 KB (0% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')}) `
+      `3.4 KB → 3.4 KB (0% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
     expect(unsupportedFormatHeic?.className).toBe('unsupported-format')
     expect(unsupportedFormatHeic?.textContent).toBe(
@@ -384,7 +384,7 @@ describe('ImageUploader component', () => {
     expect(nameJpg?.textContent).toBe('image.jpg')
     expect(sizeJpg?.className).toBe('item-size')
     expect(sizeJpg?.textContent).toBe(
-      `19.17 MB → 9.63 MB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')}) `
+      `19.17 MB → 9.63 MB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(downloadButtonJpg?.className).toBe('download-button')
@@ -506,7 +506,7 @@ describe('ImageUploader component', () => {
     expect(nameJpg?.textContent).toBe('image.webp')
     expect(sizeJpg?.className).toBe('item-size')
     expect(sizeJpg?.textContent).toBe(
-      `19.84 MB → 4.13 MB (79% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')}) `
+      `19.84 MB → 4.13 MB (79% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(downloadButtonJpg?.className).toBe('download-button')
@@ -532,7 +532,7 @@ describe('ImageUploader component', () => {
     expect(nameHeic?.textContent).toBe('image.heic')
     expect(sizeHeic?.className).toBe('item-size')
     expect(sizeHeic?.textContent).toBe(
-      `3.4 KB → 3.4 KB (0% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')}) `
+      `3.4 KB → 3.4 KB (0% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
     expect(unsupportedFormatHeic?.className).toBe('unsupported-format')
     expect(unsupportedFormatHeic?.textContent).toBe(
@@ -574,8 +574,8 @@ describe('ImageUploader component', () => {
   })
 
   it('processes files when dropped and clears drag hover', async () => {
-    const file = new File([new Uint8Array(2048)], 'dropped.png', {
-      type: 'image/png',
+    const file = new File([new Uint8Array(2048)], 'image.jpg', {
+      type: 'image/jpg',
     })
     const wrapper = await mountSuspended(ImageUploader, {
       attachTo: document.body,
@@ -713,7 +713,7 @@ describe('ImageUploader component', () => {
   })
 
   it('downloadImage falls back to anchor when showSaveFilePicker throws', async () => {
-    const file = new File([new Uint8Array(3000)], 'photo.png', {
+    const file = new File([new Uint8Array(3000)], 'image.png', {
       type: 'image/png',
     })
 

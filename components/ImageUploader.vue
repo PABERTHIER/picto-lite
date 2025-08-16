@@ -7,15 +7,15 @@
       multiple
       accept="image/*"
       hidden
-      @change="handleFiles($event.target.files)" />
+      @change="onInputChange" />
 
     <div
       class="drop-zone"
       :class="{ 'drag-hover': isDragOver }"
       @dragover.prevent="onDragOver"
       @dragleave.prevent="onDragLeave"
-      @drop.prevent="handleFiles($event.dataTransfer.files)"
-      @click="() => input.click()">
+      @drop.prevent="onDrop"
+      @click="input?.click()">
       <div v-t="'components.image_uploader.drop_zone_description'" />
       <div
         v-t="'components.image_uploader.drop_zone_supported_formats'"
@@ -41,9 +41,7 @@
         <div class="item-details">
           <div class="item-name">{{ item.name }}</div>
           <div class="item-size">
-            {{ formatSize(item.originalSize) }} →
-            {{ formatSize(item.optimizedSize) }} ({{ reductionPercent(item) }}%
-            {{ imageReductionWording }})
+            {{ formatImageReductionWording(item) }}
           </div>
           <div
             v-if="!item.success"
@@ -60,19 +58,14 @@
 </template>
 
 <script setup lang="ts">
+import type { ResultItem } from '~/types/result'
+import type { ShowSaveFilePicker } from '~/types/file-picker'
+
 const { t } = useI18n()
 
 const imageReductionWording = computed(() =>
   t('components.image_uploader.image_reduction_wording')
 )
-
-type ResultItem = {
-  name: string
-  blob: Blob
-  originalSize: number
-  optimizedSize: number
-  success: boolean
-}
 
 const input = ref<HTMLInputElement>()
 const results = ref<ResultItem[]>([])
@@ -105,6 +98,30 @@ const onDragLeave = () => {
   isDragOver.value = false
 }
 
+function onInputChange(event: Event): void {
+  const target = event.target as HTMLInputElement | null
+  const files = target?.files
+
+  if (!files || files.length === 0) {
+    return
+  }
+
+  void handleFiles(files)
+}
+
+function onDrop(event: DragEvent): void {
+  const dataTransfer = event.dataTransfer
+  const files = dataTransfer?.files
+
+  if (!files || files.length === 0) {
+    isDragOver.value = false
+    return
+  }
+
+  void handleFiles(files)
+  isDragOver.value = false
+}
+
 async function handleFiles(files: FileList) {
   processedFiles.value = 0
   totalFiles.value = 0
@@ -130,6 +147,13 @@ async function handleFiles(files: FileList) {
   }
 }
 
+function formatImageReductionWording(item: ResultItem): string {
+  const originalSize = formatSize(item.originalSize)
+  const optimizedSize = formatSize(item.optimizedSize)
+  const reduction = reductionPercent(item)
+  return `${originalSize} → ${optimizedSize} (${reduction}% ${imageReductionWording.value})`
+}
+
 function formatSize(bytes: number): string {
   return bytes > 1024 * 1024
     ? (bytes / (1024 * 1024)).toFixed(2) + ' MB'
@@ -143,9 +167,7 @@ function reductionPercent(item: ResultItem): number {
 async function downloadImage(item: ResultItem) {
   try {
     // File System Access API
-    // @ts-ignore
-    if (window.showSaveFilePicker) {
-      // @ts-ignore
+    if (hasShowSaveFilePicker(window)) {
       const handle = await window.showSaveFilePicker({
         suggestedName: item.name,
         types: [
@@ -161,7 +183,7 @@ async function downloadImage(item: ResultItem) {
       return
     }
   } catch {
-    console.warn('File System Access API not supported, fallback to link')
+    // File System Access API not supported, fallback to link'
   }
 
   // Fallback for browsers without FS Access API
@@ -173,6 +195,17 @@ async function downloadImage(item: ResultItem) {
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
+}
+
+function hasShowSaveFilePicker(
+  maybeWindow: unknown
+): maybeWindow is Window & { showSaveFilePicker: ShowSaveFilePicker } {
+  return (
+    typeof maybeWindow === 'object' &&
+    maybeWindow !== null &&
+    typeof (maybeWindow as Window & { showSaveFilePicker?: unknown })
+      .showSaveFilePicker === 'function'
+  )
 }
 </script>
 
