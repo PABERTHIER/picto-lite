@@ -1,6 +1,7 @@
 <template>
   <div class="uploader-container">
     <input
+      id="upload-input"
       ref="input"
       type="file"
       multiple
