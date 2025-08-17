@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-type localesType = 'fr' | 'en'
+import type { localesType } from '~/types/locales'
 
 const { locale, locales } = useI18n()
 const switchLocalePath = useSwitchLocalePath()

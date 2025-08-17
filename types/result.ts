@@ -5,3 +5,8 @@ export type ResultItem = {
   optimizedSize: number
   success: boolean
 }
+
+export interface FileResult {
+  file: Blob
+  success: boolean
+}

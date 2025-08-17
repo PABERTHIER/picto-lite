@@ -1,3 +1,5 @@
+import type { FileResult } from '~/types/result'
+
 const BINARY_SEARCH_ITERATIONS = 6 // Fixed iterations to find best quality
 const QUALITY_LOWER_BOUND = 0.3 // Min compression quality (30%), image degradation becomes noticeable below 0.3
 const QUALITY_UPPER_BOUND = 0.92 // Max compression quality (92%), most browsers cap this quality to 0.92
@@ -7,11 +9,6 @@ const DOWNSCALE_STEP_FACTOR = 0.85 // Reduce size by 15% per attempt progressive
 const MAX_DOWNSCALE_ATTEMPTS = 6 // Number of progressive downscale tries, 6 attempts give a precision of 0.0129 (1.3% of quality granularity), increase this value for finer control (cost time)
 const MIN_ALLOWED_SCALE = 0.05 // Minimum scale on final forced attempt
 const FINAL_FORCED_QUALITY = 0.05 // Very low quality for final aggressive compression attempt
-
-interface FileResult {
-  file: Blob
-  success: boolean
-}
 
 export async function optimizeImage(
   inputFile: File,
