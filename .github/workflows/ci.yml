@@ -40,11 +40,15 @@ jobs:
       - name: 🛠️ Install dependencies
         run: yarn install --immutable
 
-      # Step 7: Run tests
+      # Step 7: Run linter
+      - name: 🔍 Run linter
+        run: yarn lint
+
+      # Step 8: Run tests
       - name: 🔨 Run tests
         run: yarn test
 
-      # Step 8: Upload coverage
+      # Step 9: Upload coverage
       - name: ☁️ Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
