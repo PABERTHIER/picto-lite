@@ -7,6 +7,9 @@
   },
   "links": {},
   "components": {
+    "footer": {
+      "github_link_label": "Lien vers le repo"
+    },
     "image_uploader": {
       "drop_zone_description": "Glisser et déposer les images ici, ou cliquer pour sélectionner",
       "drop_zone_supported_formats": "JPG / JPEG / PNG / WebP",
@@ -14,6 +17,9 @@
       "image_reduction_wording": "en moins",
       "unsupported_format": "Format non pris en charge",
       "download_image_wording": "Télécharger"
+    },
+    "lang_switcher": {
+      "change_language_label": "Changer de langue"
     }
   },
   "pages": {

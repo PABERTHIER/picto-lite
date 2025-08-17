@@ -35,11 +35,19 @@ describe('Footer component', () => {
 
   it('renders a NuxtLink pointing to the GitHub repo with the Icon inside', async () => {
     const wrapper = await mountSuspended(Footer)
+    const githubLinkLabel = useNuxtApp().$i18n.t(
+      'components.footer.github_link_label'
+    )
     const link = wrapper.find('.github-link a')
+
     expect(link.exists()).toBe(true)
     expect(link.attributes('href')).toBe(
       'https://github.com/PABERTHIER/picto-lite'
     )
+    expect(link.attributes('aria-label')).toBe(githubLinkLabel)
+    expect(link.attributes('name')).toBe(githubLinkLabel)
+    expect(link.attributes('title')).toBe(githubLinkLabel)
+    expect(link.attributes('target')).toBe('_blank')
 
     const iconWrapper = link.findComponent(Icon)
 
@@ -49,6 +57,7 @@ describe('Footer component', () => {
       size: '30px',
       mode: 'svg',
     })
+    expect(iconWrapper.attributes('aria-hidden')).toBe('true')
 
     const svg = iconWrapper.find('svg')
 

@@ -17,11 +17,15 @@ describe('LangSwitcher component', () => {
 
   it('renders only non-current locale links', async () => {
     const wrapper = await mountSuspended(LangSwitcher)
+    const changeLanguageLabel = useNuxtApp().$i18n.t(
+      'components.lang_switcher.change_language_label'
+    )
     const links = wrapper.findAll('a')
 
     expect(links).toHaveLength(1)
     expect(links[0]?.text()).toBe('Français')
     expect(links[0]?.attributes('href')).toBe('/fr')
+    expect(links[0]?.attributes('title')).toBe(changeLanguageLabel)
   })
 
   it('clicking a locale link saves preference', async () => {

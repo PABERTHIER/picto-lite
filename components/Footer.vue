@@ -4,8 +4,18 @@
       <LangSwitcher />
     </div>
     <div class="github-link">
-      <NuxtLink to="https://github.com/PABERTHIER/picto-lite">
-        <Icon name="pl-icon:github-mark" color="black" size="30px" mode="svg" />
+      <NuxtLink
+        to="https://github.com/PABERTHIER/picto-lite"
+        :aria-label="githubLinkLabel"
+        :name="githubLinkLabel"
+        :title="githubLinkLabel"
+        target="_blank">
+        <Icon
+          name="pl-icon:github-mark"
+          color="black"
+          size="30px"
+          mode="svg"
+          aria-hidden="true" />
       </NuxtLink>
     </div>
     <div class="right-part">
@@ -17,6 +27,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
+const githubLinkLabel = computed(() => t('components.footer.github_link_label'))
 const authorName = computed(() => t('about.author'))
 </script>
 
