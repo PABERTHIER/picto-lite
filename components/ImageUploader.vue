@@ -24,8 +24,9 @@
 
     <div class="webp-option-container">
       <input id="webp-convert" v-model="convertToWebp" type="checkbox" />
-      <div
+      <label
         v-t="'components.image_uploader.webp_option_checkbox_name'"
+        for="webp-convert"
         class="name" />
     </div>
 
@@ -231,11 +232,15 @@ function hasShowSaveFilePicker(
 
   .webp-option-container {
     display: flex;
-    align-items: center;
     margin-bottom: 15px;
+
+    #webp-convert {
+      cursor: pointer;
+    }
 
     .name {
       margin-left: 5px;
+      cursor: pointer;
     }
   }
 
