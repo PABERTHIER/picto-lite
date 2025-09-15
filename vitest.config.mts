@@ -25,7 +25,7 @@ export default defineVitestConfig({
       cleanOnRerun: false,
       reportOnFailure: true,
       provider: 'v8', // or 'istanbul'
-      reportsDirectory: './app/coverage',
+      reportsDirectory: './coverage',
       reporter: [
         ['clover', { projectRoot: 'clover', file: 'clover' }], // Generates a file at coverage/clover.xml
         ['cobertura', { projectRoot: 'cobertura', file: 'cobertura' }], // Generates a file at coverage/cobertura.xml
