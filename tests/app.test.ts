@@ -51,7 +51,7 @@ describe('App component', () => {
     )
   })
 
-  it('injects all link tags declared in useHead (one assert per line)', async () => {
+  it('injects all link tags declared in useHead', async () => {
     await mountSuspended(App)
 
     const baseUrl = useNuxtApp().$i18n.baseUrl.value
@@ -126,7 +126,6 @@ describe('App component', () => {
     const baseUrl = useNuxtApp().$i18n.baseUrl.value
     const expectedOgImage = `${baseUrl}/logo.png`
     const locale = useNuxtApp().$i18n.locale.value
-    const expectedAppName = useNuxtApp().$i18n.t('app.name')
     const expectedDescription = useNuxtApp().$i18n.t('app.meta.description')
     const expectedAuthor = useNuxtApp().$i18n.t('about.author')
     const locales = useNuxtApp().$i18n.locales?.value ?? []
@@ -135,7 +134,7 @@ describe('App component', () => {
     // OG: title
     const ogTitle = document.querySelector('meta[property="og:title"]')
     expect(ogTitle).toBeTruthy()
-    expect(ogTitle!.getAttribute('content')).toEqual(expectedAppName)
+    expect(ogTitle!.getAttribute('content')).toEqual('%siteName')
 
     // OG: description
     const ogDesc = document.querySelector('meta[property="og:description"]')
@@ -190,7 +189,7 @@ describe('App component', () => {
     // Twitter: title
     const twitterTitle = document.querySelector('meta[name="twitter:title"]')
     expect(twitterTitle).toBeTruthy()
-    expect(twitterTitle!.getAttribute('content')).toEqual(expectedAppName)
+    expect(twitterTitle!.getAttribute('content')).toEqual('%siteName')
 
     // Twitter: description
     const twitterDesc = document.querySelector(

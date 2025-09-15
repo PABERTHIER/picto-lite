@@ -78,14 +78,14 @@ export default defineNuxtConfig({
   i18n: {
     defaultLocale: 'fr',
     langDir: 'locales',
-    lazy: true,
     strategy: 'prefix',
     locales: [
       { code: 'en', language: 'en-US', name: 'English', file: 'en-US.json' },
       { code: 'fr', language: 'fr-FR', name: 'Français', file: 'fr-FR.json' },
     ],
-    bundle: {
-      optimizeTranslationDirective: false,
+    experimental: {
+      // See: https://github.com/nuxt-modules/i18n/issues/3796
+      nitroContextDetection: false, // Disable Nitro-side language detection/redirection
     },
   },
   vite: {

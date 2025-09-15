@@ -1,10 +1,12 @@
 <template>
   <div class="header-container">
-    <div v-t="'app.name'" class="title" />
+    <div class="title">{{ t('app.name') }}</div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { t } = useI18n()
+</script>
 
 <style lang="scss" scoped>
 .header-container {

@@ -16,18 +16,17 @@
       @dragleave.prevent="onDragLeave"
       @drop.prevent="onDrop"
       @click="input?.click()">
-      <div v-t="'components.image_uploader.drop_zone_description'" />
-      <div
-        v-t="'components.image_uploader.drop_zone_supported_formats'"
-        class="supported-formats" />
+      <div>{{ t('components.image_uploader.drop_zone_description') }}</div>
+      <div class="supported-formats">
+        {{ t('components.image_uploader.drop_zone_supported_formats') }}
+      </div>
     </div>
 
     <div class="webp-option-container">
       <input id="webp-convert" v-model="convertToWebp" type="checkbox" />
-      <label
-        v-t="'components.image_uploader.webp_option_checkbox_name'"
-        for="webp-convert"
-        class="name" />
+      <label for="webp-convert" class="name">
+        {{ t('components.image_uploader.webp_option_checkbox_name') }}
+      </label>
     </div>
 
     <div v-if="totalFiles > 0" class="progress-container">
@@ -44,15 +43,13 @@
           <div class="item-size">
             {{ formatImageReductionWording(item) }}
           </div>
-          <div
-            v-if="!item.success"
-            v-t="'components.image_uploader.unsupported_format'"
-            class="unsupported-format" />
+          <div v-if="!item.success" class="unsupported-format">
+            {{ t('components.image_uploader.unsupported_format') }}
+          </div>
         </div>
-        <button
-          v-t="'components.image_uploader.download_image_wording'"
-          class="download-button"
-          @click="downloadImage(item)" />
+        <button class="download-button" @click="downloadImage(item)">
+          {{ t('components.image_uploader.download_image_wording') }}
+        </button>
       </div>
     </div>
   </div>
