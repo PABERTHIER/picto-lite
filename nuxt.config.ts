@@ -71,7 +71,7 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: 'pl-icon',
-        dir: './assets/svg',
+        dir: './app/assets/svg',
       },
     ],
   },

@@ -4,7 +4,7 @@ import path from 'path'
 import { installOffscreenCanvasMock } from '../helpers/offscreen-mock'
 import { optimizeImage } from '@/composables/useImageOptimizer'
 
-const FIXTURES_DIR = path.resolve('tests', 'fixtures')
+const FIXTURES_DIR = path.resolve('app', 'tests', 'fixtures')
 const FIXTURES_IMG_DIR = path.resolve(FIXTURES_DIR, 'images')
 
 describe('integration (other formats): optimizeImage on real misc fixtures', () => {
