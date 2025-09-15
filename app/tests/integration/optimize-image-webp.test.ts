@@ -4,10 +4,9 @@ import path from 'path'
 import { installOffscreenCanvasMock } from '../helpers/offscreen-mock'
 import { optimizeImage } from '@/composables/useImageOptimizer'
 
-const FIXTURES_DIR = path.resolve('tests', 'fixtures', 'images')
-const PNG_SIZE_LIMIT = 1_000_000
+const FIXTURES_DIR = path.resolve('app', 'tests', 'fixtures', 'images')
 
-describe('integration (png): optimizeImage on real PNG fixtures', () => {
+describe('integration (webp): optimizeImage on real WEBP fixtures', () => {
   const mock = installOffscreenCanvasMock()
 
   afterAll(() => {
@@ -15,20 +14,20 @@ describe('integration (png): optimizeImage on real PNG fixtures', () => {
   })
 
   const fileNames = fs.existsSync(FIXTURES_DIR)
-    ? fs.readdirSync(FIXTURES_DIR).filter(f => /\.png$/i.test(f))
+    ? fs.readdirSync(FIXTURES_DIR).filter(f => /\.webp$/i.test(f))
     : []
 
   it.each([...fileNames])(
-    `optimizes %s and returns Blob (or original)`,
+    `optimizes %s and returns Blob not larger than original`,
     async fileName => {
       const fullpath = path.join(FIXTURES_DIR, fileName)
       const buffer = fs.readFileSync(fullpath)
       const inputFile = new File([new Uint8Array(buffer)], fileName, {
-        type: 'image/png',
+        type: 'image/webp',
       })
 
       const fileNameExtension = fileName.split('.').pop()?.toLowerCase()
-      expect(fileNameExtension).toBe('png')
+      expect(fileNameExtension).toBe('webp')
 
       mock.setLastInputFileSize(inputFile.size)
 
@@ -36,32 +35,27 @@ describe('integration (png): optimizeImage on real PNG fixtures', () => {
       const resultBlob = fileResult.file
       const resultExtension = resultBlob.type.split('/').pop()?.toLowerCase()
 
-      expect(resultExtension).toBe('png')
+      expect(resultExtension).toBe('webp')
 
       expect(resultBlob).toBeInstanceOf(Blob)
       expect(resultBlob.type).toEqual(inputFile.type)
+      expect(resultBlob.size).toBeLessThan(inputFile.size)
+      expect(resultBlob.size).toBeGreaterThan(0)
       expect(fileResult.success).toBe(true)
-
-      if (inputFile.size <= PNG_SIZE_LIMIT) {
-        expect(resultBlob.size).toEqual(inputFile.size)
-      } else {
-        expect(resultBlob.size).toBeLessThan(inputFile.size)
-        expect(resultBlob.size).toBeGreaterThan(0)
-      }
     }
   )
 
   it.each([...fileNames])(
-    `optimizes %s, converts to WebP format and returns Blob (or original)`,
+    `optimizes %s, converts to WebP format and returns Blob not larger than original`,
     async fileName => {
       const fullpath = path.join(FIXTURES_DIR, fileName)
       const buffer = fs.readFileSync(fullpath)
       const inputFile = new File([new Uint8Array(buffer)], fileName, {
-        type: 'image/png',
+        type: 'image/webp',
       })
 
       const fileNameExtension = fileName.split('.').pop()?.toLowerCase()
-      expect(fileNameExtension).toBe('png')
+      expect(fileNameExtension).toBe('webp')
 
       mock.setLastInputFileSize(inputFile.size)
 
@@ -72,17 +66,10 @@ describe('integration (png): optimizeImage on real PNG fixtures', () => {
       expect(resultExtension).toBe('webp')
 
       expect(resultBlob).toBeInstanceOf(Blob)
-      expect(resultBlob.type).not.toEqual(inputFile.type)
+      expect(resultBlob.type).toEqual(inputFile.type)
+      expect(resultBlob.size).toBeLessThan(inputFile.size)
+      expect(resultBlob.size).toBeGreaterThan(0)
       expect(fileResult.success).toBe(true)
-
-      if (inputFile.size <= PNG_SIZE_LIMIT) {
-        expect(resultBlob.size).not.toEqual(inputFile.size)
-        expect(resultBlob.size).toBeLessThan(PNG_SIZE_LIMIT)
-        expect(resultBlob.size).toBeGreaterThan(0)
-      } else {
-        expect(resultBlob.size).toBeLessThan(inputFile.size)
-        expect(resultBlob.size).toBeGreaterThan(0)
-      }
     }
   )
 })
