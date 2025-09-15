@@ -12791,7 +12791,7 @@ __metadata:
     globals: "npm:^16.4.0"
     happy-dom: "npm:^18.0.1"
     nuxt: "npm:^3.17.6"
-    playwright-core: "npm:^1.54.1"
+    playwright-core: "npm:^1.55.0"
     prettier: "npm:^3.6.2"
     sass: "npm:^1.92.1"
     typescript: "npm:^5.9.2"
@@ -12833,12 +12833,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:^1.53.2, playwright-core@npm:^1.54.1":
+"playwright-core@npm:^1.53.2":
   version: 1.54.2
   resolution: "playwright-core@npm:1.54.2"
   bin:
     playwright-core: cli.js
   checksum: 10c0/44850e20bf35237c8c3dedf1096c655f8af939dde53c5469f72cae3dd744966858a302419b909a73d7a2093323123e7ebcc0fdd55151b4193afb7812c1fd2c88
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:^1.55.0":
+  version: 1.55.0
+  resolution: "playwright-core@npm:1.55.0"
+  bin:
+    playwright-core: cli.js
+  checksum: 10c0/c39d6aa30e7a4e73965942ca5e13405ae05c9cb49f755a35f04248c864c0b24cf662d9767f1797b3ec48d1cf4e54774dce4a19c16534bd5cfd2aa3da81c9dc3a
   languageName: node
   linkType: hard
 
