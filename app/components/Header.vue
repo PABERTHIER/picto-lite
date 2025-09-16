@@ -13,6 +13,7 @@ const { t } = useI18n()
   padding: 10px;
   background-color: $header-background-color;
   border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   .title {
     text-align: center;

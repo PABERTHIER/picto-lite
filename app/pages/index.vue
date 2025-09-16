@@ -38,4 +38,9 @@ useSeoMeta({
 defineOgImageComponent('NuxtSeo', { theme: '#ff0000', colorMode: 'dark' })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.main {
+  height: 100%;
+  width: 100%;
+}
+</style>
