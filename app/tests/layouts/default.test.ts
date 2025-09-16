@@ -49,7 +49,11 @@ describe('Default Layout', () => {
 
     expect(pageContainer.exists()).toBe(true)
     expect(pageContainer.element.children.length).toEqual(1)
-    const [pageTitle] = Array.from(pageContainer.element.children)
+    const [pageContent] = Array.from(pageContainer.element.children)
+    expect(pageContent?.className).toEqual('page-content')
+    expect(pageContent?.children.length).toEqual(1)
+
+    const [pageTitle] = Array.from(pageContent!.children)
     expect(pageTitle?.className).toEqual('')
 
     expect(footerContainer.exists()).toBe(true)
