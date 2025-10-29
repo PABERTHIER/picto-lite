@@ -9,8 +9,10 @@ export default defineVitestConfig({
     server: {
       deps: {
         external: ['nuxt-og-image', '@nuxtjs/og-image'],
-        moduleDirectories: ['@nuxtjs/seo', '@nuxtjs/og-image'],
       },
+    },
+    deps: {
+      moduleDirectories: ['@nuxtjs/seo', '@nuxtjs/og-image'],
     },
     update: true,
     reporters: ['json', 'html', 'junit', ['verbose', { summary: false }]],
@@ -62,15 +64,6 @@ export default defineVitestConfig({
       nuxt: {
         domEnvironment: 'happy-dom',
       },
-    },
-    // https://github.com/vitest-dev/vitest/blob/3cb2c857057815274ed3b2d06fae8ad925c033f0/docs/config/index.md#testtransformmode
-    testTransformMode: {
-      ssr: [
-        '**/node_modules/nuxt-og-image/**',
-        'nuxt-og-image',
-        '@nuxtjs/og-image',
-      ],
-      web: [],
     },
   },
 })
