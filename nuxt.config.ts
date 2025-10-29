@@ -83,10 +83,6 @@ export default defineNuxtConfig({
       { code: 'en', language: 'en-US', name: 'English', file: 'en-US.json' },
       { code: 'fr', language: 'fr-FR', name: 'Français', file: 'fr-FR.json' },
     ],
-    experimental: {
-      // See: https://github.com/nuxt-modules/i18n/issues/3796
-      nitroContextDetection: false, // Disable Nitro-side language detection/redirection
-    },
   },
   vite: {
     css: {
