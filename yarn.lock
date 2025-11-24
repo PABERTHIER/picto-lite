@@ -333,24 +333,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capsizecss/metrics@npm:^3.5.0":
-  version: 3.5.0
-  resolution: "@capsizecss/metrics@npm:3.5.0"
-  checksum: 10c0/1a06d25c18cb552c40334cda34b436bb5f63d2a95a37ec413a3ca564cdc7ce70dc8a0180c7dcab5dbd79bba0a4fbbde7f97e9057c8a84715a1abcdf610843fd8
-  languageName: node
-  linkType: hard
-
-"@capsizecss/unpack@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "@capsizecss/unpack@npm:2.4.0"
-  dependencies:
-    blob-to-buffer: "npm:^1.2.8"
-    cross-fetch: "npm:^3.0.4"
-    fontkit: "npm:^2.0.2"
-  checksum: 10c0/4f1598627872a0b69190b326136f896ff666323b86865c4973a5feb11f99fc057ebaca2d057048f87b93db2500662416ce37a170c034f56a4720f1363f91f828
-  languageName: node
-  linkType: hard
-
 "@capsizecss/unpack@npm:^3.0.0":
   version: 3.0.1
   resolution: "@capsizecss/unpack@npm:3.0.1"
@@ -1414,7 +1396,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nuxt/devtools-kit@npm:^2.4.0, @nuxt/devtools-kit@npm:^2.6.3, @nuxt/devtools-kit@npm:^2.6.5":
+"@nuxt/devtools-kit@npm:^2.6.3, @nuxt/devtools-kit@npm:^2.6.5":
   version: 2.7.0
   resolution: "@nuxt/devtools-kit@npm:2.7.0"
   dependencies:
@@ -1569,34 +1551,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nuxt/fonts@npm:^0.11.4":
-  version: 0.11.4
-  resolution: "@nuxt/fonts@npm:0.11.4"
-  dependencies:
-    "@nuxt/devtools-kit": "npm:^2.4.0"
-    "@nuxt/kit": "npm:^3.17.3"
-    consola: "npm:^3.4.2"
-    css-tree: "npm:^3.1.0"
-    defu: "npm:^6.1.4"
-    esbuild: "npm:^0.25.4"
-    fontaine: "npm:^0.6.0"
-    h3: "npm:^1.15.3"
-    jiti: "npm:^2.4.2"
-    magic-regexp: "npm:^0.10.0"
-    magic-string: "npm:^0.30.17"
-    node-fetch-native: "npm:^1.6.6"
-    ohash: "npm:^2.0.11"
-    pathe: "npm:^2.0.3"
-    sirv: "npm:^3.0.1"
-    tinyglobby: "npm:^0.2.13"
-    ufo: "npm:^1.6.1"
-    unifont: "npm:^0.4.1"
-    unplugin: "npm:^2.3.3"
-    unstorage: "npm:^1.16.0"
-  checksum: 10c0/e58b29bb4346aaa4a1f76ff9bbcaff0995551151d22832917e5b9bc89370626bce63acb30b7b0f1d72e905b3e71d75befcdc61f0a2c3eac43d44a404eb26fe10
-  languageName: node
-  linkType: hard
-
 "@nuxt/fonts@npm:^0.12.1":
   version: 0.12.1
   resolution: "@nuxt/fonts@npm:0.12.1"
@@ -1676,7 +1630,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nuxt/kit@npm:^3.13.2, @nuxt/kit@npm:^3.15.4, @nuxt/kit@npm:^3.17.3, @nuxt/kit@npm:^3.19.3":
+"@nuxt/kit@npm:^3.13.2, @nuxt/kit@npm:^3.15.4, @nuxt/kit@npm:^3.19.3":
   version: 3.20.0
   resolution: "@nuxt/kit@npm:3.20.0"
   dependencies:
@@ -5497,13 +5451,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"blob-to-buffer@npm:^1.2.8":
-  version: 1.2.9
-  resolution: "blob-to-buffer@npm:1.2.9"
-  checksum: 10c0/ff8d3327f030fcd98b28c7557158721bc36b2102452bb4d8808d7bf497a6feee34623a40f80ec8a097851c866369fc76ef948cee4e78373f34738b70ab3f8cf6
-  languageName: node
-  linkType: hard
-
 "boolbase@npm:^1.0.0":
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
@@ -6077,15 +6024,6 @@ __metadata:
   version: 9.1.0
   resolution: "croner@npm:9.1.0"
   checksum: 10c0/7debd8d171e84b2519a2adfe6a4ed6f761890da3d15239511de87f16f46ae040b1a5d89a40ad58bb89f0e4546d3a9bf093a5a65ce0484a89451d97de139ad64a
-  languageName: node
-  linkType: hard
-
-"cross-fetch@npm:^3.0.4":
-  version: 3.2.0
-  resolution: "cross-fetch@npm:3.2.0"
-  dependencies:
-    node-fetch: "npm:^2.7.0"
-  checksum: 10c0/d8596adf0269130098a676f6739a0922f3cc7b71cc89729925411ebe851a87026171c82ea89154c4811c9867c01c44793205a52e618ce2684650218c7fbeeb9f
   languageName: node
   linkType: hard
 
@@ -8005,22 +7943,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fontaine@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "fontaine@npm:0.6.0"
-  dependencies:
-    "@capsizecss/metrics": "npm:^3.5.0"
-    "@capsizecss/unpack": "npm:^2.4.0"
-    css-tree: "npm:^3.1.0"
-    magic-regexp: "npm:^0.10.0"
-    magic-string: "npm:^0.30.17"
-    pathe: "npm:^2.0.3"
-    ufo: "npm:^1.6.1"
-    unplugin: "npm:^2.3.2"
-  checksum: 10c0/034d3ba118188564c9dcd432ddde7224b245c2008c98809e140292297ae304d101c5bbe1e10f8e7a65014a842ae4b70e60c81e5de4861a39c6f565446c443ca1
-  languageName: node
-  linkType: hard
-
 "fontkit@npm:^2.0.2":
   version: 2.0.4
   resolution: "fontkit@npm:2.0.4"
@@ -8453,7 +8375,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"h3@npm:^1.12.0, h3@npm:^1.15.3, h3@npm:^1.15.4":
+"h3@npm:^1.12.0, h3@npm:^1.15.4":
   version: 1.15.4
   resolution: "h3@npm:1.15.4"
   dependencies:
@@ -10433,7 +10355,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.7, node-fetch@npm:^2.7.0":
+"node-fetch@npm:^2.6.7":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
@@ -11546,7 +11468,7 @@ __metadata:
   dependencies:
     "@nuxt/eslint": "npm:1.10.0"
     "@nuxt/eslint-config": "npm:^1.10.0"
-    "@nuxt/fonts": "npm:^0.11.4"
+    "@nuxt/fonts": "npm:^0.12.1"
     "@nuxt/test-utils": "npm:^3.20.1"
     "@nuxt/types": "npm:^2.18.1"
     "@nuxt/ui": "npm:^4.2.1"
@@ -13848,16 +13770,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unifont@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "unifont@npm:0.4.1"
-  dependencies:
-    css-tree: "npm:^3.0.0"
-    ohash: "npm:^2.0.0"
-  checksum: 10c0/81e3820496ca2c473251768722d5a8d470a2c0ab87cc8c59bc8aff30c55c5d7a59bfd7df23e833e4ca315d70f1d1777798039cba6648c039983d1f7dda2183c4
-  languageName: node
-  linkType: hard
-
 "unifont@npm:^0.6.0":
   version: 0.6.0
   resolution: "unifont@npm:0.6.0"
@@ -14019,7 +13931,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unplugin@npm:^2.0.0, unplugin@npm:^2.1.0, unplugin@npm:^2.3.10, unplugin@npm:^2.3.2, unplugin@npm:^2.3.3, unplugin@npm:^2.3.4, unplugin@npm:^2.3.5, unplugin@npm:^2.3.6":
+"unplugin@npm:^2.0.0, unplugin@npm:^2.1.0, unplugin@npm:^2.3.10, unplugin@npm:^2.3.2, unplugin@npm:^2.3.4, unplugin@npm:^2.3.5, unplugin@npm:^2.3.6":
   version: 2.3.10
   resolution: "unplugin@npm:2.3.10"
   dependencies:
@@ -14098,7 +14010,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unstorage@npm:^1.16.0, unstorage@npm:^1.16.1, unstorage@npm:^1.17.1, unstorage@npm:^1.17.2":
+"unstorage@npm:^1.16.1, unstorage@npm:^1.17.1, unstorage@npm:^1.17.2":
   version: 1.17.3
   resolution: "unstorage@npm:1.17.3"
   dependencies:
