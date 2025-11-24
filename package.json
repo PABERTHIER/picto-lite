@@ -23,7 +23,7 @@
     "@nuxt/ui": "^3.3.7",
     "@nuxtjs/i18n": "^10.1.2",
     "@nuxtjs/seo": "^3.2.2",
-    "nuxt": "^4.2.0",
+    "nuxt": "^4.2.1",
     "sass": "^1.94.2"
   },
   "devDependencies": {
