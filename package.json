@@ -24,7 +24,7 @@
     "@nuxtjs/i18n": "^10.2.1",
     "@nuxtjs/seo": "^3.3.0",
     "nuxt": "^4.2.2",
-    "sass": "^1.97.2"
+    "sass": "^1.97.3"
   },
   "devDependencies": {
     "@nuxt/eslint": "1.13.0",
