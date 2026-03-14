@@ -21,7 +21,7 @@
   "dependencies": {
     "@nuxt/fonts": "^0.12.1",
     "@nuxt/ui": "^4.4.0",
-    "@nuxtjs/i18n": "^10.2.1",
+    "@nuxtjs/i18n": "^10.2.3",
     "@nuxtjs/seo": "^3.4.0",
     "nuxt": "^4.3.0",
     "sass": "^1.98.0"
