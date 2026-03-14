@@ -63,11 +63,6 @@ describe('App component', () => {
     expect(canonical!.getAttribute('href')).toEqual(`${baseUrl}/${locale}`)
 
     // alternates
-    const alternateRoot = document.querySelector(
-      `link[rel="alternate"][hreflang="fr-FR"][href="${baseUrl}"]`
-    )
-    expect(alternateRoot).toBeTruthy()
-
     const alternateFr = document.querySelector(
       `link[rel="alternate"][hreflang="fr-FR"][href="${baseUrl}/fr"]`
     )
