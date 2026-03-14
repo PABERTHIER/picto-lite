@@ -92,6 +92,9 @@ export default defineNuxtConfig({
         },
       },
     },
+    optimizeDeps: {
+      include: ['@vue/devtools-core', '@vue/devtools-kit'],
+    },
     plugins: [],
   },
   compatibilityDate: '2025-04-19',

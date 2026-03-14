@@ -36,7 +36,6 @@ export default defineVitestConfig({
           {
             metricsToShow: ['branches', 'functions'],
             verbose: true,
-            subdir: './html-spa',
           },
         ], // Generates a HTML report at coverage/html-spa, you can view in your browser
         ['html', { verbose: true }], // Generates a HTML report at coverage/html, you can view in your browser and inside the Vitest UI
@@ -51,7 +50,14 @@ export default defineVitestConfig({
         ['text', { skipEmpty: true, skipFull: true, maxCols: 1 }], // Displayed on the terminal
         // ['none'] // No output
       ],
-      exclude: ['**/*.spec.ts', '**/*.test.ts', '**/node_modules/**'],
+      exclude: [
+        '**/*.spec.ts',
+        '**/*.test.ts',
+        '**/node_modules/**',
+        '**/*.html',
+        '**/coverage/**',
+        '**/tests_output/**',
+      ],
       include: [
         '**/components/**',
         '**/composables/**',
