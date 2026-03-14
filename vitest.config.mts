@@ -3,7 +3,7 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 export default defineVitestConfig({
   test: {
     environment: 'nuxt',
-    setupFiles: ['tests/setup.ts'],
+    setupFiles: ['app/tests/setup.ts'],
     globals: true,
     name: { label: 'PictoLite Tests', color: 'red' },
     server: {
@@ -17,9 +17,9 @@ export default defineVitestConfig({
     update: true,
     reporters: ['json', 'html', 'junit', ['verbose', { summary: false }]],
     outputFile: {
-      json: './tests_output/tests.json',
-      html: './tests_output/tests.html',
-      junit: './tests_output/tests.xml',
+      json: './app/tests_output/tests.json',
+      html: './app/tests_output/tests.html',
+      junit: './app/tests_output/tests.xml',
     },
     coverage: {
       enabled: true,
@@ -27,7 +27,7 @@ export default defineVitestConfig({
       cleanOnRerun: false,
       reportOnFailure: true,
       provider: 'v8', // or 'istanbul'
-      reportsDirectory: './coverage',
+      reportsDirectory: './app/coverage',
       reporter: [
         ['clover', { projectRoot: 'clover', file: 'clover' }], // Generates a file at coverage/clover.xml
         ['cobertura', { projectRoot: 'cobertura', file: 'cobertura' }], // Generates a file at coverage/cobertura.xml

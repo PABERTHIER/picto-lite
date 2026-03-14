@@ -60,6 +60,13 @@ describe('ImageUploader component', () => {
     expect(wrapper.exists()).toBe(true)
   })
 
+  it('has totalFiles equal to 0 on mount', async () => {
+    const wrapper = await mountSuspended(ImageUploader)
+
+    expect(wrapper.find('.progress-container').exists()).toBe(false)
+    expect(wrapper.findAll('.results-list-item').length).toBe(0)
+  })
+
   it('has the correct structure', async () => {
     const wrapper = await mountSuspended(ImageUploader)
 
