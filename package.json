@@ -22,7 +22,7 @@
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
     "@nuxt/ui": "^4.5.1",
-    "@nuxtjs/i18n": "^10.2.3",
+    "@nuxtjs/i18n": "^10.2.4",
     "@nuxtjs/seo": "^3.4.0",
     "nuxt": "^4.4.2",
     "sass": "^1.99.0"
