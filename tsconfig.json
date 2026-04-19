@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
