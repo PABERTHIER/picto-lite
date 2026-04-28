@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn dev)",
+      "Bash(yarn build)",
+      "Bash(yarn generate)",
+      "Bash(yarn preview)",
+      "Bash(yarn lint*)",
+      "Bash(yarn install)",
+      "Bash(yarn test*)",
+      "Bash(nuxt *)",
+      "Read",
+      "Edit",
+      "Write",
+      "Grep",
+      "Glob"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(del /s /q *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git reset --hard *)",
+      "Bash(git reset *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git stash *)",
+      "Bash(git branch -D *)",
+      "Bash(git tag *)",
+      "Bash(git am *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git revert *)"
+    ]
+  }
+}
