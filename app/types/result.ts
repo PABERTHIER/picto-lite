@@ -1,6 +1,7 @@
 export type ResultItem = {
   name: string
   blob: Blob
+  originalBlob: Blob
   originalSize: number
   optimizedSize: number
   success: boolean

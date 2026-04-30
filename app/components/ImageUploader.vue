@@ -47,11 +47,24 @@
             {{ t('components.image_uploader.unsupported_format') }}
           </div>
         </div>
-        <button class="download-button" @click="downloadImage(item)">
-          {{ t('components.image_uploader.download_image_wording') }}
-        </button>
+        <div class="item-actions">
+          <button
+            v-if="item.success"
+            class="preview-button"
+            @click="previewItem = item">
+            {{ t('components.image_uploader.preview_image_wording') }}
+          </button>
+          <button class="download-button" @click="downloadImage(item)">
+            {{ t('components.image_uploader.download_image_wording') }}
+          </button>
+        </div>
       </div>
     </div>
+
+    <ImagePreviewModal
+      v-if="previewItem"
+      :item="previewItem"
+      @close="previewItem = null" />
   </div>
 </template>
 
@@ -67,7 +80,7 @@ const imageReductionWording = computed(() =>
 
 const input = ref<HTMLInputElement>()
 const results = ref<ResultItem[]>([])
-
+const previewItem = ref<ResultItem | null>(null)
 const convertToWebp = ref(false)
 const isDragOver = ref(false)
 const totalFiles = ref(0)
@@ -119,6 +132,7 @@ function onDrop(event: DragEvent): void {
 }
 
 async function handleFiles(files: FileList) {
+  previewItem.value = null
   processedFiles.value = 0
   totalFiles.value = 0
 
@@ -135,6 +149,7 @@ async function handleFiles(files: FileList) {
     results.value.push({
       name,
       blob: fileResult.file,
+      originalBlob: file,
       originalSize: file.size,
       optimizedSize: fileResult.file.size,
       success: fileResult.success,
@@ -203,6 +218,8 @@ function hasShowSaveFilePicker(
       .showSaveFilePicker === 'function'
   )
 }
+
+defineExpose({ previewItem })
 </script>
 
 <style lang="scss" scoped>
@@ -282,6 +299,25 @@ function hasShowSaveFilePicker(
 
         .unsupported-format {
           color: $dark-red-color;
+        }
+      }
+
+      .item-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .preview-button {
+        padding: 4px 12px;
+        background-color: $dark-grey-color;
+        color: $white-color;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $grey-color-2;
         }
       }
 

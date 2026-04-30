@@ -16,7 +16,15 @@
       "webp_option_checkbox_name": "Convert to WebP format",
       "image_reduction_wording": "reduction",
       "unsupported_format": "Unsupported format",
-      "download_image_wording": "Download"
+      "download_image_wording": "Download",
+      "preview_image_wording": "Preview"
+    },
+    "image_preview_modal": {
+      "original_label": "Original",
+      "optimized_label": "Optimized",
+      "close_label": "Close",
+      "zoom_in_label": "Zoom in",
+      "zoom_out_label": "Zoom out"
     },
     "lang_switcher": {
       "change_language_label": "Change language"
