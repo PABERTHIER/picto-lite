@@ -428,38 +428,6 @@ describe('useImageOptimizer composable optimizeImage method', () => {
     expect(fileResult.success).toBe(false)
   })
 
-  it.skip('falls back to original if final forced compressed blob cannot be decoded', async () => {
-    let callCount = 0
-
-    globalThis.createImageBitmap = (async (
-      image: ImageBitmapSource,
-      _options?: ImageBitmapOptions
-    ): Promise<ImageBitmap> => {
-      callCount++
-      if (
-        callCount > 1 &&
-        image instanceof Blob &&
-        image.type === 'image/webp'
-      ) {
-        throw new Error('Decode fail')
-      }
-      return {
-        width: 100,
-        height: 50,
-        close: () => {},
-      } as unknown as ImageBitmap
-    }) as typeof createImageBitmap
-
-    const inputFile = new File([new Uint8Array(2_000_000)], 'large.webp', {
-      type: 'image/webp',
-    })
-
-    const fileResult = await optimizeImage(inputFile, true)
-
-    expect(fileResult.file).toBe(inputFile)
-    expect(fileResult.success).toBe(false)
-  })
-
   it('handles empty jpg image', async () => {
     lastInputFileSize = 0
     const tinyFile = new File([], 'tiny.jpg', { type: 'image/jpg' })
