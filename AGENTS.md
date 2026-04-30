@@ -28,7 +28,7 @@ picto-lite/
 │   ├── pages/
 │   │   └── index.vue              # Main page (SEO meta + ImageUploader)
 │   ├── components/
-│   │   ├── ImageUploader.vue      # Core UI: drag-drop, progress, results, download
+│   │   ├── ImageUploader.vue      # Core UI: drag-drop, progress, results, delete, bulk download
 │   │   ├── Header.vue
 │   │   ├── Footer.vue
 │   │   ├── LangSwitcher.vue
@@ -42,7 +42,7 @@ picto-lite/
 │   │   ├── variables.scss         # SCSS variables (auto-injected via Vite)
 │   │   └── default.scss           # Global base styles
 │   ├── types/
-│   │   ├── result.ts              # ResultItem, FileResult
+│   │   ├── result.ts              # ResultItem (requires id: string), FileResult
 │   │   ├── file-picker.ts         # ShowSaveFilePicker, FilePickerOptions
 │   │   └── locales.ts             # localesType
 │   ├── assets/svg/                # SVG icon sources (pl-icon collection)
@@ -80,6 +80,7 @@ picto-lite/
 | SEO                | @nuxtjs/seo (OG, Twitter, Schema)  |
 | UI components      | @nuxt/ui                            |
 | Fonts              | @nuxt/fonts (Google Fonts)          |
+| Zip creation       | jszip (bulk image download)         |
 | Testing            | Vitest + @nuxt/test-utils           |
 | Linting            | ESLint + Prettier                   |
 | Package manager    | Yarn 4.13.0                         |
@@ -268,9 +269,11 @@ Tests live in `app/tests/` and use **Vitest** + **@nuxt/test-utils**.
 |---|---|
 | Mount a component | `await mountSuspended(MyComponent)` from `@nuxt/test-utils/runtime` |
 | Mock a Nuxt auto-import | `mockNuxtImport('composableName', () => mockImpl)` — not `vi.mock()` |
+| Mock a third-party package | `vi.mock('jszip', () => ({ default: vi.fn(...) }))` — `vi.mock()` is correct for non-Nuxt imports |
 | Flush async flows | `await waitForPromises()` = `new Promise(resolve => setTimeout(resolve, 0))` |
 | Mock OffscreenCanvas | `installOffscreenCanvasMock()` from `app/tests/helpers/offscreen-mock.ts` |
 | Mock showSaveFilePicker | Set `global.showSaveFilePicker = vi.fn(...)` — test both present and absent |
+| AbortError (picker cancel) | `showSaveFilePicker` throws `DOMException` with `name === 'AbortError'` when user cancels — this must NOT trigger the `<a download>` fallback |
 
 ### Global setup
 

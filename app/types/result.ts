@@ -1,4 +1,5 @@
 export type ResultItem = {
+  id: string
   name: string
   blob: Blob
   originalBlob: Blob

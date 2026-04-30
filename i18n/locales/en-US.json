@@ -17,7 +17,10 @@
       "image_reduction_wording": "reduction",
       "unsupported_format": "Unsupported format",
       "download_image_wording": "Download",
-      "preview_image_wording": "Preview"
+      "preview_image_wording": "Preview",
+      "delete_item_wording": "Remove",
+      "download_all_wording": "Download all",
+      "clear_all_wording": "Clear all"
     },
     "image_preview_modal": {
       "original_label": "Original",

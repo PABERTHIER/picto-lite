@@ -48,6 +48,13 @@ vi.mock('~/composables/useImageOptimizer', ...)
 
 `mockNuxtImport` is already available globally from `app/tests/setup.ts` which mocks `useI18n`.
 
+Use `vi.mock()` for **third-party npm packages** that are not Nuxt auto-imports:
+
+```typescript
+// ✅ correct — jszip is a regular npm package, not a Nuxt auto-import
+vi.mock('jszip', () => ({ default: vi.fn(() => ({ ... })) }))
+```
+
 ---
 
 ## Flushing Async Flows
@@ -92,7 +99,7 @@ describe('...', () => {
 
 ### showSaveFilePicker (File System Access API)
 
-Test both presence and absence of the API:
+Test both presence and absence of the API, and the AbortError cancel case:
 
 ```typescript
 type GlobalWithPicker = typeof globalThis & {
@@ -107,6 +114,11 @@ g.showSaveFilePicker = vi.fn().mockResolvedValue({
     close: vi.fn().mockResolvedValue(undefined),
   }),
 })
+
+// Simulate user cancellation — must NOT trigger <a download> fallback
+g.showSaveFilePicker = vi.fn().mockRejectedValue(
+  Object.assign(new DOMException('User cancelled'), { name: 'AbortError' })
+)
 
 // Simulate API unavailable (default in test environment)
 delete g.showSaveFilePicker
@@ -133,3 +145,5 @@ describe('{ComponentName} component', () => {
 - `beforeEach` always calls `vi.resetAllMocks()`
 - Keep test descriptions concrete: "shows progress bar when files are processing"
   (not "works correctly")
+- Test factory helpers that build `ResultItem` objects must include `id: string` — it is a
+  required field (`ResultItem.id` is not optional)

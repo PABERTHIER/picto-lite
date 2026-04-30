@@ -30,17 +30,34 @@
     </div>
 
     <div v-if="totalFiles > 0" class="progress-container">
-      <div class="progress-bar-container">
+      <div
+        class="progress-bar-container"
+        :class="{ 'is-processing': isProcessing }">
         <div class="progress-bar" :style="progressStyle" />
       </div>
       <div class="progress-text">{{ processedFiles }} / {{ totalFiles }}</div>
     </div>
 
+    <div v-if="results.length > 0 && !isProcessing" class="bulk-actions">
+      <button
+        v-if="successfulResults.length > 0"
+        class="download-all-button"
+        @click="downloadAllImages">
+        {{ t('components.image_uploader.download_all_wording') }}
+      </button>
+      <button class="clear-all-button" @click="clearAll">
+        {{ t('components.image_uploader.clear_all_wording') }}
+      </button>
+    </div>
+
     <div class="results-list">
-      <div v-for="(item, idx) in results" :key="idx" class="results-list-item">
+      <div
+        v-for="(item, idx) in results"
+        :key="item.id"
+        class="results-list-item">
         <div class="item-details">
           <div class="item-name">{{ item.name }}</div>
-          <div class="item-size">
+          <div :class="['item-size', reductionClass(item)]">
             {{ formatImageReductionWording(item) }}
           </div>
           <div v-if="!item.success" class="unsupported-format">
@@ -57,6 +74,9 @@
           <button class="download-button" @click="downloadImage(item)">
             {{ t('components.image_uploader.download_image_wording') }}
           </button>
+          <button class="delete-button" @click="removeItem(idx)">
+            {{ t('components.image_uploader.delete_item_wording') }}
+          </button>
         </div>
       </div>
     </div>
@@ -69,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import JSZip from 'jszip'
 import type { ResultItem } from '~/types/result'
 import type { ShowSaveFilePicker } from '~/types/file-picker'
 
@@ -85,6 +106,13 @@ const convertToWebp = ref(false)
 const isDragOver = ref(false)
 const totalFiles = ref(0)
 const processedFiles = ref(0)
+const currentBatchId = ref(0)
+const itemIdCounter = ref(0)
+
+const isProcessing = computed(
+  () => totalFiles.value > 0 && processedFiles.value < totalFiles.value
+)
+const successfulResults = computed(() => results.value.filter(r => r.success))
 
 const progressPercent = computed(() =>
   Math.round((processedFiles.value / Math.max(1, totalFiles.value)) * 100)
@@ -135,18 +163,24 @@ async function handleFiles(files: FileList) {
   previewItem.value = null
   processedFiles.value = 0
   totalFiles.value = 0
-
   results.value = []
+
+  const batchId = ++currentBatchId.value
   totalFiles.value = files.length
 
   for (const file of Array.from(files)) {
     const fileResult = await optimizeImage(file, convertToWebp.value)
-    const ext =
-      fileResult.success && convertToWebp.value
-        ? 'webp'
-        : file.name.split('.').pop()!
+
+    if (currentBatchId.value !== batchId) {
+      return
+    }
+
+    const shouldUseWebpExt = fileResult.success && convertToWebp.value
+    const ext = shouldUseWebpExt ? 'webp' : file.name.split('.').pop()!
     const name = `${file.name.replace(/\.[^/.]+$/, '')}.${ext}`
+
     results.value.push({
+      id: String(++itemIdCounter.value),
       name,
       blob: fileResult.file,
       originalBlob: file,
@@ -154,14 +188,37 @@ async function handleFiles(files: FileList) {
       optimizedSize: fileResult.file.size,
       success: fileResult.success,
     })
+
     processedFiles.value++
   }
+}
+
+function removeItem(idx: number): void {
+  if (previewItem.value === results.value[idx]) {
+    previewItem.value = null
+  }
+
+  results.value.splice(idx, 1)
+
+  if (results.value.length === 0) {
+    totalFiles.value = 0
+    processedFiles.value = 0
+  }
+}
+
+function clearAll(): void {
+  currentBatchId.value++
+  results.value = []
+  totalFiles.value = 0
+  processedFiles.value = 0
+  previewItem.value = null
 }
 
 function formatImageReductionWording(item: ResultItem): string {
   const originalSize = formatSize(item.originalSize)
   const optimizedSize = formatSize(item.optimizedSize)
   const reduction = reductionPercent(item)
+
   return `${originalSize} → ${optimizedSize} (${reduction}% ${imageReductionWording.value})`
 }
 
@@ -173,6 +230,56 @@ function formatSize(bytes: number): string {
 
 function reductionPercent(item: ResultItem): number {
   return Math.round((1 - item.optimizedSize / item.originalSize) * 100)
+}
+
+function reductionClass(item: ResultItem): string {
+  const percent = reductionPercent(item)
+
+  if (percent >= 20) {
+    return 'reduction-good'
+  }
+
+  if (percent > 0) {
+    return 'reduction-moderate'
+  }
+
+  return 'reduction-none'
+}
+
+function downloadImageFallback(item: ResultItem): void {
+  const url = URL.createObjectURL(item.blob)
+  const a = document.createElement('a')
+
+  a.href = url
+  a.download = item.name
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+async function downloadAllImages(): Promise<void> {
+  const zip = new JSZip()
+
+  for (const item of successfulResults.value) {
+    const arrayBuffer = await item.blob.arrayBuffer()
+    zip.file(item.name, arrayBuffer)
+  }
+
+  const zipBlob = await zip.generateAsync({
+    type: 'blob',
+    compression: 'DEFLATE',
+    compressionOptions: { level: 1 },
+  })
+  const url = URL.createObjectURL(zipBlob)
+  const a = document.createElement('a')
+
+  a.href = url
+  a.download = 'optimized-images.zip'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
 }
 
 async function downloadImage(item: ResultItem) {
@@ -188,24 +295,21 @@ async function downloadImage(item: ResultItem) {
           },
         ],
       })
+
       const writable = await handle.createWritable()
       await writable.write(item.blob)
       await writable.close()
+
       return
     }
-  } catch {
-    // File System Access API not supported, fallback to link'
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return
+    }
   }
 
   // Fallback for browsers without FS Access API
-  const url = URL.createObjectURL(item.blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = item.name
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  downloadImageFallback(item)
 }
 
 function hasShowSaveFilePicker(
@@ -264,11 +368,30 @@ defineExpose({ previewItem })
       background: $light-grey-color;
       border-radius: 4px;
       margin-bottom: 5px;
+      position: relative;
+      overflow: hidden;
+
+      &.is-processing::after {
+        width: 40%;
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.55),
+          transparent
+        );
+        animation: shimmer-progress 1.5s ease-in-out infinite;
+      }
 
       .progress-bar {
         height: 100%;
+        position: relative;
         background: $blue-color;
         border-radius: 4px;
+        z-index: 1;
       }
     }
   }
@@ -276,8 +399,9 @@ defineExpose({ previewItem })
   .results-list {
     .results-list-item {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
       align-items: center;
+      gap: 8px;
       padding: 8px;
       border: 1px solid $light-grey-color;
       border-radius: 4px;
@@ -288,13 +412,25 @@ defineExpose({ previewItem })
       }
 
       .item-details {
+        min-width: 0;
+        flex: 1;
+
         .item-name {
           font-weight: 500;
+          overflow-wrap: break-word;
         }
 
         .item-size {
           font-size: 14px;
           color: $grey-blue-color;
+
+          &.reduction-good {
+            color: $green-color;
+          }
+
+          &.reduction-none {
+            color: $grey-color;
+          }
         }
 
         .unsupported-format {
@@ -305,7 +441,14 @@ defineExpose({ previewItem })
       .item-actions {
         display: flex;
         gap: 8px;
-        flex-shrink: 0;
+        flex-wrap: wrap;
+        margin-left: auto;
+        justify-content: flex-end;
+
+        @media (max-width: $sm) {
+          width: 100%;
+          flex-direction: column;
+        }
       }
 
       .preview-button {
@@ -333,7 +476,62 @@ defineExpose({ previewItem })
           background-color: $blue-color-2;
         }
       }
+
+      .delete-button {
+        padding: 4px 12px;
+        background-color: $dark-red-color;
+        color: $white-color;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $red-color;
+        }
+      }
     }
+  }
+
+  .bulk-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 15px;
+
+    .download-all-button {
+      padding: 6px 14px;
+      background-color: $blue-color;
+      color: $white-color;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $blue-color-2;
+      }
+    }
+
+    .clear-all-button {
+      padding: 6px 14px;
+      background-color: $dark-grey-color;
+      color: $white-color;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $grey-color-2;
+      }
+    }
+  }
+}
+
+@keyframes shimmer-progress {
+  from {
+    left: -40%;
+  }
+  to {
+    left: 100%;
   }
 }
 </style>

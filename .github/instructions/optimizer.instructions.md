@@ -66,6 +66,8 @@ They are not available in Node.js or the Vitest test environment.
 - Never add direct calls to these APIs outside of the composable and component files that already use them
 - The `showSaveFilePicker` fallback to `<a download>` in `ImageUploader.vue` is **required** for
   browsers that don't support the File System Access API — never remove it
+- When `showSaveFilePicker` throws a `DOMException` with `name === 'AbortError'` (user cancelled
+  the native picker), the fallback **must NOT** fire — catch and return silently instead
 
 ---
 

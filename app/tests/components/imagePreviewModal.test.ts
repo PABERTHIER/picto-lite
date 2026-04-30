@@ -9,6 +9,7 @@ const waitForPromises = (): Promise<void> =>
 
 function createResultItem(overrides: Partial<ResultItem> = {}): ResultItem {
   return {
+    id: 'test-id',
     name: 'test-image.png',
     blob: new Blob([new Uint8Array(1_500)], { type: 'image/png' }),
     originalBlob: new Blob([new Uint8Array(3_000)], { type: 'image/png' }),
