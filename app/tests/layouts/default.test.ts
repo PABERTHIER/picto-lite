@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { h, defineComponent } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import DefaultLayout from '@/layouts/default.vue'
@@ -80,5 +80,17 @@ describe('Default Layout', () => {
     })
 
     expect(wrapper.findComponent(Footer).exists()).toBe(true)
+  })
+
+  it('removes the resize listener on unmount', async () => {
+    const removeSpy = vi.spyOn(window, 'removeEventListener')
+    const wrapper = await mountSuspended(DefaultLayout, {
+      slots: { default: () => h(PageStub) },
+    })
+
+    wrapper.unmount()
+
+    expect(removeSpy).toHaveBeenCalledWith('resize', expect.any(Function))
+    removeSpy.mockRestore()
   })
 })

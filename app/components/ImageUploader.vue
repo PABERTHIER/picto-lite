@@ -74,9 +74,7 @@ const totalFiles = ref(0)
 const processedFiles = ref(0)
 
 const progressPercent = computed(() =>
-  totalFiles.value > 0
-    ? Math.round((processedFiles.value / totalFiles.value) * 100)
-    : 0
+  Math.round((processedFiles.value / Math.max(1, totalFiles.value)) * 100)
 )
 const progressStyle = computed(() => {
   const minimalFileRequired: number = 1
