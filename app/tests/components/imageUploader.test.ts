@@ -204,7 +204,7 @@ describe('ImageUploader component', () => {
     expect(resultsListItem?.className).toBe('results-list-item')
     expect(resultsListItem?.children).toHaveLength(2)
 
-    const [itemDetails, downloadButton] = Array.from(resultsListItem!.children)
+    const [itemDetails, itemActions] = Array.from(resultsListItem!.children)
 
     expect(itemDetails?.className).toBe('item-details')
     expect(itemDetails?.children).toHaveLength(2)
@@ -216,6 +216,16 @@ describe('ImageUploader component', () => {
     expect(size?.className).toBe('item-size')
     expect(size?.textContent).toBe(
       `19.84 MB → 9.63 MB (51% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
+    )
+
+    expect(itemActions?.className).toBe('item-actions')
+    expect(itemActions?.children).toHaveLength(2)
+
+    const [previewButton, downloadButton] = Array.from(itemActions!.children)
+
+    expect(previewButton?.className).toBe('preview-button')
+    expect(previewButton?.textContent).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.preview_image_wording')
     )
 
     expect(downloadButton?.className).toBe('download-button')
@@ -324,7 +334,7 @@ describe('ImageUploader component', () => {
     expect(resultsListItemPng?.className).toBe('results-list-item')
     expect(resultsListItemPng?.children).toHaveLength(2)
 
-    const [itemDetailsPng, downloadButtonPng] = Array.from(
+    const [itemDetailsPng, itemActionsPng] = Array.from(
       resultsListItemPng!.children
     )
 
@@ -340,6 +350,18 @@ describe('ImageUploader component', () => {
       `2.9 KB → 1.5 KB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
+    expect(itemActionsPng?.className).toBe('item-actions')
+    expect(itemActionsPng?.children).toHaveLength(2)
+
+    const [previewButtonPng, downloadButtonPng] = Array.from(
+      itemActionsPng!.children
+    )
+
+    expect(previewButtonPng?.className).toBe('preview-button')
+    expect(previewButtonPng?.textContent).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.preview_image_wording')
+    )
+
     expect(downloadButtonPng?.className).toBe('download-button')
     expect(downloadButtonPng?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
@@ -348,7 +370,7 @@ describe('ImageUploader component', () => {
     expect(resultsListItemHeic?.className).toBe('results-list-item')
     expect(resultsListItemHeic?.children).toHaveLength(2)
 
-    const [itemDetailsHeic, downloadButtonHeic] = Array.from(
+    const [itemDetailsHeic, itemActionsHeic] = Array.from(
       resultsListItemHeic!.children
     )
 
@@ -370,6 +392,11 @@ describe('ImageUploader component', () => {
       useNuxtApp().$i18n.t('components.image_uploader.unsupported_format')
     )
 
+    expect(itemActionsHeic?.className).toBe('item-actions')
+    expect(itemActionsHeic?.children).toHaveLength(1)
+
+    const [downloadButtonHeic] = Array.from(itemActionsHeic!.children)
+
     expect(downloadButtonHeic?.className).toBe('download-button')
     expect(downloadButtonHeic?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
@@ -378,7 +405,7 @@ describe('ImageUploader component', () => {
     expect(resultsListItemJpg?.className).toBe('results-list-item')
     expect(resultsListItemJpg?.children).toHaveLength(2)
 
-    const [itemDetailsJpg, downloadButtonJpg] = Array.from(
+    const [itemDetailsJpg, itemActionsJpg] = Array.from(
       resultsListItemJpg!.children
     )
 
@@ -392,6 +419,18 @@ describe('ImageUploader component', () => {
     expect(sizeJpg?.className).toBe('item-size')
     expect(sizeJpg?.textContent).toBe(
       `19.17 MB → 9.63 MB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
+    )
+
+    expect(itemActionsJpg?.className).toBe('item-actions')
+    expect(itemActionsJpg?.children).toHaveLength(2)
+
+    const [previewButtonJpg, downloadButtonJpg] = Array.from(
+      itemActionsJpg!.children
+    )
+
+    expect(previewButtonJpg?.className).toBe('preview-button')
+    expect(previewButtonJpg?.textContent).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.preview_image_wording')
     )
 
     expect(downloadButtonJpg?.className).toBe('download-button')
@@ -500,7 +539,7 @@ describe('ImageUploader component', () => {
     expect(resultsListItemJpg?.className).toBe('results-list-item')
     expect(resultsListItemJpg?.children).toHaveLength(2)
 
-    const [itemDetailsJpg, downloadButtonJpg] = Array.from(
+    const [itemDetailsJpg, itemActionsJpg] = Array.from(
       resultsListItemJpg!.children
     )
 
@@ -516,6 +555,18 @@ describe('ImageUploader component', () => {
       `19.84 MB → 4.13 MB (79% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
+    expect(itemActionsJpg?.className).toBe('item-actions')
+    expect(itemActionsJpg?.children).toHaveLength(2)
+
+    const [previewButtonJpg, downloadButtonJpg] = Array.from(
+      itemActionsJpg!.children
+    )
+
+    expect(previewButtonJpg?.className).toBe('preview-button')
+    expect(previewButtonJpg?.textContent).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.preview_image_wording')
+    )
+
     expect(downloadButtonJpg?.className).toBe('download-button')
     expect(downloadButtonJpg?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
@@ -524,7 +575,7 @@ describe('ImageUploader component', () => {
     expect(resultsListItemHeic?.className).toBe('results-list-item')
     expect(resultsListItemHeic?.children).toHaveLength(2)
 
-    const [itemDetailsHeic, downloadButtonHeic] = Array.from(
+    const [itemDetailsHeic, itemActionsHeic] = Array.from(
       resultsListItemHeic!.children
     )
 
@@ -545,6 +596,11 @@ describe('ImageUploader component', () => {
     expect(unsupportedFormatHeic?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.unsupported_format')
     )
+
+    expect(itemActionsHeic?.className).toBe('item-actions')
+    expect(itemActionsHeic?.children).toHaveLength(1)
+
+    const [downloadButtonHeic] = Array.from(itemActionsHeic!.children)
 
     expect(downloadButtonHeic?.className).toBe('download-button')
     expect(downloadButtonHeic?.textContent).toBe(
@@ -766,5 +822,155 @@ describe('ImageUploader component', () => {
 
     appendSpy.mockRestore()
     removeSpy.mockRestore()
+  })
+
+  it('shows preview button only for successful items', async () => {
+    const pngImage = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+    const heicImage = new File([new Uint8Array(3_500)], 'image.heic', {
+      type: 'image/heic',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader)
+
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(pngImage)
+    dataTransfer.items.add(heicImage)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    const items = wrapper.findAll('.results-list-item')
+    expect(items).toHaveLength(2)
+
+    // Successful item has preview button
+    expect(items[0]!.find('.preview-button').exists()).toBe(true)
+
+    // Unsuccessful item does not have preview button
+    expect(items[1]!.find('.preview-button').exists()).toBe(false)
+  })
+
+  it('opens preview modal when preview button is clicked', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    expect(document.querySelector('.modal-backdrop')).toBeNull()
+
+    const previewButton = wrapper.find('.preview-button')
+    await previewButton.trigger('click')
+    await waitForPromises()
+
+    const modal = document.querySelector('.modal-backdrop')
+    expect(modal).not.toBeNull()
+
+    const modalTitle = document.querySelector('.modal-title')
+    expect(modalTitle?.textContent).toBe('image.png')
+  })
+
+  it('closes preview modal when close button is clicked', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', {
+      value: dataTransfer.files,
+      configurable: true,
+    })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    const previewButton = wrapper.find('.preview-button')
+    await previewButton.trigger('click')
+    await waitForPromises()
+
+    expect(wrapper.vm.previewItem).not.toBeNull()
+    expect(document.querySelector('.modal-backdrop')).not.toBeNull()
+
+    // Escape key uses a document-level listener registered by ImagePreviewModal
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await waitForPromises()
+
+    expect(wrapper.vm.previewItem).toBeNull()
+  })
+
+  it('resets preview modal when new files are uploaded', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', {
+      value: dataTransfer.files,
+      configurable: true,
+    })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    const previewButton = wrapper.find('.preview-button')
+    await previewButton.trigger('click')
+    await waitForPromises()
+
+    expect(wrapper.vm.previewItem).not.toBeNull()
+
+    // Upload new files — handleFiles resets previewItem
+    const newFile = new File([new Uint8Array(2_000)], 'new-image.png', {
+      type: 'image/png',
+    })
+    const newDataTransfer = new DataTransfer()
+
+    newDataTransfer.items.add(newFile)
+
+    Object.defineProperty(inputElement, 'files', {
+      value: newDataTransfer.files,
+      configurable: true,
+    })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    expect(wrapper.vm.previewItem).toBeNull()
   })
 })
