@@ -9,6 +9,7 @@ const waitForPromises = (): Promise<void> =>
 
 function createResultItem(overrides: Partial<ResultItem> = {}): ResultItem {
   return {
+    id: 'test-id',
     name: 'test-image.png',
     blob: new Blob([new Uint8Array(1_500)], { type: 'image/png' }),
     originalBlob: new Blob([new Uint8Array(3_000)], { type: 'image/png' }),
@@ -121,6 +122,55 @@ describe('ImagePreviewModal component', () => {
     const sizes = document.querySelectorAll('.panel-size')
     expect(sizes[0]?.textContent).toBe('5.00 MB')
     expect(sizes[1]?.textContent).toBe('2.50 MB')
+  })
+
+  it('does not show dimensions before image load', async () => {
+    const item = createResultItem()
+    wrapper = await mountSuspended(ImagePreviewModal, {
+      props: { item },
+      attachTo: document.body,
+    })
+
+    expect(document.querySelectorAll('.panel-dims')).toHaveLength(0)
+  })
+
+  it('shows image dimensions in panel headers after image load', async () => {
+    const item = createResultItem()
+    wrapper = await mountSuspended(ImagePreviewModal, {
+      props: { item },
+      attachTo: document.body,
+    })
+
+    const images = document.querySelectorAll(
+      '.image-container img'
+    ) as NodeListOf<HTMLImageElement>
+
+    Object.defineProperty(images[0]!, 'naturalWidth', {
+      value: 1920,
+      configurable: true,
+    })
+    Object.defineProperty(images[0]!, 'naturalHeight', {
+      value: 1080,
+      configurable: true,
+    })
+    images[0]!.dispatchEvent(new Event('load'))
+
+    Object.defineProperty(images[1]!, 'naturalWidth', {
+      value: 1280,
+      configurable: true,
+    })
+    Object.defineProperty(images[1]!, 'naturalHeight', {
+      value: 720,
+      configurable: true,
+    })
+    images[1]!.dispatchEvent(new Event('load'))
+
+    await waitForPromises()
+
+    const dims = document.querySelectorAll('.panel-dims')
+    expect(dims).toHaveLength(2)
+    expect(dims[0]?.textContent?.trim()).toBe('1920 × 1080')
+    expect(dims[1]?.textContent?.trim()).toBe('1280 × 720')
   })
 
   it('shows both images with correct alt text', async () => {

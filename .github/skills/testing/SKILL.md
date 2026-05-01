@@ -81,6 +81,13 @@ beforeEach(() => {
 })
 ```
 
+Use `vi.mock()` for **third-party npm packages** (not Nuxt auto-imports):
+
+```typescript
+// ✅ correct — jszip is a regular npm package, not a Nuxt auto-import
+vi.mock('jszip', () => ({ default: vi.fn(() => ({ ... })) }))
+```
+
 ---
 
 ## Flushing Async Flows
@@ -137,7 +144,7 @@ describe('useImageOptimizer', () => {
 
 ## showSaveFilePicker Mock
 
-The `ImageUploader` uses the File System Access API when available. Test both branches:
+The `ImageUploader` uses the File System Access API when available. Test all three branches:
 
 ```typescript
 type GlobalWithPicker = typeof globalThis & {
@@ -152,6 +159,11 @@ g.showSaveFilePicker = vi.fn().mockResolvedValue({
     close: vi.fn().mockResolvedValue(undefined),
   }),
 })
+
+// Branch: user cancels picker — must NOT trigger <a download> fallback
+g.showSaveFilePicker = vi.fn().mockRejectedValue(
+  Object.assign(new DOMException('User cancelled'), { name: 'AbortError' })
+)
 
 // Branch: API not available (restore to default)
 delete g.showSaveFilePicker

@@ -31,10 +31,13 @@ This file provides Copilot-specific behavioral guidance that complements `AGENTS
 
 - Use `mountSuspended()` from `@nuxt/test-utils/runtime` for component mounting
 - Use `mockNuxtImport()` for mocking Nuxt auto-imports (not `vi.mock()`)
+- Use `vi.mock()` for third-party npm packages that are **not** Nuxt auto-imports (e.g., `jszip`)
 - Use `installOffscreenCanvasMock()` from `app/tests/helpers/offscreen-mock.ts`
 - Always flush async flows with `waitForPromises()` before asserting async state
 - Always call `vi.resetAllMocks()` in `beforeEach`
 - Test `showSaveFilePicker` both present (`global.showSaveFilePicker = vi.fn(...)`) and absent
+- Test user cancellation: `showSaveFilePicker` rejects with `DOMException { name: 'AbortError' }` — the `<a download>` fallback must NOT fire
+- `ResultItem` objects in test factories must include `id: string` — the field is required
 
 ## Git Policy
 

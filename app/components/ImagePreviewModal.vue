@@ -14,6 +14,9 @@
               <span class="panel-label">
                 {{ t('components.image_preview_modal.original_label') }}
               </span>
+              <span v-if="originalDimensions" class="panel-dims">
+                {{ formatDimensions(originalDimensions) }}
+              </span>
               <span class="panel-size">
                 {{ formatSize(item.originalSize) }}
               </span>
@@ -46,6 +49,9 @@
             <div class="panel-header">
               <span class="panel-label">
                 {{ t('components.image_preview_modal.optimized_label') }}
+              </span>
+              <span v-if="optimizedDimensions" class="panel-dims">
+                {{ formatDimensions(optimizedDimensions) }}
               </span>
               <span class="panel-size">
                 {{ formatSize(item.optimizedSize) }}
@@ -102,6 +108,9 @@ const optimizedZoomed = ref(false)
 const originalCanZoom = ref(true)
 const optimizedCanZoom = ref(true)
 
+const originalDimensions = ref<{ width: number; height: number } | null>(null)
+const optimizedDimensions = ref<{ width: number; height: number } | null>(null)
+
 const originalUrl = ref('')
 const optimizedUrl = ref('')
 
@@ -116,12 +125,14 @@ const panelState = {
     containerRef: originalContainerRef,
     imgRef: originalImgRef,
     canZoom: originalCanZoom,
+    dims: originalDimensions,
   },
   optimized: {
     zoomed: optimizedZoomed,
     containerRef: optimizedContainerRef,
     imgRef: optimizedImgRef,
     canZoom: optimizedCanZoom,
+    dims: optimizedDimensions,
   },
 }
 
@@ -151,13 +162,20 @@ function formatSize(bytes: number): string {
     : (bytes / 1024).toFixed(1) + ' KB'
 }
 
+function formatDimensions(dims: { width: number; height: number }): string {
+  return `${dims.width} × ${dims.height}`
+}
+
 function imageNeedsZoom(img: HTMLImageElement): boolean {
   return img.naturalWidth > 0 && img.offsetWidth < img.naturalWidth
 }
 
 function onImageLoad(panel: PanelId): void {
-  const { imgRef, canZoom } = panelState[panel]
-  canZoom.value = imageNeedsZoom(imgRef.value!)
+  const { imgRef, canZoom, dims } = panelState[panel]
+  const img = imgRef.value!
+
+  canZoom.value = imageNeedsZoom(img)
+  dims.value = { width: img.naturalWidth, height: img.naturalHeight }
 }
 
 function onKeydown(event: KeyboardEvent): void {
@@ -361,6 +379,11 @@ onBeforeUnmount(() => {
 
           .panel-label {
             font-weight: 500;
+          }
+
+          .panel-dims {
+            font-size: 14px;
+            color: $grey-blue-color;
           }
 
           .panel-size {

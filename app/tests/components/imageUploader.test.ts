@@ -11,38 +11,40 @@ const globalWithShowSaveFilePicker = global as typeof globalThis & {
 const waitForPromises = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0))
 
-mockNuxtImport('optimizeImage', () => {
-  return async (_file: File, _convert: boolean) => {
-    let mimeType = _file.type
-    let blobSize = 0
-    let success = false
+const defaultOptimizeImageMockImpl = async (_file: File, _convert: boolean) => {
+  let mimeType = _file.type
+  let blobSize = 0
+  let success = false
 
-    if (mimeType === 'image/png' || mimeType === 'image/webp') {
-      blobSize = 1_500
-      success = true
-    } else if (mimeType === 'image/jpg') {
-      blobSize = 10_100_500
-      success = true
-    } else {
-      blobSize = 3_500
-      success = false
-    }
-
-    if (_convert && success) {
-      mimeType = 'image/webp'
-      blobSize = Math.floor(blobSize / 2.33)
-    }
-
-    return {
-      file: new Blob([new Uint8Array(blobSize)], { type: mimeType }),
-      success,
-    }
+  if (mimeType === 'image/png' || mimeType === 'image/webp') {
+    blobSize = 1_500
+    success = true
+  } else if (mimeType === 'image/jpg') {
+    blobSize = 10_100_500
+    success = true
+  } else {
+    blobSize = 3_500
+    success = false
   }
-})
+
+  if (_convert && success) {
+    mimeType = 'image/webp'
+    blobSize = Math.floor(blobSize / 2.33)
+  }
+
+  return {
+    file: new Blob([new Uint8Array(blobSize)], { type: mimeType }),
+    success,
+  }
+}
+
+const mockOptimizeImage = vi.hoisted(() => vi.fn())
+mockNuxtImport('optimizeImage', () => mockOptimizeImage)
 
 describe('ImageUploader component', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    mockOptimizeImage.mockImplementation(defaultOptimizeImageMockImpl)
 
     // Ensure FS Access API is unset by default
     delete globalWithShowSaveFilePicker.showSaveFilePicker
@@ -138,10 +140,16 @@ describe('ImageUploader component', () => {
     const uploaderContainer = wrapper.find('.uploader-container')
 
     expect(uploaderContainer.exists()).toBe(true)
-    expect(uploaderContainer.element.children).toHaveLength(5) // The progress bar is visible
+    expect(uploaderContainer.element.children).toHaveLength(6) // The progress bar is visible
 
-    const [uploaderInput, dropZone, webpOption, progressBar, resultsList] =
-      Array.from(uploaderContainer.element.children)
+    const [
+      uploaderInput,
+      dropZone,
+      webpOption,
+      progressBar,
+      bulkActions,
+      resultsList,
+    ] = Array.from(uploaderContainer.element.children)
 
     expect(uploaderInput).toBeTruthy()
     expect(uploaderInput?.id).toBe('upload-input')
@@ -196,6 +204,21 @@ describe('ImageUploader component', () => {
     expect(progressBarText?.className).toBe('progress-text')
     expect(progressBarText?.textContent).toBe('1 / 1')
 
+    expect(bulkActions?.className).toBe('bulk-actions')
+    expect(bulkActions?.children).toHaveLength(2)
+
+    const [downloadAllButton, clearAllButton] = Array.from(
+      bulkActions!.children
+    )
+    expect(downloadAllButton?.className).toBe('download-all-button')
+    expect(downloadAllButton?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.download_all_wording')
+    )
+    expect(clearAllButton?.className).toBe('clear-all-button')
+    expect(clearAllButton?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.clear_all_wording')
+    )
+
     expect(resultsList?.className).toBe('results-list')
     expect(resultsList?.children).toHaveLength(1)
 
@@ -213,15 +236,17 @@ describe('ImageUploader component', () => {
 
     expect(name?.className).toBe('item-name')
     expect(name?.textContent).toBe('image.jpg')
-    expect(size?.className).toBe('item-size')
+    expect(size?.className).toBe('item-size reduction-good')
     expect(size?.textContent).toBe(
       `19.84 MB → 9.63 MB (51% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(itemActions?.className).toBe('item-actions')
-    expect(itemActions?.children).toHaveLength(2)
+    expect(itemActions?.children).toHaveLength(3)
 
-    const [previewButton, downloadButton] = Array.from(itemActions!.children)
+    const [previewButton, downloadButton, deleteButton] = Array.from(
+      itemActions!.children
+    )
 
     expect(previewButton?.className).toBe('preview-button')
     expect(previewButton?.textContent).toBe(
@@ -231,6 +256,11 @@ describe('ImageUploader component', () => {
     expect(downloadButton?.className).toBe('download-button')
     expect(downloadButton?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
+    )
+
+    expect(deleteButton?.className).toBe('delete-button')
+    expect(deleteButton?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.delete_item_wording')
     )
   })
 
@@ -267,10 +297,16 @@ describe('ImageUploader component', () => {
     const uploaderContainer = wrapper.find('.uploader-container')
 
     expect(uploaderContainer.exists()).toBe(true)
-    expect(uploaderContainer.element.children).toHaveLength(5) // The progress bar is visible
+    expect(uploaderContainer.element.children).toHaveLength(6) // The progress bar is visible
 
-    const [uploaderInput, dropZone, webpOption, progressBar, resultsList] =
-      Array.from(uploaderContainer.element.children)
+    const [
+      uploaderInput,
+      dropZone,
+      webpOption,
+      progressBar,
+      bulkActions,
+      resultsList,
+    ] = Array.from(uploaderContainer.element.children)
 
     expect(uploaderInput).toBeTruthy()
     expect(uploaderInput?.id).toBe('upload-input')
@@ -325,6 +361,21 @@ describe('ImageUploader component', () => {
     expect(progressBarText?.className).toBe('progress-text')
     expect(progressBarText?.textContent).toBe('3 / 3')
 
+    expect(bulkActions?.className).toBe('bulk-actions')
+    expect(bulkActions?.children).toHaveLength(2)
+
+    const [downloadAllButton, clearAllButton] = Array.from(
+      bulkActions!.children
+    )
+    expect(downloadAllButton?.className).toBe('download-all-button')
+    expect(downloadAllButton?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.download_all_wording')
+    )
+    expect(clearAllButton?.className).toBe('clear-all-button')
+    expect(clearAllButton?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.clear_all_wording')
+    )
+
     expect(resultsList?.className).toBe('results-list')
     expect(resultsList?.children).toHaveLength(3)
 
@@ -345,15 +396,15 @@ describe('ImageUploader component', () => {
 
     expect(namePng?.className).toBe('item-name')
     expect(namePng?.textContent).toBe('image.png')
-    expect(sizePng?.className).toBe('item-size')
+    expect(sizePng?.className).toBe('item-size reduction-good')
     expect(sizePng?.textContent).toBe(
       `2.9 KB → 1.5 KB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(itemActionsPng?.className).toBe('item-actions')
-    expect(itemActionsPng?.children).toHaveLength(2)
+    expect(itemActionsPng?.children).toHaveLength(3)
 
-    const [previewButtonPng, downloadButtonPng] = Array.from(
+    const [previewButtonPng, downloadButtonPng, deleteButtonPng] = Array.from(
       itemActionsPng!.children
     )
 
@@ -365,6 +416,11 @@ describe('ImageUploader component', () => {
     expect(downloadButtonPng?.className).toBe('download-button')
     expect(downloadButtonPng?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
+    )
+
+    expect(deleteButtonPng?.className).toBe('delete-button')
+    expect(deleteButtonPng?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.delete_item_wording')
     )
 
     expect(resultsListItemHeic?.className).toBe('results-list-item')
@@ -383,7 +439,7 @@ describe('ImageUploader component', () => {
 
     expect(nameHeic?.className).toBe('item-name')
     expect(nameHeic?.textContent).toBe('image.heic')
-    expect(sizeHeic?.className).toBe('item-size')
+    expect(sizeHeic?.className).toBe('item-size reduction-none')
     expect(sizeHeic?.textContent).toBe(
       `3.4 KB → 3.4 KB (0% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
@@ -393,13 +449,20 @@ describe('ImageUploader component', () => {
     )
 
     expect(itemActionsHeic?.className).toBe('item-actions')
-    expect(itemActionsHeic?.children).toHaveLength(1)
+    expect(itemActionsHeic?.children).toHaveLength(2)
 
-    const [downloadButtonHeic] = Array.from(itemActionsHeic!.children)
+    const [downloadButtonHeic, deleteButtonHeic] = Array.from(
+      itemActionsHeic!.children
+    )
 
     expect(downloadButtonHeic?.className).toBe('download-button')
     expect(downloadButtonHeic?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
+    )
+
+    expect(deleteButtonHeic?.className).toBe('delete-button')
+    expect(deleteButtonHeic?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.delete_item_wording')
     )
 
     expect(resultsListItemJpg?.className).toBe('results-list-item')
@@ -416,15 +479,15 @@ describe('ImageUploader component', () => {
 
     expect(nameJpg?.className).toBe('item-name')
     expect(nameJpg?.textContent).toBe('image.jpg')
-    expect(sizeJpg?.className).toBe('item-size')
+    expect(sizeJpg?.className).toBe('item-size reduction-good')
     expect(sizeJpg?.textContent).toBe(
       `19.17 MB → 9.63 MB (50% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(itemActionsJpg?.className).toBe('item-actions')
-    expect(itemActionsJpg?.children).toHaveLength(2)
+    expect(itemActionsJpg?.children).toHaveLength(3)
 
-    const [previewButtonJpg, downloadButtonJpg] = Array.from(
+    const [previewButtonJpg, downloadButtonJpg, deleteButtonJpg] = Array.from(
       itemActionsJpg!.children
     )
 
@@ -436,6 +499,11 @@ describe('ImageUploader component', () => {
     expect(downloadButtonJpg?.className).toBe('download-button')
     expect(downloadButtonJpg?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
+    )
+
+    expect(deleteButtonJpg?.className).toBe('delete-button')
+    expect(deleteButtonJpg?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.delete_item_wording')
     )
   })
 
@@ -453,7 +521,7 @@ describe('ImageUploader component', () => {
 
     const webpConvertCheckbox = wrapper.find('input[id="webp-convert"]')
     expect(webpConvertCheckbox.exists()).toBe(true)
-    webpConvertCheckbox.setValue(true)
+    await webpConvertCheckbox.setValue(true)
 
     const input = wrapper.find('input[type="file"]')
     expect(input.exists()).toBe(true)
@@ -471,10 +539,16 @@ describe('ImageUploader component', () => {
     const uploaderContainer = wrapper.find('.uploader-container')
 
     expect(uploaderContainer.exists()).toBe(true)
-    expect(uploaderContainer.element.children).toHaveLength(5) // The progress bar is visible
+    expect(uploaderContainer.element.children).toHaveLength(6) // The progress bar is visible
 
-    const [uploaderInput, dropZone, webpOption, progressBar, resultsList] =
-      Array.from(uploaderContainer.element.children)
+    const [
+      uploaderInput,
+      dropZone,
+      webpOption,
+      progressBar,
+      bulkActions,
+      resultsList,
+    ] = Array.from(uploaderContainer.element.children)
 
     expect(uploaderInput).toBeTruthy()
     expect(uploaderInput?.id).toBe('upload-input')
@@ -529,6 +603,21 @@ describe('ImageUploader component', () => {
     expect(progressBarText?.className).toBe('progress-text')
     expect(progressBarText?.textContent).toBe('2 / 2')
 
+    expect(bulkActions?.className).toBe('bulk-actions')
+    expect(bulkActions?.children).toHaveLength(2)
+
+    const [downloadAllButton, clearAllButton] = Array.from(
+      bulkActions!.children
+    )
+    expect(downloadAllButton?.className).toBe('download-all-button')
+    expect(downloadAllButton?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.download_all_wording')
+    )
+    expect(clearAllButton?.className).toBe('clear-all-button')
+    expect(clearAllButton?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.clear_all_wording')
+    )
+
     expect(resultsList?.className).toBe('results-list')
     expect(resultsList?.children).toHaveLength(2)
 
@@ -550,15 +639,15 @@ describe('ImageUploader component', () => {
 
     expect(nameJpg?.className).toBe('item-name')
     expect(nameJpg?.textContent).toBe('image.webp')
-    expect(sizeJpg?.className).toBe('item-size')
+    expect(sizeJpg?.className).toBe('item-size reduction-good')
     expect(sizeJpg?.textContent).toBe(
       `19.84 MB → 4.13 MB (79% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
 
     expect(itemActionsJpg?.className).toBe('item-actions')
-    expect(itemActionsJpg?.children).toHaveLength(2)
+    expect(itemActionsJpg?.children).toHaveLength(3)
 
-    const [previewButtonJpg, downloadButtonJpg] = Array.from(
+    const [previewButtonJpg, downloadButtonJpg, deleteButtonJpg] = Array.from(
       itemActionsJpg!.children
     )
 
@@ -570,6 +659,11 @@ describe('ImageUploader component', () => {
     expect(downloadButtonJpg?.className).toBe('download-button')
     expect(downloadButtonJpg?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
+    )
+
+    expect(deleteButtonJpg?.className).toBe('delete-button')
+    expect(deleteButtonJpg?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.delete_item_wording')
     )
 
     expect(resultsListItemHeic?.className).toBe('results-list-item')
@@ -588,7 +682,7 @@ describe('ImageUploader component', () => {
 
     expect(nameHeic?.className).toBe('item-name')
     expect(nameHeic?.textContent).toBe('image.heic')
-    expect(sizeHeic?.className).toBe('item-size')
+    expect(sizeHeic?.className).toBe('item-size reduction-none')
     expect(sizeHeic?.textContent).toBe(
       `3.4 KB → 3.4 KB (0% ${useNuxtApp().$i18n.t('components.image_uploader.image_reduction_wording')})`
     )
@@ -598,13 +692,20 @@ describe('ImageUploader component', () => {
     )
 
     expect(itemActionsHeic?.className).toBe('item-actions')
-    expect(itemActionsHeic?.children).toHaveLength(1)
+    expect(itemActionsHeic?.children).toHaveLength(2)
 
-    const [downloadButtonHeic] = Array.from(itemActionsHeic!.children)
+    const [downloadButtonHeic, deleteButtonHeic] = Array.from(
+      itemActionsHeic!.children
+    )
 
     expect(downloadButtonHeic?.className).toBe('download-button')
     expect(downloadButtonHeic?.textContent).toBe(
       useNuxtApp().$i18n.t('components.image_uploader.download_image_wording')
+    )
+
+    expect(deleteButtonHeic?.className).toBe('delete-button')
+    expect(deleteButtonHeic?.textContent?.trim()).toBe(
+      useNuxtApp().$i18n.t('components.image_uploader.delete_item_wording')
     )
   })
 
@@ -617,6 +718,75 @@ describe('ImageUploader component', () => {
 
     await dropZone.trigger('dragleave')
     expect(dropZone.classes()).not.toContain('drag-hover')
+  })
+
+  it('applies webp extension when convertToWebp is enabled for a successful file', async () => {
+    const pngFile = new File([new Uint8Array(3000)], 'photo.png', {
+      type: 'image/png',
+    })
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+
+    const checkboxEl = wrapper.find('input[id="webp-convert"]')
+      .element as HTMLInputElement
+    checkboxEl.checked = true
+
+    await wrapper.find('input[id="webp-convert"]').trigger('change')
+    await waitForPromises()
+
+    await wrapper.find('.drop-zone').trigger('drop', {
+      dataTransfer: { files: [pngFile] },
+    })
+    await waitForPromises()
+
+    expect(wrapper.find('.item-name').text()).toBe('photo.webp')
+  })
+
+  it('applies reduction-moderate class for small savings (1–19%)', async () => {
+    // 1700-byte PNG → mock returns 1500 bytes → ~12% reduction → reduction-moderate
+    const file = new File([new Uint8Array(1700)], 'image.png', {
+      type: 'image/png',
+    })
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+
+    const input = wrapper.find('input[type="file"]')
+
+    Object.defineProperty(input.element, 'files', {
+      value: [file],
+      configurable: true,
+    })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    const sizeEl = wrapper.find('.item-size')
+    expect(sizeEl.classes()).toContain('reduction-moderate')
+  })
+
+  it('hides download-all button and keeps clear-all when all results failed', async () => {
+    // image/jpeg is not handled by the mock and returns success=false,
+    // covering the &&-short-circuit on shouldUseWebpExt and the v-if false branch on download-all
+    const file = new File([new Uint8Array(3_000)], 'image.jpeg', {
+      type: 'image/jpeg',
+    })
+    const wrapper = await mountSuspended(ImageUploader)
+    const input = wrapper.find('input[type="file"]')
+
+    Object.defineProperty(input.element, 'files', {
+      value: [file],
+      configurable: true,
+    })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    expect(wrapper.findAll('.results-list-item')).toHaveLength(1)
+    expect(wrapper.find('.bulk-actions').exists()).toBe(true)
+    expect(wrapper.find('.download-all-button').exists()).toBe(false)
+    expect(wrapper.find('.clear-all-button').exists()).toBe(true)
   })
 
   it('does nothing when input change contains no files', async () => {
@@ -634,6 +804,55 @@ describe('ImageUploader component', () => {
 
     const items = wrapper.findAll('.results-list-item')
     expect(items.length).toBe(0)
+  })
+
+  it('cancels in-flight processing when a new batch starts', async () => {
+    let resolveFirstCall!: (value: { file: Blob; success: boolean }) => void
+    mockOptimizeImage.mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          resolveFirstCall = resolve
+        })
+    )
+
+    const file1 = new File([new Uint8Array(3_000)], 'first.png', {
+      type: 'image/png',
+    })
+    const file2 = new File([new Uint8Array(3_000)], 'second.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader)
+    const input = wrapper.find('input[type="file"]')
+
+    // Start first batch — mock is blocked until we release it
+    Object.defineProperty(input.element, 'files', {
+      value: [file1],
+      configurable: true,
+    })
+
+    await input.trigger('change')
+
+    // Start second batch before first resolves, which increments currentBatchId
+    Object.defineProperty(input.element, 'files', {
+      value: [file2],
+      configurable: true,
+    })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    // Release first call — handleFiles will find batchId changed and return early
+    resolveFirstCall({
+      file: new Blob([new Uint8Array(1_500)], { type: 'image/png' }),
+      success: true,
+    })
+
+    await waitForPromises()
+
+    // Only second batch result should remain
+    expect(wrapper.findAll('.results-list-item')).toHaveLength(1)
+    expect(wrapper.find('.item-name').text()).toBe('second.png')
   })
 
   it('processes files when dropped and clears drag hover', async () => {
@@ -972,5 +1191,249 @@ describe('ImageUploader component', () => {
     await waitForPromises()
 
     expect(wrapper.vm.previewItem).toBeNull()
+  })
+
+  it('removes an item from the list when delete button is clicked', async () => {
+    const pngImage = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+    const jpgImage = new File([new Uint8Array(20_800_800)], 'image.jpg', {
+      type: 'image/jpg',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader)
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(pngImage)
+    dataTransfer.items.add(jpgImage)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    expect(wrapper.findAll('.results-list-item')).toHaveLength(2)
+
+    const deleteButtons = wrapper.findAll('.delete-button')
+    await deleteButtons[0]!.trigger('click')
+    await waitForPromises()
+
+    expect(wrapper.findAll('.results-list-item')).toHaveLength(1)
+    expect(wrapper.find('.item-name').text()).toBe('image.jpg')
+  })
+
+  it('hides progress bar and bulk actions when last item is deleted', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader)
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    expect(wrapper.find('.progress-container').exists()).toBe(true)
+    expect(wrapper.find('.bulk-actions').exists()).toBe(true)
+
+    const deleteButton = wrapper.find('.delete-button')
+    await deleteButton.trigger('click')
+    await waitForPromises()
+
+    expect(wrapper.find('.results-list-item').exists()).toBe(false)
+    expect(wrapper.find('.progress-container').exists()).toBe(false)
+    expect(wrapper.find('.bulk-actions').exists()).toBe(false)
+  })
+
+  it('closes preview modal when the previewed item is deleted', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    await wrapper.find('.preview-button').trigger('click')
+    await waitForPromises()
+    expect(wrapper.vm.previewItem).not.toBeNull()
+
+    await wrapper.find('.delete-button').trigger('click')
+    await waitForPromises()
+    expect(wrapper.vm.previewItem).toBeNull()
+  })
+
+  it('clears all results and resets progress when clear all is clicked', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader)
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    expect(wrapper.findAll('.results-list-item')).toHaveLength(1)
+    expect(wrapper.find('.bulk-actions').exists()).toBe(true)
+
+    await wrapper.find('.clear-all-button').trigger('click')
+    await waitForPromises()
+
+    expect(wrapper.findAll('.results-list-item')).toHaveLength(0)
+    expect(wrapper.find('.bulk-actions').exists()).toBe(false)
+    expect(wrapper.find('.progress-container').exists()).toBe(false)
+  })
+
+  it('closes preview modal when clear all is clicked', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    await wrapper.find('.preview-button').trigger('click')
+    await waitForPromises()
+    expect(wrapper.vm.previewItem).not.toBeNull()
+
+    await wrapper.find('.clear-all-button').trigger('click')
+    await waitForPromises()
+    expect(wrapper.vm.previewItem).toBeNull()
+    expect(wrapper.findAll('.results-list-item')).toHaveLength(0)
+  })
+
+  it('downloadAllImages creates a zip and triggers download', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const appendSpy = vi.spyOn(document.body, 'appendChild')
+    const removeSpy = vi.spyOn(document.body, 'removeChild')
+
+    const wrapper = await mountSuspended(ImageUploader)
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    const downloadAllButton = wrapper.find('.download-all-button')
+    expect(downloadAllButton.exists()).toBe(true)
+
+    await downloadAllButton.trigger('click')
+    await waitForPromises()
+    await waitForPromises()
+    await waitForPromises()
+    await waitForPromises()
+    await waitForPromises()
+
+    expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
+    expect(appendSpy).toHaveBeenCalled()
+    expect(removeSpy).toHaveBeenCalled()
+
+    appendSpy.mockRestore()
+    removeSpy.mockRestore()
+  })
+
+  it('does not fallback to anchor download when showSaveFilePicker is cancelled (AbortError)', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    globalWithShowSaveFilePicker.showSaveFilePicker = vi.fn(async () => {
+      throw new DOMException('The user aborted a request.', 'AbortError')
+    }) as unknown as ShowSaveFilePicker
+
+    const wrapper = await mountSuspended(ImageUploader, {
+      attachTo: document.body,
+    })
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    // Set up spy after mounting to avoid capturing the mount's own appendChild call
+    const appendSpy = vi.spyOn(document.body, 'appendChild')
+
+    const downloadButton = wrapper.find('.download-button')
+    await downloadButton.trigger('click')
+    await waitForPromises()
+
+    expect(globalWithShowSaveFilePicker.showSaveFilePicker).toHaveBeenCalled()
+    expect(appendSpy).not.toHaveBeenCalled()
+    expect(globalThis.URL.createObjectURL).not.toHaveBeenCalled()
+
+    appendSpy.mockRestore()
+  })
+
+  it('hides bulk actions while files are being processed', async () => {
+    const file = new File([new Uint8Array(3_000)], 'image.png', {
+      type: 'image/png',
+    })
+
+    const wrapper = await mountSuspended(ImageUploader)
+    const input = wrapper.find('input[type="file"]')
+    const inputElement = input.element as HTMLInputElement
+    const dataTransfer = new DataTransfer()
+
+    dataTransfer.items.add(file)
+
+    Object.defineProperty(inputElement, 'files', { value: dataTransfer.files })
+
+    // Before upload starts, bulk-actions is not visible
+    expect(wrapper.find('.bulk-actions').exists()).toBe(false)
+
+    await input.trigger('change')
+    await waitForPromises()
+
+    // After processing completes, bulk-actions should be visible
+    expect(wrapper.find('.bulk-actions').exists()).toBe(true)
   })
 })

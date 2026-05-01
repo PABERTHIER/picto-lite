@@ -66,6 +66,13 @@ beforeEach(() => {
 })
 ```
 
+Use `vi.mock()` for **third-party npm packages** (not Nuxt auto-imports):
+
+```typescript
+// ✅ correct — jszip is a regular npm package
+vi.mock('jszip', () => ({ default: vi.fn(() => ({ ... })) }))
+```
+
 ---
 
 ## Flushing Async Flows
@@ -112,7 +119,7 @@ Use `setLastInputFileSize` to control the simulated input file size per test.
 
 ## showSaveFilePicker Mock
 
-Test both presence and absence of the File System Access API:
+Test both presence and absence of the File System Access API, and the user-cancel (AbortError) case:
 
 ```typescript
 type GlobalWithPicker = typeof globalThis & {
@@ -127,6 +134,11 @@ g.showSaveFilePicker = vi.fn().mockResolvedValue({
     close: vi.fn().mockResolvedValue(undefined),
   }),
 })
+
+// Simulate user cancellation — must NOT trigger <a download> fallback
+g.showSaveFilePicker = vi.fn().mockRejectedValue(
+  Object.assign(new DOMException('User cancelled'), { name: 'AbortError' })
+)
 
 // In beforeEach: ensure API is absent by default
 delete g.showSaveFilePicker
