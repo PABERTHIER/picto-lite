@@ -28,7 +28,7 @@
     "types": ["@nuxt/types", "@nuxtjs/i18n", "node", "vitest/globals"],
     "useDefineForClassFields": true,
     "useUnknownInCatchVariables": true,
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext", "dom"],
+    "noImplicitAny": true
   },
-  "noImplicitAny": true
 }

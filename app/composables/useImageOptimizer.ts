@@ -3,46 +3,42 @@ import type { FileResult } from '~/types/result'
 const BINARY_SEARCH_ITERATIONS = 6 // Fixed iterations to find best quality
 const QUALITY_LOWER_BOUND = 0.3 // Min compression quality (30%), image degradation becomes noticeable below 0.3
 const QUALITY_UPPER_BOUND = 0.92 // Max compression quality (92%), most browsers cap this quality to 0.92
-const MIN_INITIAL_COMPRESSION_RATIO = 0.2 // Never compress below 20% scale initially
 const MAX_INITIAL_COMPRESSION_RATIO = 1 // Max 100% scale (original size)
 const DOWNSCALE_STEP_FACTOR = 0.85 // Reduce size by 15% per attempt progressively
-const MAX_DOWNSCALE_ATTEMPTS = 6 // Number of progressive downscale tries, 6 attempts give a precision of 0.0129 (1.3% of quality granularity), increase this value for finer control (cost time)
 const MIN_ALLOWED_SCALE = 0.05 // Minimum scale on final forced attempt
-const FINAL_FORCED_QUALITY = 0.05 // Very low quality for final aggressive compression attempt
+const PNG_PASSTHROUGH_THRESHOLD = 1_000_000 // PNGs ≤ 1 MB are returned as-is (already well-compressed)
 
 export async function optimizeImage(
   inputFile: File,
   shouldConvertToWebp: boolean
 ): Promise<FileResult> {
   try {
-    const originalSize = inputFile.size
     const inputFileType = inputFile.type
+
+    // PNG has its own pipeline (separate from lossy formats, preserves text & transparency)
+    if (inputFileType === 'image/png') {
+      return await (shouldConvertToWebp
+        ? convertPngToWebp(inputFile)
+        : optimizePngImage(inputFile))
+    }
+
+    const originalSize = inputFile.size
+    const outputMime = shouldConvertToWebp ? 'image/webp' : inputFileType
 
     const imageBitmap = await createImageBitmap(inputFile)
     const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height)
 
-    const outputMime = shouldConvertToWebp ? 'image/webp' : inputFileType
-
-    if (inputFileType === 'image/png') {
-      if (shouldConvertToWebp) {
-        return convertPngToWebp(inputFile)
-      } else {
-        return optimizePngImage(inputFile)
-      }
-    }
-
     const isLossy =
       outputMime === 'image/webp' ||
       outputMime === 'image/jpeg' ||
-      outputMime === 'image/jpg' ||
-      outputMime === 'image/webp'
+      outputMime === 'image/jpg'
 
     if (!isLossy) {
       const ctx = canvas.getContext('2d')
       ctx?.drawImage(imageBitmap, 0, 0)
-      const blob = await canvas.convertToBlob({
-        type: inputFileType,
-      })
+      const blob = await canvas.convertToBlob({ type: inputFileType })
+      closeBitmap(imageBitmap)
+
       return chooseBest(blob, inputFile, originalSize)
     }
 
@@ -77,15 +73,20 @@ export async function optimizeImage(
       }
     }
 
+    closeBitmap(imageBitmap)
+
     return chooseBest(bestBlob, inputFile, originalSize)
   } catch {
     return { file: inputFile, success: false }
   }
 }
 
+// PNG-specific pipeline: separate from lossy path, tuned to preserve text & transparency.
+// Files ≤ PNG_PASSTHROUGH_THRESHOLD are returned untouched.
+// Larger files go through a progressive downscale loop (up to 3 attempts), followed by
+// a final forced attempt. chooseBest ensures we never return a file larger than the original.
 async function optimizePngImage(inputFile: File): Promise<FileResult> {
-  const isSmallPngFile = inputFile.size <= 1_000_000
-  // Early exit: If PNG already small enough, return it as-is to preserve quality (e.g., for text readability)
+  const isSmallPngFile = inputFile.size <= PNG_PASSTHROUGH_THRESHOLD
   if (isSmallPngFile) {
     return { file: inputFile, success: true }
   }
@@ -96,19 +97,12 @@ async function optimizePngImage(inputFile: File): Promise<FileResult> {
   const originalHeight = imageBitmap.height
   const outputMimeType = 'image/png'
 
-  // Per-file tuned params (less aggressive for PNGs to preserve text/readability)
-  let localMinInitialCompressionRatio = MIN_INITIAL_COMPRESSION_RATIO
-  let localMaxDownscaleAttempts = MAX_DOWNSCALE_ATTEMPTS
-  let localQualityLower = QUALITY_LOWER_BOUND
+  // PNG-tuned params: less aggressive than lossy defaults to preserve text/readability
+  const localMinInitialCompressionRatio = 0.6 // Don't start below 60% scale
+  const localMaxDownscaleAttempts = 3 // Fewer progressive downscales
+  const localQualityLower = 0.5 // Don't drop below 50% quality
   const localQualityUpper = QUALITY_UPPER_BOUND
-  let localFinalForcedQuality = FINAL_FORCED_QUALITY
-
-  // PNGs often contain text/sharp edges -> avoid aggressive downscaling/low-quality
-  localMinInitialCompressionRatio = 0.6 // don't start below 60% scale
-  localMaxDownscaleAttempts = 3 // fewer progressive downscales
-  localQualityLower = 0.5 // don't drop below 50% quality
-  // make the final forced attempt less aggressive for PNGs
-  localFinalForcedQuality = 0.35
+  const localFinalForcedQuality = 0.35 // Make the final forced attempt less aggressive for PNGs
 
   // Progressive compression attempts with gradually decreasing scale
   for (
@@ -125,10 +119,6 @@ async function optimizePngImage(inputFile: File): Promise<FileResult> {
         )
       ) * Math.pow(DOWNSCALE_STEP_FACTOR, attemptIndex)
 
-    if (scaleFactor <= 0) {
-      break
-    }
-
     const blob = await compressImageAtScale(
       originalWidth,
       originalHeight,
@@ -144,21 +134,13 @@ async function optimizePngImage(inputFile: File): Promise<FileResult> {
       continue
     }
 
-    // Accept only if the new file is smaller than original
-    if (blob.size < inputFile.size) {
-      if (typeof imageBitmap.close === 'function') {
-        try {
-          imageBitmap.close()
-        } catch {
-          // Ignore errors closing bitmap
-        }
-      }
+    // blob.size <= maxAllowedFileSize < inputFile.size (invariant: only runs for files > 1 MB)
+    closeBitmap(imageBitmap)
 
-      return chooseBest(blob, inputFile, inputFile.size)
-    }
+    return chooseBest(blob, inputFile, inputFile.size)
   }
 
-  // Final forced attempt with minimal scale and quality (most aggressive) — use per-file final quality
+  // Final forced attempt: most aggressive, lowest quality
   const finalScaleFactor = Math.max(
     MIN_ALLOWED_SCALE,
     Math.sqrt(maxAllowedFileSize / inputFile.size) *
@@ -188,14 +170,7 @@ async function optimizePngImage(inputFile: File): Promise<FileResult> {
 
     let forcedCompressedBlob: Blob | null = null
     try {
-      forcedCompressedBlob = await (
-        finalCanvas as unknown as {
-          convertToBlob: (opts: {
-            type: string
-            quality: number
-          }) => Promise<Blob>
-        }
-      ).convertToBlob({
+      forcedCompressedBlob = await finalCanvas.convertToBlob({
         type: outputMimeType,
         quality: localFinalForcedQuality,
       })
@@ -212,32 +187,18 @@ async function optimizePngImage(inputFile: File): Promise<FileResult> {
     }
 
     if (forcedCompressedBlob && forcedCompressedBlob.size < inputFile.size) {
-      if (typeof imageBitmap.close === 'function') {
-        try {
-          imageBitmap.close()
-        } catch {
-          // Ignore errors closing bitmap
-        }
-      }
+      closeBitmap(imageBitmap)
 
       return chooseBest(forcedCompressedBlob, inputFile, inputFile.size)
     }
   }
 
-  // Cleanup and fallback: close bitmap and return original file as last resort
-  if (typeof imageBitmap.close === 'function') {
-    try {
-      imageBitmap.close()
-    } catch {
-      // Ignore errors closing bitmap
-    }
-  }
+  closeBitmap(imageBitmap)
 
   return { file: inputFile, success: true }
 }
 
-// Try compressing image at given scale, returning compressed Blob or null if fails
-// NOTE: accepts per-call quality bounds so PNGs can be treated less aggressively.
+// Try compressing the image at given scale; returns null if no candidate fits under the target.
 async function compressImageAtScale(
   originalWidth: number,
   originalHeight: number,
@@ -264,14 +225,10 @@ async function compressImageAtScale(
 
     for (let i = 0; i < BINARY_SEARCH_ITERATIONS; i++) {
       const testQuality = (qualityLow + qualityHigh) / 2
-      const candidateBlob = await (
-        offscreenCanvas as unknown as {
-          convertToBlob: (opts: {
-            type: string
-            quality: number
-          }) => Promise<Blob>
-        }
-      ).convertToBlob({ type: outputMimeType, quality: testQuality })
+      const candidateBlob = await offscreenCanvas.convertToBlob({
+        type: outputMimeType,
+        quality: testQuality,
+      })
 
       if (candidateBlob.size > maxAllowedFileSize) {
         qualityHigh = testQuality
@@ -295,58 +252,60 @@ async function convertPngToWebp(inputFile: File): Promise<FileResult> {
     ctx.drawImage(imageBitmap, 0, 0)
 
     try {
-      blob = await (
-        canvas as unknown as {
-          convertToBlob: (opts: {
-            type: string
-            quality: number
-          }) => Promise<Blob>
-        }
-      ).convertToBlob({ type: 'image/webp', quality: QUALITY_UPPER_BOUND })
+      blob = await canvas.convertToBlob({
+        type: 'image/webp',
+        quality: QUALITY_UPPER_BOUND,
+      })
       try {
         await createImageBitmap(blob)
-        if (typeof imageBitmap.close === 'function') {
-          try {
-            imageBitmap.close()
-          } catch {
-            // ignore
-          }
-        }
+        closeBitmap(imageBitmap)
 
         return chooseBest(blob, inputFile, inputFile.size)
       } catch {
-        // verification failed -> fall through to regular pipeline
+        // Verification failed — fall through to chooseBest below
       }
     } catch {
-      // conversion failed, fall through
+      // Conversion failed
     }
   }
+
+  closeBitmap(imageBitmap)
 
   return chooseBest(blob, inputFile, inputFile.size)
 }
 
+function closeBitmap(bitmap: ImageBitmap): void {
+  if (typeof bitmap.close === 'function') {
+    try {
+      bitmap.close()
+    } catch {
+      // Ignore errors closing bitmap
+    }
+  }
+}
+
 function computeTargetSize(size: number): number {
-  // tiny files: do not touch (metadata re-encode may increase)
+  // Tiny files: do not touch (metadata re-encode could increase size)
   if (size <= 200_000) {
     return size
   }
 
-  // small: light compression
+  // Small: light compression
   if (size <= 1_000_000) {
     return Math.round(size * 0.9)
   }
 
-  // medium: aim for ~50%
+  // Medium: aim for ~60%
   if (size <= 5_000_000) {
     return Math.round(size * 0.6)
   }
 
-  // large: aim for ~20-25% but with an absolute floor
+  // Large: aim for ~25% but with an absolute floor
   if (size <= 10_000_000) {
     return Math.max(Math.round(size * 0.25), 1_000_000) // e.g. 7MB -> at least 1MB
   }
 
-  // very large: stronger reduction but keep a reasonable floor
+  // Very large: stronger reduction with a reasonable floor
   if (size <= 30_000_000) {
     return Math.max(Math.round(size * 0.15), 1_500_000) // e.g. 20MB -> at least 3MB
   }
