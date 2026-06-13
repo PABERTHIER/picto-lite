@@ -168,7 +168,8 @@ async function optimizePngImage(inputFile: File): Promise<FileResult> {
       finalCanvasHeight
     )
 
-    let forcedCompressedBlob: Blob | null = null
+    let forcedCompressedBlob: Blob | null
+
     try {
       forcedCompressedBlob = await finalCanvas.convertToBlob({
         type: outputMimeType,

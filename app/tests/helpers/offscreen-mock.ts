@@ -45,7 +45,7 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
       const areaFactor = Math.max(1, Math.round(targetArea / (100 * 100)))
       const clampedQuality = Math.max(0, Math.min(1, quality ?? 0.92))
 
-      let simulatedSize = 0
+      let simulatedSize
 
       if (type === 'image/webp') {
         simulatedSize = Math.max(
@@ -123,7 +123,7 @@ export function installOffscreenCanvasMock(initialInputFileSize = 1_000_000): {
         close: () => {},
       } as unknown as ImageBitmap
     } catch (e) {
-      throw new Error(`${e}`)
+      throw new Error(`${e}`, { cause: e })
     }
   }) as unknown as typeof createImageBitmap
   ;(globalThis as unknown as { OffscreenCanvas?: unknown }).OffscreenCanvas =
