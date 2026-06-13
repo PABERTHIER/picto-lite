@@ -32,7 +32,7 @@ class MockOffscreenCanvas {
     // Clamp quality for safe behavior:
     const clampedQuality = Math.min(Math.max(quality, 0), 1)
 
-    let simulatedSize = 0
+    let simulatedSize
 
     if (type === 'image/webp') {
       simulatedSize = Math.max(

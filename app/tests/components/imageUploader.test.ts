@@ -13,8 +13,8 @@ const waitForPromises = (): Promise<void> =>
 
 const defaultOptimizeImageMockImpl = async (_file: File, _convert: boolean) => {
   let mimeType = _file.type
-  let blobSize = 0
-  let success = false
+  let blobSize
+  let success
 
   if (mimeType === 'image/png' || mimeType === 'image/webp') {
     blobSize = 1_500
