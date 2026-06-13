@@ -12115,7 +12115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nuxt@npm:^4.4.2":
+"nuxt@npm:^4.4.8":
   version: 4.4.8
   resolution: "nuxt@npm:4.4.8"
   dependencies:
@@ -13110,7 +13110,7 @@ __metadata:
     globals: "npm:^17.6.0"
     happy-dom: "npm:^20.10.3"
     jszip: "npm:^3.10.1"
-    nuxt: "npm:^4.4.2"
+    nuxt: "npm:^4.4.8"
     playwright-core: "npm:^1.60.0"
     prettier: "npm:^3.8.4"
     sass: "npm:^1.101.0"
