@@ -12,7 +12,7 @@ This file provides Copilot-specific behavioral guidance that complements `AGENTS
 - Use `<script setup lang="ts">` for all Vue SFCs (never Options API or `<script>` without `setup`)
 - Nuxt auto-imports are available — do NOT manually import `ref`, `computed`, `watch`,
   `useI18n`, `useHead`, `useSeoMeta`, `useRoute`, `useRuntimeConfig`, `useLocalePath`,
-  `onMounted`, `onBeforeUnmount`, `defineOgImageComponent`
+  `onMounted`, `onBeforeUnmount`, `defineOgImage`
 - `optimizeImage` from `app/composables/useImageOptimizer.ts` is **also auto-imported**
 - DO manually import types: `import type { ResultItem } from '~/types/result'`
 - All component styles must use `<style lang="scss" scoped>`

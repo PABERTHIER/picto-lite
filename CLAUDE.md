@@ -25,7 +25,7 @@ Nuxt auto-imports mean you must **never** manually import these in `.vue` or `.t
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHead, useSeoMeta } from '#imports'
-import { defineOgImageComponent } from 'nuxt-og-image'
+import { defineOgImage } from 'nuxt-og-image'
 ```
 
 Auto-imported from `app/composables/`:

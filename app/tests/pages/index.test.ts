@@ -3,12 +3,12 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MainPage from '@/pages/index.vue'
 import ImageUploader from '@/components/ImageUploader.vue'
 
-const mockDefineOgImageComponent = vi.fn()
+const mockDefineOgImage = vi.fn()
 
 describe('Page Component', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.stubGlobal('defineOgImageComponent', mockDefineOgImageComponent)
+    vi.stubGlobal('defineOgImage', mockDefineOgImage)
   })
 
   it('renders correctly', async () => {
@@ -35,10 +35,10 @@ describe('Page Component', () => {
     expect(wrapper.findComponent(ImageUploader).exists()).toBe(true)
   })
 
-  it('calls defineOgImageComponent with correct arguments', async () => {
+  it('calls defineOgImage with correct arguments', async () => {
     await mountSuspended(MainPage)
 
-    expect(mockDefineOgImageComponent).toHaveBeenCalledWith('NuxtSeo', {
+    expect(mockDefineOgImage).toHaveBeenCalledWith('NuxtSeo', {
       theme: '#ff0000',
       colorMode: 'dark',
     })

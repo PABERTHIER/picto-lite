@@ -35,7 +35,7 @@ useSeoMeta({
   msapplicationTileImage: `${baseUrl.value}/${ogImageEndPath}`,
 })
 
-defineOgImageComponent('NuxtSeo', { theme: '#ff0000', colorMode: 'dark' })
+defineOgImage('NuxtSeo', { theme: '#ff0000', colorMode: 'dark' })
 </script>
 
 <style lang="scss" scoped>
