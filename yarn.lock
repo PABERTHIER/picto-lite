@@ -2238,7 +2238,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nuxt/ui@npm:^4.6.1":
+"@nuxt/ui@npm:^4.8.2":
   version: 4.8.2
   resolution: "@nuxt/ui@npm:4.8.2"
   dependencies:
@@ -13096,7 +13096,7 @@ __metadata:
     "@nuxt/fonts": "npm:^0.14.0"
     "@nuxt/test-utils": "npm:^4.0.3"
     "@nuxt/types": "npm:^2.18.1"
-    "@nuxt/ui": "npm:^4.6.1"
+    "@nuxt/ui": "npm:^4.8.2"
     "@nuxtjs/eslint-config-typescript": "npm:^12.1.0"
     "@nuxtjs/i18n": "npm:^10.2.4"
     "@nuxtjs/seo": "npm:^3.4.0"
