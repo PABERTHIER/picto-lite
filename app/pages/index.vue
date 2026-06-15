@@ -34,8 +34,6 @@ useSeoMeta({
   appleMobileWebAppTitle: '%siteName',
   msapplicationTileImage: `${baseUrl.value}/${ogImageEndPath}`,
 })
-
-defineOgImage('NuxtSeo', { theme: '#ff0000', colorMode: 'dark' })
 </script>
 
 <style lang="scss" scoped>

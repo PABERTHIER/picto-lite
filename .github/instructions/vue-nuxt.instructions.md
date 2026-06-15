@@ -16,13 +16,12 @@ import { ref, computed, watch, watchEffect, reactive } from 'vue'
 import { onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHead, useSeoMeta } from '#imports'
-import { defineOgImage } from 'nuxt-og-image'
 ```
 
 Nuxt auto-imports: `ref`, `computed`, `watch`, `watchEffect`, `reactive`, `readonly`,
 `toRef`, `toRefs`, `onMounted`, `onBeforeUnmount`, `onUnmounted`, `useI18n`, `useHead`,
 `useSeoMeta`, `useRoute`, `useRouter`, `useRuntimeConfig`, `useNuxtApp`, `useState`,
-`navigateTo`, `definePageMeta`, `useLocalePath`, `defineOgImage`
+`navigateTo`, `definePageMeta`, `useLocalePath`
 
 Auto-imported from `app/composables/`:
 `optimizeImage` — do NOT import manually

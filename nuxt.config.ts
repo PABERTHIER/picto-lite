@@ -133,6 +133,6 @@ export default defineNuxtConfig({
     },
   },
   ogImage: {
-    zeroRuntime: true,
+    enabled: false,
   },
 })
