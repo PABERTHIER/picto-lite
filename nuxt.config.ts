@@ -98,7 +98,12 @@ export default defineNuxtConfig({
       },
     },
     optimizeDeps: {
-      include: ['@vue/devtools-core', '@vue/devtools-kit', 'jszip'],
+      include: [
+        '@unhead/schema-org/vue',
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        'jszip',
+      ],
     },
     plugins: [],
   },
@@ -128,8 +133,6 @@ export default defineNuxtConfig({
     },
   },
   ogImage: {
-    componentOptions: {
-      global: true,
-    },
+    enabled: false,
   },
 })

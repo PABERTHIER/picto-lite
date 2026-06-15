@@ -48,7 +48,7 @@ Adding a manual import for any of these will cause lint errors:
 
 **Vue reactivity:** `ref`, `computed`, `watch`, `watchEffect`, `reactive`, `readonly`, `toRef`, `toRefs`, `onMounted`, `onBeforeUnmount`, `onUnmounted`
 
-**Nuxt composables:** `useI18n`, `useHead`, `useSeoMeta`, `useRoute`, `useRouter`, `useRuntimeConfig`, `useNuxtApp`, `useState`, `navigateTo`, `definePageMeta`, `useLocalePath`, `defineOgImageComponent`
+**Nuxt composables:** `useI18n`, `useHead`, `useSeoMeta`, `useRoute`, `useRouter`, `useRuntimeConfig`, `useNuxtApp`, `useState`, `navigateTo`, `definePageMeta`, `useLocalePath`
 
 **Project composables** (from `app/composables/`): `optimizeImage`
 

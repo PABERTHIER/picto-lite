@@ -18,7 +18,6 @@ mockNuxtImport('useI18n', () => () => ({
 describe('App component (locale fallback)', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.stubGlobal('defineOgImageComponent', vi.fn())
   })
 
   it('falls back to en_US when a locale entry has no language field', async () => {

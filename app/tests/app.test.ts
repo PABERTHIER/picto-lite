@@ -2,12 +2,9 @@ import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import App from '@/app.vue'
 
-const mockDefineOgImageComponent = vi.fn()
-
 describe('App component', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.stubGlobal('defineOgImageComponent', mockDefineOgImageComponent)
   })
 
   it('renders correctly', async () => {
