@@ -118,6 +118,7 @@ describe('App component', () => {
     const baseUrl = useNuxtApp().$i18n.baseUrl.value
     const expectedOgImage = `${baseUrl}/logo.png`
     const locale = useNuxtApp().$i18n.locale.value
+    const expectedAppName = useNuxtApp().$i18n.t('app.name')
     const expectedDescription = useNuxtApp().$i18n.t('app.meta.description')
     const expectedAuthor = useNuxtApp().$i18n.t('about.author')
     const locales = useNuxtApp().$i18n.locales?.value ?? []
@@ -126,7 +127,7 @@ describe('App component', () => {
     // OG: title
     const ogTitle = document.querySelector('meta[property="og:title"]')
     expect(ogTitle).toBeTruthy()
-    expect(ogTitle!.getAttribute('content')).toEqual('%siteName')
+    expect(ogTitle!.getAttribute('content')).toEqual(expectedAppName)
 
     // OG: description
     const ogDesc = document.querySelector('meta[property="og:description"]')
@@ -181,7 +182,7 @@ describe('App component', () => {
     // Twitter: title
     const twitterTitle = document.querySelector('meta[name="twitter:title"]')
     expect(twitterTitle).toBeTruthy()
-    expect(twitterTitle!.getAttribute('content')).toEqual('%siteName')
+    expect(twitterTitle!.getAttribute('content')).toEqual(expectedAppName)
 
     // Twitter: description
     const twitterDesc = document.querySelector(
