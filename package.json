@@ -20,8 +20,9 @@
     "profile": "nuxt build --profile"
   },
   "dependencies": {
+    "@iconify-json/lucide": "^1.2.118",
     "@nuxt/fonts": "^0.14.0",
-    "@nuxt/ui": "^4.8.2",
+    "@nuxt/ui": "^4.10.0",
     "@nuxtjs/i18n": "^10.4.0",
     "@nuxtjs/seo": "^5.3.0",
     "jszip": "^3.10.1",
