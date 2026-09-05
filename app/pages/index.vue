@@ -26,11 +26,6 @@ useSeoMeta({
   ogImageType: 'image/png',
   ogImageWidth: '1200',
   ogImageHeight: '600',
-  twitterTitle: '%siteName',
-  twitterDescription: computed(() => t('app.meta.description')),
-  twitterImage: `${baseUrl.value}/${ogImageEndPath}`,
-  twitterImageAlt: computed(() => t('app.meta.description')),
-  twitterImageType: 'image/png',
   appleMobileWebAppTitle: '%siteName',
   msapplicationTileImage: `${baseUrl.value}/${ogImageEndPath}`,
 })

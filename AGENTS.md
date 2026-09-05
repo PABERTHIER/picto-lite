@@ -74,10 +74,10 @@ picto-lite/
 
 | Purpose            | Technology                          |
 |--------------------|-------------------------------------|
-| Framework          | Nuxt 4 (Vue 3 + TypeScript)        |
+| Framework          | Nuxt 4 (Vue 3 + TypeScript)         |
 | Styling            | SCSS with global variables          |
-| i18n               | @nuxtjs/i18n (prefix strategy)     |
-| SEO                | @nuxtjs/seo (OG, Twitter, Schema)  |
+| i18n               | @nuxtjs/i18n (prefix strategy)      |
+| SEO                | @nuxtjs/seo (OG, Schema)            |
 | UI components      | @nuxt/ui                            |
 | Fonts              | @nuxt/fonts (Google Fonts)          |
 | Zip creation       | jszip (bulk image download)         |

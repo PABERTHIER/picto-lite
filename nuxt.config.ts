@@ -2,13 +2,8 @@
 export default defineNuxtConfig({
   app: {
     head: {
-      charset: 'utf-8',
-      htmlAttrs: {
-        lang: 'fr',
-      },
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
       title: 'PictoLite',
-      viewport: 'width=device-width, initial-scale=1',
       meta: [
         {
           name: 'viewport',

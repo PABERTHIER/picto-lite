@@ -95,11 +95,6 @@ describe('App component', () => {
     )
     expect(appleTouch).toBeTruthy()
 
-    const applePrecomposed = document.querySelector(
-      'link[rel="apple-touch-icon-precomposed"][href="apple-icon.png"]'
-    )
-    expect(applePrecomposed).toBeTruthy()
-
     const appleStartup = document.querySelector(
       'link[rel="apple-touch-startup-image"][href="apple-icon.png"]'
     )
@@ -150,7 +145,9 @@ describe('App component', () => {
     // OG: url
     const ogUrl = document.querySelector('meta[property="og:url"]')
     expect(ogUrl).toBeTruthy()
-    expect(ogUrl!.getAttribute('content')).toEqual(baseUrl)
+    expect(ogUrl!.getAttribute('content')).toEqual(
+      `${baseUrl}/${currentLocale}`
+    )
 
     // OG: type
     const ogType = document.querySelector('meta[property="og:type"]')
@@ -178,23 +175,6 @@ describe('App component', () => {
       )
       expect(metaAlt).toBeTruthy()
     }
-
-    // Twitter: title
-    const twitterTitle = document.querySelector('meta[name="twitter:title"]')
-    expect(twitterTitle).toBeTruthy()
-    expect(twitterTitle!.getAttribute('content')).toEqual(expectedAppName)
-
-    // Twitter: description
-    const twitterDesc = document.querySelector(
-      'meta[name="twitter:description"]'
-    )
-    expect(twitterDesc).toBeTruthy()
-    expect(twitterDesc!.getAttribute('content')).toEqual(expectedDescription)
-
-    // Twitter: image
-    const twitterImage = document.querySelector('meta[name="twitter:image"]')
-    expect(twitterImage).toBeTruthy()
-    expect(twitterImage!.getAttribute('content')).toEqual(expectedOgImage)
 
     // Author & Creator
     const metaAuthor = document.querySelector('meta[name="author"]')

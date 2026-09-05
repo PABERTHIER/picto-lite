@@ -9,6 +9,7 @@ const { t, locale, locales } = useI18n()
 const runtimeConfig = useRuntimeConfig()
 const baseUrl = ref(runtimeConfig.public.i18n.baseUrl)
 const ogImageEndPath = 'logo.png'
+const canonicalUrl = computed(() => `${baseUrl.value}/${locale.value}`)
 
 const availableLocaleAlternates = computed(() => {
   const localesFiltered = locales.value.filter(l => l.code !== locale.value)
@@ -30,11 +31,27 @@ useHead({
     { name: 'description', content: computed(() => t('app.meta.description')) },
   ],
   link: [
-    { rel: 'canonical', href: `${baseUrl.value}/${locale.value}` },
-    { rel: 'alternate', href: `${baseUrl.value}`, hreflang: 'fr-FR' },
-    { rel: 'alternate', href: `${baseUrl.value}/fr`, hreflang: 'fr-FR' },
-    { rel: 'alternate', href: `${baseUrl.value}/en`, hreflang: 'en-US' },
-    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'canonical', href: canonicalUrl.value },
+    {
+      rel: 'alternate',
+      href: computed(() => `${baseUrl.value}/en`),
+      hreflang: 'en-US',
+    },
+    {
+      rel: 'alternate',
+      href: computed(() => `${baseUrl.value}/fr`),
+      hreflang: 'fr-FR',
+    },
+    {
+      rel: 'alternate',
+      href: computed(() => `${baseUrl.value}`),
+      hreflang: 'x-default',
+    },
+    {
+      rel: 'preconnect',
+      href: 'https://fonts.googleapis.com',
+      crossorigin: '',
+    },
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap',
@@ -42,7 +59,6 @@ useHead({
     },
     { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     { rel: 'apple-touch-icon', href: 'apple-icon.png' },
-    { rel: 'apple-touch-icon-precomposed', href: 'apple-icon.png' },
     { rel: 'apple-touch-startup-image', href: 'apple-icon.png' },
     { rel: 'mask-icon', href: 'apple-icon.png', color: '#000000' },
   ],
@@ -61,16 +77,10 @@ useSeoMeta({
   ogImageType: 'image/png',
   ogImageWidth: '1200',
   ogImageHeight: '600',
-  ogUrl: `${baseUrl.value}`,
+  ogUrl: canonicalUrl.value,
   ogType: 'website',
   ogLocale: locale.value,
   ogLocaleAlternate: availableLocaleAlternates.value,
-  twitterCard: 'summary_large_image',
-  twitterTitle: computed(() => t('app.name')),
-  twitterDescription: computed(() => t('app.meta.description')),
-  twitterImage: `${baseUrl.value}/${ogImageEndPath}`,
-  twitterImageAlt: computed(() => t('app.meta.description')),
-  twitterImageType: 'image/png',
   author: computed(() => t('about.author')),
   creator: computed(() => t('about.author')),
   articleTag: computed(() => [
