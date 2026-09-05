@@ -1426,12 +1426,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify-json/lucide@npm:^1.2.118":
-  version: 1.2.118
-  resolution: "@iconify-json/lucide@npm:1.2.118"
+"@iconify-json/lucide@npm:^1.2.129":
+  version: 1.2.129
+  resolution: "@iconify-json/lucide@npm:1.2.129"
   dependencies:
     "@iconify/types": "npm:*"
-  checksum: 10c0/19f838585b594727c52c7841c5dff06b4deeef76e52d89a0dc47dd302003d0db98a936fa80fdb37bfa0eec06cc118d71144db8403d013adf8d1b3ae06ed4df2e
+  checksum: 10c0/99c6f39d52a69b46718eb5af4514852eefe609f8006155ac6fcfca3ad78126cde2372465d2ec33a6b1dc02ceea8de5e017e43aa9d3d3c52e57cd54684b21871c
   languageName: node
   linkType: hard
 
@@ -13624,7 +13624,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "picto-lite@workspace:."
   dependencies:
-    "@iconify-json/lucide": "npm:^1.2.118"
+    "@iconify-json/lucide": "npm:^1.2.129"
     "@nuxt/eslint": "npm:1.17.0"
     "@nuxt/eslint-config": "npm:^1.17.0"
     "@nuxt/fonts": "npm:^0.14.0"
