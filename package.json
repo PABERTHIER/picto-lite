@@ -35,7 +35,7 @@
     "@nuxt/test-utils": "^4.2.0",
     "@nuxt/types": "^2.18.1",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
-    "@types/node": "^25.9.5",
+    "@types/node": "^26.4.1",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
     "@vue/test-utils": "^2.5.0",
