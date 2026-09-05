@@ -4881,7 +4881,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=20.0.0, @types/node@npm:^26.4.0":
+"@types/node@npm:*, @types/node@npm:>=20.0.0, @types/node@npm:^26.4.0, @types/node@npm:^26.4.1":
   version: 26.4.1
   resolution: "@types/node@npm:26.4.1"
   dependencies:
@@ -4894,15 +4894,6 @@ __metadata:
   version: 16.18.126
   resolution: "@types/node@npm:16.18.126"
   checksum: 10c0/5c137eb141d33de32b16ff26047ff6d449432b58d0d25f7cced2040c97727d81fe1099a7581eb336d14a6840f5b09e363bdd43d7a6995e8e81eb47aa51e413fc
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^25.9.5":
-  version: 25.9.5
-  resolution: "@types/node@npm:25.9.5"
-  dependencies:
-    undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10c0/addbfe55f14d6a7f149a8796c2fca68463ac6caf911c623f552d07385691d36c0669a9c38724350d0e958131827d59a63c18781e753dede8113a903dd62b7932
   languageName: node
   linkType: hard
 
@@ -12711,7 +12702,7 @@ __metadata:
     "@nuxtjs/eslint-config-typescript": "npm:^12.1.0"
     "@nuxtjs/i18n": "npm:^10.6.0"
     "@nuxtjs/seo": "npm:^5.3.14"
-    "@types/node": "npm:^25.9.5"
+    "@types/node": "npm:^26.4.1"
     "@vitest/coverage-v8": "npm:^4.1.11"
     "@vitest/ui": "npm:^4.1.11"
     "@vue/test-utils": "npm:^2.5.0"
@@ -15243,13 +15234,6 @@ __metadata:
     unplugin:
       optional: true
   checksum: 10c0/64a8d85b24d00d6d85e2420e48d68f5827535f8ed54009a4eb00181952fd43e8d783d2c377f8bcf479467c0541d4485866458e83781438cc55bb9dbe26ca9268
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:>=7.24.0 <7.24.7":
-  version: 7.24.6
-  resolution: "undici-types@npm:7.24.6"
-  checksum: 10c0/d9cd8befb643ac904615c280a095ba4240531f6bb4a5e75a22a7483630ca8d3f1016d2ab6ace6ceda1f63b3a2db2fe037fafe121d6917a0187573aa548ff78ca
   languageName: node
   linkType: hard
 
