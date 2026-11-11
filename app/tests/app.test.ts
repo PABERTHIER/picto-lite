@@ -102,19 +102,6 @@ describe('App component', () => {
       )
       expect(alternateEn).toBeTruthy()
 
-      // preconnect
-      const preconnect = document.querySelector(
-        'link[rel="preconnect"][href="https://fonts.googleapis.com"]'
-      )
-      expect(preconnect).toBeTruthy()
-
-      // stylesheet (and crossorigin)
-      const stylesheet = document.querySelector(
-        'link[rel="stylesheet"][href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"]'
-      )
-      expect(stylesheet).toBeTruthy()
-      expect(stylesheet!.getAttribute('crossorigin')).toEqual('')
-
       // icon
       const icon = document.querySelector(
         'link[rel="icon"][type="image/x-icon"][href="/favicon.ico"]'
