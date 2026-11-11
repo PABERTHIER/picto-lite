@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { enableAutoUnmount } from '@vue/test-utils'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import ImageUploader from '@/components/ImageUploader.vue'
 import type { FilePickerOptions, ShowSaveFilePicker } from '~/types/file-picker'
@@ -42,6 +43,8 @@ const mockOptimizeImage = vi.hoisted(() => vi.fn())
 mockNuxtImport('optimizeImage', () => mockOptimizeImage)
 
 describe('ImageUploader component', () => {
+  enableAutoUnmount(afterEach)
+
   beforeEach(() => {
     vi.resetAllMocks()
     mockOptimizeImage.mockImplementation(defaultOptimizeImageMockImpl)
@@ -49,11 +52,18 @@ describe('ImageUploader component', () => {
     // Ensure FS Access API is unset by default
     delete globalWithShowSaveFilePicker.showSaveFilePicker
 
-    // Stub URL.createObjectURL to avoid real blob URL creation side-effects
-    globalWithShowSaveFilePicker.URL = globalWithShowSaveFilePicker.URL ?? URL
-    globalWithShowSaveFilePicker.URL.createObjectURL = vi.fn(
-      () => 'blob:fake-url'
-    )
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake-url')
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+
+    // Since Nuxt 4.6.0 (https://github.com/nuxt/nuxt/pull/36391)
+    // Happy DOM follows download anchors as navigation, replacing the page URL
+    // Keep the download boundary mocked so subsequent Nuxt mounts keep a valid base URL
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    delete globalWithShowSaveFilePicker.showSaveFilePicker
   })
 
   it('renders correctly', async () => {
@@ -957,9 +967,11 @@ describe('ImageUploader component', () => {
     expect(createWritableSpy).toHaveBeenCalled()
     expect(writeSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
+    expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()
   })
 
   it('falls back to anchor download when FS Access API is not available', async () => {
+    const pageUrl = window.location.href
     const file = new File([new Uint8Array(3_000)], 'image.jpg', {
       type: 'image/jpg',
     })
@@ -989,12 +1001,19 @@ describe('ImageUploader component', () => {
     expect(appendSpy).toHaveBeenCalled()
     expect(removeSpy).toHaveBeenCalled()
     expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
+    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledOnce()
+    expect(vi.mocked(HTMLAnchorElement.prototype.click).mock.contexts).toEqual([
+      expect.objectContaining({ href: 'blob:fake-url', download: file.name }),
+    ])
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fake-url')
+    expect(window.location.href).toBe(pageUrl)
 
     appendSpy.mockRestore()
     removeSpy.mockRestore()
   })
 
   it('downloadImage falls back to anchor when showSaveFilePicker throws', async () => {
+    const pageUrl = window.location.href
     const file = new File([new Uint8Array(3000)], 'image.png', {
       type: 'image/png',
     })
@@ -1038,6 +1057,13 @@ describe('ImageUploader component', () => {
       (globalThis as unknown as { URL: { createObjectURL: unknown } }).URL
         .createObjectURL
     ).toHaveBeenCalled()
+
+    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledOnce()
+    expect(vi.mocked(HTMLAnchorElement.prototype.click).mock.contexts).toEqual([
+      expect.objectContaining({ href: 'blob:fake-url', download: file.name }),
+    ])
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fake-url')
+    expect(window.location.href).toBe(pageUrl)
 
     appendSpy.mockRestore()
     removeSpy.mockRestore()
@@ -1339,6 +1365,7 @@ describe('ImageUploader component', () => {
   })
 
   it('downloadAllImages creates a zip and triggers download', async () => {
+    const pageUrl = window.location.href
     const file = new File([new Uint8Array(3_000)], 'image.png', {
       type: 'image/png',
     })
@@ -1371,6 +1398,15 @@ describe('ImageUploader component', () => {
     expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
     expect(appendSpy).toHaveBeenCalled()
     expect(removeSpy).toHaveBeenCalled()
+    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledOnce()
+    expect(vi.mocked(HTMLAnchorElement.prototype.click).mock.contexts).toEqual([
+      expect.objectContaining({
+        href: 'blob:fake-url',
+        download: 'optimized-images.zip',
+      }),
+    ])
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fake-url')
+    expect(window.location.href).toBe(pageUrl)
 
     appendSpy.mockRestore()
     removeSpy.mockRestore()
@@ -1409,6 +1445,7 @@ describe('ImageUploader component', () => {
     expect(globalWithShowSaveFilePicker.showSaveFilePicker).toHaveBeenCalled()
     expect(appendSpy).not.toHaveBeenCalled()
     expect(globalThis.URL.createObjectURL).not.toHaveBeenCalled()
+    expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()
 
     appendSpy.mockRestore()
   })
