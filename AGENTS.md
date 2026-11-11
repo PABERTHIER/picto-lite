@@ -83,7 +83,7 @@ Consult [package.json](package.json) for current versions.
 picto-lite/
 ├── .agents/
 │   ├── README.md                 # Shared guidance index
-│   ├── docs/                     # Agent optimizer reference and dependency audit
+│   ├── docs/                     # Agent optimizer reference
 │   └── skills/
 │       ├── nuxt-vue-patterns/SKILL.md
 │       ├── i18n/SKILL.md
