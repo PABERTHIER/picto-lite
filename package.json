@@ -21,26 +21,26 @@
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
-    "@nuxt/icon": "^2.6.1",
+    "@nuxt/icon": "^2.6.2",
     "@nuxtjs/i18n": "^10.6.0",
-    "@nuxtjs/seo": "^5.3.14",
-    "jszip": "^3.10.1",
-    "nuxt": "^4.5.2"
+    "@nuxtjs/seo": "^5.3.16",
+    "jszip": "^3.10.2",
+    "nuxt": "^4.6.4"
   },
   "devDependencies": {
     "@nuxt/eslint": "1.17.0",
     "@nuxt/test-utils": "^4.2.0",
-    "@types/node": "^26.4.1",
+    "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
     "@vue/test-utils": "^2.5.0",
-    "eslint": "^10.10.0",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-prettier": "^5.5.7",
     "happy-dom": "^20.14.0",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.10",
     "rolldown": "1.2.15",
-    "sass": "^1.104.0",
+    "sass": "^1.106.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
   }
