@@ -40,6 +40,9 @@ Keep dependency changes within scope and let Yarn maintain `yarn.lock`.
 | --------------------------- | -------------------------- | --------------------------------------------------------- |
 | Install locked dependencies | `yarn install --immutable` | Preserve the lockfile during setup                        |
 | Start development           | `yarn dev`                 | Normally `http://localhost:3000`                          |
+| Check formatting            | `yarn format:check`        | Checks application Vue, TypeScript, SCSS and locale JSON  |
+| Format application files    | `yarn format`              | Broad write operation; prefer changed-file scope          |
+| Check types                 | `yarn typecheck`           | Nuxt and Vue TypeScript checks                            |
 | Lint                        | `yarn lint`                | ESLint with Prettier integration                          |
 | Fix lint findings           | `yarn lint:fix`            | Review fixes and keep them within scope                   |
 | Run tests once              | `yarn test --run`          | Explicit single run outside CI                            |
@@ -58,6 +61,10 @@ Its build-named job does not run `yarn build` or `yarn generate`.
 The workflow's Corepack preparation version is separate from the package-manager pin; check the actual launcher version when reproducing CI.
 Use only scripts present in `package.json`.
 
+`format` and `format:check` exclude Markdown and root configuration files.
+Check changed Markdown explicitly with the installed Prettier using `--prose-wrap preserve --end-of-line lf`.
+See [README.md](README.md) for the human-facing setup and dependency map.
+
 ## Direct Dependencies
 
 Consult [package.json](package.json) for current versions.
@@ -73,7 +80,7 @@ Consult [package.json](package.json) for current versions.
 | `sass`                                                                                   | SCSS compilation                                                                          |
 | `rolldown`                                                                               | Build tooling satisfying Nuxt's Rolldown peer dependency                                  |
 | `@nuxt/eslint`, `eslint`, `eslint-config-prettier`, `eslint-plugin-prettier`, `prettier` | Flat lint configuration and formatting; Nuxt supplies its config and globals transitively |
-| `typescript`, `@types/node`                                                              | TypeScript and Node support; framework types come from generated Nuxt 4 configuration     |
+| `typescript`, `vue-tsc`, `@types/node`                                                   | Nuxt, Vue and Node type checking                                                          |
 | `@nuxt/test-utils`, `@vue/test-utils`, `happy-dom`, `vitest`                             | Nuxt runtime mounting, component assertions, DOM environment and runner                   |
 | `@vitest/coverage-v8`, `@vitest/ui`                                                      | Enabled V8 coverage, HTML reporting and interactive UI                                    |
 
@@ -297,12 +304,14 @@ The [.agents index](.agents/README.md) is navigational, not a separate automatic
 | Change                                  | Relevant checks                                                                       |
 | --------------------------------------- | ------------------------------------------------------------------------------------- |
 | Markdown only                           | Changed-file Prettier, frontmatter, local links/anchors, catalogs and source accuracy |
-| Component or composable behavior        | `yarn lint`, focused `yarn test --run <test-path>` and affected user journeys         |
+| Application implementation              | `yarn format:check`, `yarn typecheck`, `yarn lint` and affected FR/EN behavior        |
+| Component or composable behavior        | Focused `yarn test --run <test-path>` and affected user journeys                      |
 | Optimizer or downloads                  | Size/fallback/error tests, actual browser encode/decode and picker behavior           |
 | SSR or Nuxt configuration               | Relevant production build and hydration checks                                        |
 | Routes, prerendering or static delivery | `yarn generate` and affected output                                                   |
 | Translated UI or interaction            | Both locales, narrow/desktop layouts, keyboard and affected preview/download states   |
 
+Run type checking and lint sequentially in the same workspace: Nuxt regenerates the ESLint configuration imported by the lint command.
 Check Markdown explicitly with the installed Prettier using `--prose-wrap preserve --end-of-line lf`.
 Use UTF-8, LF, a final newline, aligned tables and one sentence per source line in prose.
 Keep command and code examples valid for their stated language.
