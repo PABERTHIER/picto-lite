@@ -1,105 +1,38 @@
 ---
-applyTo: "app/**/*.vue"
+description: 'Use when editing PictoLite Vue components, pages, layouts, application TypeScript, shared SCSS or Nuxt configuration.'
+applyTo: 'app/**/*.vue,app/**/*.ts,app/styles/**/*.scss,nuxt.config.ts'
 ---
 
-# Vue & Nuxt File Instructions
+# Vue And Nuxt Instructions
 
-## Script Block
+Use [nuxt-vue-patterns](../../.agents/skills/nuxt-vue-patterns/SKILL.md) for component contracts, TypeScript, SSR, lifecycle and styles.
+Read the affected implementation before choosing a new abstraction.
 
-Always use `<script setup lang="ts">`. Never use Options API or `<script>` without `setup`.
+## Implementation Rules
 
-### Auto-imports — NEVER import these manually
+- Keep SFC order: `<template>`, `<script setup lang="ts">`, then scoped SCSS.
+  Preserve the default layout's intentional unscoped global styles.
+- Prefer Nuxt auto-imports for registered composables and components.
+  Import project types and external library APIs explicitly; tests may also need explicit imports.
+- Use braces for conditionals and blank lines between guards, state changes, derived values and returns.
+  Group declarations and helpers by responsibility.
+- Keep browser globals and DOM access in mounted hooks or user-event paths.
+  Preserve stable SSR markup and clean up listeners, timers and object URLs.
+- Keep translated script-side values and metadata reactive with tracked getters or `computed()`.
+  Use the [i18n skill](../../.agents/skills/i18n/SKILL.md) for localized destinations and messages.
+- Reuse the layout's main landmark, injected Sass tokens and actual component contracts.
+  Dynamic progress and preview measurements can use inline bindings; static appearance belongs in SCSS.
+- Preserve result IDs, batch invalidation and original blobs when changing uploader state.
+  Read [optimizer instructions](optimizer.instructions.md) when changing result or download behavior.
 
-```typescript
-// ❌ These will trigger lint errors (unnecessary imports)
-import { ref, computed, watch, watchEffect, reactive } from 'vue'
-import { onMounted, onBeforeUnmount, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useHead, useSeoMeta } from '#imports'
-```
+## Select Additional Guidance
 
-Nuxt auto-imports: `ref`, `computed`, `watch`, `watchEffect`, `reactive`, `readonly`,
-`toRef`, `toRefs`, `onMounted`, `onBeforeUnmount`, `onUnmounted`, `useI18n`, `useHead`,
-`useSeoMeta`, `useRoute`, `useRouter`, `useRuntimeConfig`, `useNuxtApp`, `useState`,
-`navigateTo`, `definePageMeta`, `useLocalePath`
+| Concern in the task                          | Guidance                                                                                                             |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Locale messages or translated consumers      | [i18n](../../.agents/skills/i18n/SKILL.md)                                                                           |
+| Tests, mocks or async assertions             | [testing](../../.agents/skills/testing/SKILL.md) and [test instructions](testing.instructions.md)                    |
+| Compression, results or downloads            | [optimizer instructions](optimizer.instructions.md) and [optimizer reference](../../.agents/docs/IMAGE_OPTIMIZER.md) |
+| Appearance, responsive layout or interaction | [Mobile acceptance](../../AGENTS.md#mobile-experience-acceptance-criteria) and the Nuxt/Vue skill                    |
 
-Auto-imported from `app/composables/`:
-`optimizeImage` — do NOT import manually
-
-### DO import types explicitly
-
-```typescript
-import type { ResultItem } from '~/types/result'
-import type { FileResult } from '~/types/result'
-import type { ShowSaveFilePicker } from '~/types/file-picker'
-import type { FilePickerOptions } from '~/types/file-picker'
-import type { localesType } from '~/types/locales'
-```
-
----
-
-## Template Block
-
-- Components are auto-imported — never manually register or import them in `<script setup>`
-- Always use `localePath()` for internal navigation links:
-  ```vue
-  <NuxtLink :to="localePath('/')">...</NuxtLink>
-  ```
-- Use `:prop="value"` (v-bind shorthand) for dynamic props
-- Use `v-show` instead of `v-if` for elements that toggle visibility without being removed from DOM
-
----
-
-## Style Block
-
-Always `<style lang="scss" scoped>`. Never:
-- Plain CSS (`<style>`)
-- Unscoped styles (`<style lang="scss">` without `scoped`)
-- Inline styles on elements
-
-SCSS variables from `app/styles/variables.scss` are globally injected — use them without `@use`:
-```scss
-.my-class {
-  color: $primary-text-color;     // ✅ correct
-  background: $background-color;
-  height: $header-height;
-
-  @media (max-width: $sm) {
-    font-size: 14px;
-  }
-}
-```
-
-Exception: `app/layouts/default.vue` uses `<style lang="scss">` (unscoped) for global reset
-and layout styles — this is intentional. Other layout and page styles use `scoped`.
-
----
-
-## Reactive Values in Meta Tags
-
-i18n values used in `useHead()` and `useSeoMeta()` must be wrapped in `computed()`:
-
-```typescript
-// ✅ correct — reactive
-content: computed(() => t('app.meta.description'))
-
-// ❌ wrong — not reactive, won't update on locale switch
-content: t('app.meta.description')
-```
-
-Exception: `articleTag` array values use `.value` directly (already resolved):
-```typescript
-articleTag: computed(() => [
-  computed(() => t('about.author')).value,
-  computed(() => t('app.name')).value,
-])
-```
-
----
-
-## TypeScript Strictness
-
-- `strict: true` is enabled — no implicit `any`
-- Always type reactive variables when TypeScript cannot infer: `const results = ref<ResultItem[]>([])`
-- Use `const` for everything that doesn't need reassignment
-- Prefer explicit type annotations on function parameters over inference
+Load only the guidance needed for the change.
+Follow [shared verification](../../AGENTS.md#verification), including affected French/English and mobile/keyboard journeys.

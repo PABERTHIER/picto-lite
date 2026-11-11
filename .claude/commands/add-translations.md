@@ -1,12 +1,9 @@
 ---
-description: Add i18n translations for a PictoLite component or page to both fr-FR.json and en-US.json.
+description: Add or update PictoLite messages in both locales within a translation-only request.
 ---
 
-Use the `/i18n` skill to add translations for: $ARGUMENTS
+Read and follow [i18n](../../.agents/skills/i18n/SKILL.md) for this request: $ARGUMENTS
 
-If no arguments were given, ask the user for:
-
-1. Location — which section of the JSON key tree (e.g., `components.image_uploader`, `pages.main`)
-2. Key name(s) — in `snake_case`
-3. French text (fr-FR)
-4. English text (en-US) — natural English, not a literal translation
+Keep the task limited to the two locale files unless consumer changes are requested.
+Resolve missing details from the conversation and repository before asking for clarification.
+Use the skill's paired-edit and verification guidance.

@@ -1,65 +1,57 @@
-# GitHub Copilot Repository Instructions
+# GitHub Copilot Entry Point
 
-This project uses shared agent instructions defined in `AGENTS.md` at the repository root.
-Copilot reads both this file and `AGENTS.md` automatically.
+[AGENTS.md](../AGENTS.md) owns shared constraints, architecture, commands and verification.
+Its Git policy prohibits every Git command unless the user explicitly lifts the restriction for the task.
+Use [.agents/README.md](../.agents/README.md) to select focused context.
 
-This file provides Copilot-specific behavioral guidance that complements `AGENTS.md`.
+## Copilot Conventions
 
-## Copilot-Specific Guidelines
+- Treat [mobile acceptance](../AGENTS.md#mobile-experience-acceptance-criteria) as part of UI completion.
+  Check affected FR/EN journeys, longer labels, keyboard/touch operation and short viewports.
+- Follow the nearest implementation and the Nuxt/Vue skill.
+  The default layout owns the main landmark and intentional global styles; component appearance uses scoped SCSS.
+- Keep translated derived state and metadata reactive.
+  Read both root and page head blocks, and use locale-aware destinations without localizing asset URLs.
+- Preserve optimizer size/fallback behavior, result IDs, original blobs and async batch invalidation.
+  Native picker cancellation must not start a browser fallback download.
+- Read matching scoped instructions and load only relevant guide and skill bodies.
 
-### Code Generation
+## Reference Documentation
 
-- Use `<script setup lang="ts">` for all Vue SFCs (never Options API or `<script>` without `setup`)
-- Nuxt auto-imports are available — do NOT manually import `ref`, `computed`, `watch`,
-  `useI18n`, `useHead`, `useSeoMeta`, `useRoute`, `useRuntimeConfig`, `useLocalePath`,
-  `onMounted`, `onBeforeUnmount`
-- `optimizeImage` from `app/composables/useImageOptimizer.ts` is **also auto-imported**
-- DO manually import types: `import type { ResultItem } from '~/types/result'`
-- All component styles must use `<style lang="scss" scoped>`
-- Use SCSS variables from `app/styles/variables.scss` (auto-injected via Vite — no `@use` needed)
-- Follow `.editorconfig`: 2-space indent, LF line endings, utf-8
+| Guide                                                           | Read for                                                     |
+| --------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Agent optimizer reference](../.agents/docs/IMAGE_OPTIMIZER.md) | Actual branches, invariants, limitations and review criteria |
+| [Developer optimizer walkthrough](../docs/IMAGE_OPTIMIZER.md)   | Detailed pipeline, helper and metadata diagrams              |
 
-### When Suggesting Code Changes
+## Shared Skills
 
-- Match existing patterns in the same file/project
-- Preserve optimizer invariants: `chooseBest()` must never return a file larger than the original
-- Always call `yarn lint` after making code changes — ESLint + Prettier must pass
-- Use `computed(() => t('...'))` for all reactive i18n values in `useHead`/`useSeoMeta`
-- All image paths in `public/` start with `/` (relative to project root)
+| Skill                | File                                                              | Use for                                                |
+| -------------------- | ----------------------------------------------------------------- | ------------------------------------------------------ |
+| Nuxt and Vue         | [nuxt-vue-patterns](../.agents/skills/nuxt-vue-patterns/SKILL.md) | Components, TypeScript, SSR, styles and lifecycle      |
+| Internationalization | [i18n](../.agents/skills/i18n/SKILL.md)                           | Paired FR/EN messages and reactive localized consumers |
+| Testing              | [testing](../.agents/skills/testing/SKILL.md)                     | Nuxt mounting, browser mocks and async behavior        |
 
-### When Writing Tests
+Keep canonical skill content in `.agents/skills/`.
+The catalog is a discovery aid; load only the guidance needed for the task.
 
-- Use `mountSuspended()` from `@nuxt/test-utils/runtime` for component mounting
-- Use `mockNuxtImport()` for mocking Nuxt auto-imports (not `vi.mock()`)
-- Use `vi.mock()` for third-party npm packages that are **not** Nuxt auto-imports (e.g., `jszip`)
-- Use `installOffscreenCanvasMock()` from `app/tests/helpers/offscreen-mock.ts`
-- Always flush async flows with `waitForPromises()` before asserting async state
-- Always call `vi.resetAllMocks()` in `beforeEach`
-- Test `showSaveFilePicker` both present (`global.showSaveFilePicker = vi.fn(...)`) and absent
-- Test user cancellation: `showSaveFilePicker` rejects with `DOMException { name: 'AbortError' }` — the `<a download>` fallback must NOT fire
-- `ResultItem` objects in test factories must include `id: string` — the field is required
+## Scoped Instructions
 
-## Git Policy
+| Instruction                                               | File patterns                                                                                     | Use for                                         |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| [Nuxt and Vue](instructions/vue-nuxt.instructions.md)     | `app/**/*.vue`, `app/**/*.ts`, `app/styles/**/*.scss`, `nuxt.config.ts`                           | Structure, SSR, component contracts and styling |
+| [Internationalization](instructions/i18n.instructions.md) | `i18n/**/*.json`                                                                                  | Locale keys, copy and interpolation             |
+| [Testing](instructions/testing.instructions.md)           | `app/tests/**/*.ts`, `vitest.config.mts`                                                          | Runtime tests and configuration                 |
+| [Optimizer](instructions/optimizer.instructions.md)       | `app/composables/useImageOptimizer.ts`, `app/components/ImageUploader.vue`, `app/types/result.ts` | Compression, results and downloads              |
 
-**Never run any git write command without explicit user instruction.**
+Each scoped file declares `description` and `applyTo` metadata.
+Read matching files explicitly when automatic attachment is unavailable.
+Use the [shared applicability rules](../AGENTS.md#tool-integration-and-scoped-instructions) when scopes overlap.
 
-Forbidden without a direct user request:
-- `git commit`, `git push`, `git reset`, `git rebase`, `git merge`
-- `git cherry-pick`, `git revert`, `git stash`, `git tag`
-- `git branch -D`, `git am`
+## Reusable Prompts
 
-Allowed: `git status`, `git diff`, `git log`, `git show` (read-only inspection).
+| Prompt              | File                                                             | Scope                                              |
+| ------------------- | ---------------------------------------------------------------- | -------------------------------------------------- |
+| `/add-translations` | [add-translations.prompt.md](prompts/add-translations.prompt.md) | Both locale files through the shared i18n workflow |
 
-If asked to commit or push, **ask for confirmation first** and show what will be committed.
-Never commit speculatively at the end of a task.
-
-### Commit Messages
-
-- Use conventional commit format
-- Include a clear description of what changed and why
-
-## Reference Files
-
-- See `.github/instructions/` for file-type-specific rules that apply automatically
-- See `.github/prompts/` for reusable prompt templates (invoke with `/` in Copilot Chat)
-- See `.github/skills/` for detailed pattern references (invoke with `/skill-name`)
+Keep tool-specific files focused on routing to shared guidance.
+Use [AGENTS.md verification](../AGENTS.md#verification) and report checks actually performed.
