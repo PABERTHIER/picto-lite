@@ -31,13 +31,13 @@ This tool has been created to optimise the images locally.
 Nothing is sent to a server, the browser will handled the optimisation.
 Everything is handled on the client-side.
 
-## Nuxt 3 Minimal Starter :man_technologist:
+## Nuxt 4 Minimal Starter :man_technologist:
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Look at the [Nuxt 4 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ### Setup
 
-Try to use the latest version of Node.js (using the 22.17.0 for Nuxt 3.17.6 for example).
+Try to use the latest version of Node.js (using the 24.16.0 for Nuxt 4.x for example).
 
 Install the Volar VSCode extension.
 
