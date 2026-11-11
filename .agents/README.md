@@ -28,7 +28,6 @@ Tool-specific files should link to shared guidance rather than maintain competin
 
 Documentation is not proof of runtime behavior.
 Mocked Canvas tests do not establish real compression ratios, image fidelity or browser compatibility.
-The dependency audit records recommendations without changing the manifest or lockfile.
 
 ## Reference Guides
 

@@ -62,21 +62,20 @@ Use only scripts present in `package.json`.
 
 Consult [package.json](package.json) for current versions.
 
-| Dependencies                                                                                                    | Purpose or current status                                                                  |
-| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `nuxt`                                                                                                          | Routing, Vue application build, SSR and prerendering                                       |
-| `@nuxtjs/i18n`                                                                                                  | French/English messages and prefixed routes                                                |
-| `@nuxtjs/seo`                                                                                                   | Site metadata, schema, robots, sitemap and link-checker integration                        |
-| `@nuxt/ui`, `@iconify-json/lucide`                                                                              | Current provider of the Icon integration and default Lucide bundle                         |
-| `@nuxt/fonts`                                                                                                   | Font integration; inspect resolved families and actual requests when changing typography   |
-| `jszip`                                                                                                         | Bulk download of successful image results                                                  |
-| `sass`                                                                                                          | SCSS compilation and injected tokens                                                       |
-| `@nuxt/eslint`, `@nuxt/eslint-config`, `eslint`, `eslint-config-prettier`, `eslint-plugin-prettier`, `prettier` | Current flat lint and formatting stack; the direct Nuxt config declaration is redundant    |
-| `@nuxtjs/eslint-config-typescript`, `globals`                                                                   | Legacy unused preset and redundant direct globals declaration, respectively                |
-| `typescript`, `@types/node`, `@nuxt/types`                                                                      | TypeScript and Node support; legacy Nuxt types are still explicitly referenced by tsconfig |
-| `@nuxt/test-utils`, `@vue/test-utils`, `happy-dom`, `vitest`                                                    | Nuxt runtime mounting, component assertions, DOM environment and runner                    |
-| `@vitest/coverage-v8`, `@vitest/ui`                                                                             | Enabled V8 coverage, HTML reporting and interactive UI                                     |
-| `playwright-core`, `vite-svg-loader`                                                                            | Direct entries with no authored browser harness or SVG-loader consumer found               |
+| Dependencies                                                                             | Purpose                                                                                   |
+| ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `nuxt`                                                                                   | Routing, Vue application build, SSR and prerendering                                      |
+| `@nuxtjs/i18n`                                                                           | French/English messages and prefixed routes                                               |
+| `@nuxtjs/seo`                                                                            | Site metadata, schema, robots, sitemap and link-checker integration                       |
+| `@nuxt/icon`                                                                             | Explicit Icon integration for the custom `pl-icon` SVG collection                         |
+| `@nuxt/fonts`                                                                            | Font integration with explicit font-weight defaults                                       |
+| `jszip`                                                                                  | Bulk download of successful image results                                                 |
+| `sass`                                                                                   | SCSS compilation                                                                          |
+| `rolldown`                                                                               | Build tooling satisfying Nuxt's Rolldown peer dependency                                  |
+| `@nuxt/eslint`, `eslint`, `eslint-config-prettier`, `eslint-plugin-prettier`, `prettier` | Flat lint configuration and formatting; Nuxt supplies its config and globals transitively |
+| `typescript`, `@types/node`                                                              | TypeScript and Node support; framework types come from generated Nuxt 4 configuration     |
+| `@nuxt/test-utils`, `@vue/test-utils`, `happy-dom`, `vitest`                             | Nuxt runtime mounting, component assertions, DOM environment and runner                   |
+| `@vitest/coverage-v8`, `@vitest/ui`                                                      | Enabled V8 coverage, HTML reporting and interactive UI                                    |
 
 ## Architecture
 
