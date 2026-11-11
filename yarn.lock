@@ -2238,7 +2238,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nuxt/icon@npm:^2.6.1":
+"@nuxt/icon@npm:^2.6.2":
   version: 2.6.2
   resolution: "@nuxt/icon@npm:2.6.2"
   dependencies:
@@ -4001,7 +4001,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^26.6.5":
+"@types/node@npm:^26.6.6":
   version: 26.6.6
   resolution: "@types/node@npm:26.6.6"
   dependencies:
@@ -6707,7 +6707,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^10.13.0":
+"eslint@npm:^10.14.0":
   version: 10.14.0
   resolution: "eslint@npm:10.14.0"
   dependencies:
@@ -8069,15 +8069,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jszip@npm:^3.10.1":
-  version: 3.10.1
-  resolution: "jszip@npm:3.10.1"
+"jszip@npm:^3.10.2":
+  version: 3.10.2
+  resolution: "jszip@npm:3.10.2"
   dependencies:
     lie: "npm:~3.3.0"
     pako: "npm:~1.0.2"
     readable-stream: "npm:~2.3.6"
     setimmediate: "npm:^1.0.5"
-  checksum: 10c0/58e01ec9c4960383fb8b38dd5f67b83ccc1ec215bf74c8a5b32f42b6e5fb79fada5176842a11409c4051b5b94275044851814a31076bf49e1be218d3ef57c863
+  checksum: 10c0/c51b1473062bb7ac81c0c76047d99a2b56a062f2427ac989e28b46b31ecab636a440f137d15ff6320a961b7e1048c802f0bed83a2e10ed0ba9c2cfd84e818bc6
   languageName: node
   linkType: hard
 
@@ -9835,19 +9835,19 @@ __metadata:
   dependencies:
     "@nuxt/eslint": "npm:1.17.0"
     "@nuxt/fonts": "npm:^0.14.0"
-    "@nuxt/icon": "npm:^2.6.1"
+    "@nuxt/icon": "npm:^2.6.2"
     "@nuxt/test-utils": "npm:^4.2.0"
     "@nuxtjs/i18n": "npm:^10.6.0"
     "@nuxtjs/seo": "npm:^5.3.16"
-    "@types/node": "npm:^26.6.5"
+    "@types/node": "npm:^26.6.6"
     "@vitest/coverage-v8": "npm:^4.1.11"
     "@vitest/ui": "npm:^4.1.11"
     "@vue/test-utils": "npm:^2.5.0"
-    eslint: "npm:^10.13.0"
+    eslint: "npm:^10.14.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-prettier: "npm:^5.5.7"
     happy-dom: "npm:^20.14.0"
-    jszip: "npm:^3.10.1"
+    jszip: "npm:^3.10.2"
     nuxt: "npm:^4.5.2"
     prettier: "npm:^3.9.10"
     rolldown: "npm:1.2.15"
