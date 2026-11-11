@@ -43,7 +43,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/i18n',
     '@nuxtjs/seo',
-    '@nuxt/ui',
+    '@nuxt/icon',
     '@nuxt/fonts',
     '@nuxt/test-utils/module',
     '@nuxt/eslint',
@@ -60,6 +60,11 @@ export default defineNuxtConfig({
             ? 'http://localhost:3000'
             : 'https://pictolite.vercel.app',
       },
+    },
+  },
+  fonts: {
+    defaults: {
+      weights: [400, 500, 600, 700],
     },
   },
   icon: {

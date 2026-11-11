@@ -122,8 +122,8 @@ Do not copy a click-only container as the pattern for new controls.
 Respect reduced motion when changing animation or scrolling.
 
 The footer uses `<Icon name="pl-icon:github-mark">` from the custom SVG collection.
-It is supplied indirectly through the registered Nuxt UI module's Icon integration.
-Check that integration before removing a module that appears unused in templates.
+It is supplied by the explicitly registered `@nuxt/icon` module.
+Preserve that module and the `pl-icon` custom collection when changing dependencies.
 Keep decorative icons hidden from assistive technology when their parent control supplies the name.
 
 ## Verification
