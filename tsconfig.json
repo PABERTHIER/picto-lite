@@ -30,5 +30,5 @@
     "useUnknownInCatchVariables": true,
     "lib": ["esnext", "dom"],
     "noImplicitAny": true
-  },
+  }
 }

@@ -49,22 +49,33 @@ yarn dev
 The development server normally runs at `http://localhost:3000`.
 Use `yarn.cmd` if PowerShell blocks `yarn.ps1`.
 
-| Task                    | Command              |
-| ----------------------- | -------------------- |
-| Lint                    | `yarn lint`          |
-| Fix lint findings       | `yarn lint:fix`      |
-| Run tests once          | `yarn test --run`    |
-| Watch tests             | `yarn test:watch`    |
-| Open Vitest UI          | `yarn test:ui`       |
-| Run coverage            | `yarn test:coverage` |
-| Build production output | `yarn build`         |
-| Generate static output  | `yarn generate`      |
-| Preview built output    | `yarn preview`       |
-| Profile a build         | `yarn profile`       |
+| Task                     | Command              |
+| ------------------------ | -------------------- |
+| Check formatting         | `yarn format:check`  |
+| Format application files | `yarn format`        |
+| Check types              | `yarn typecheck`     |
+| Lint                     | `yarn lint`          |
+| Fix lint findings        | `yarn lint:fix`      |
+| Run tests once           | `yarn test --run`    |
+| Watch tests              | `yarn test:watch`    |
+| Open Vitest UI           | `yarn test:ui`       |
+| Run coverage             | `yarn test:coverage` |
+| Build production output  | `yarn build`         |
+| Generate static output   | `yarn generate`      |
+| Preview built output     | `yarn preview`       |
+| Profile a build          | `yarn profile`       |
 
 `yarn test` starts Vitest in watch mode during interactive development.
 Coverage is enabled in [vitest.config.mts](vitest.config.mts), with reports under `app/coverage/` and test reports under `app/tests_output/`.
 CI installs dependencies immutably, runs lint/tests and uploads coverage; its job name does not establish production-build coverage.
+
+`format` and `format:check` exclude Markdown and root configuration files.
+They check application Vue, TypeScript, SCSS and locale JSON formatting.
+`yarn format` formats those files; prefer targeting changed files for small edits.
+`yarn typecheck` checks Nuxt and Vue types.
+Run formatting, type checking and lint locally for application changes, with build or generation checks as required by the affected behavior.
+Run type checking and lint sequentially in the same workspace: Nuxt regenerates the ESLint configuration imported by the lint command.
+For documentation, check changed files with the installed Prettier using `--check --prose-wrap preserve --end-of-line lf`.
 
 ### Production
 
@@ -87,7 +98,7 @@ Consult [package.json](package.json) for current versions.
 | `sass`                                                                                   | SCSS compilation                                                                          |
 | `rolldown`                                                                               | Build tooling satisfying Nuxt's Rolldown peer dependency                                  |
 | `@nuxt/eslint`, `eslint`, `eslint-config-prettier`, `eslint-plugin-prettier`, `prettier` | Flat lint configuration and formatting; Nuxt supplies its config and globals transitively |
-| `typescript`, `@types/node`                                                              | TypeScript and Node support; framework types come from generated Nuxt 4 configuration     |
+| `typescript`, `vue-tsc`, `@types/node`                                                   | Nuxt, Vue and Node type checking                                                          |
 | `@nuxt/test-utils`, `@vue/test-utils`, `happy-dom`, `vitest`                             | Nuxt runtime mounting, component assertions, DOM environment and runner                   |
 | `@vitest/coverage-v8`, `@vitest/ui`                                                      | Enabled V8 coverage, HTML reporting and interactive UI                                    |
 

@@ -17,7 +17,10 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
-    "profile": "nuxt build --profile"
+    "profile": "nuxt build --profile",
+    "typecheck": "nuxt typecheck",
+    "format": "prettier --write \"app/**/*.{vue,ts,scss}\" \"i18n/locales/*.json\"",
+    "format:check": "prettier --check \"app/**/*.{vue,ts,scss}\" \"i18n/locales/*.json\""
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
@@ -42,6 +45,7 @@
     "rolldown": "1.2.15",
     "sass": "^1.106.1",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "vue-tsc": "3.3.13"
   }
 }
