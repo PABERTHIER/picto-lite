@@ -47,16 +47,6 @@ useHead({
       href: computed(() => `${baseUrl.value}`),
       hreflang: 'x-default',
     },
-    {
-      rel: 'preconnect',
-      href: 'https://fonts.googleapis.com',
-      crossorigin: '',
-    },
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap',
-      crossorigin: '',
-    },
     { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     { rel: 'apple-touch-icon', href: 'apple-icon.png' },
     { rel: 'apple-touch-startup-image', href: 'apple-icon.png' },
