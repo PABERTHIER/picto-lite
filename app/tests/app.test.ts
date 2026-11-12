@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { enableAutoUnmount } from '@vue/test-utils'
-import { injectHead } from '@unhead/vue'
+import { injectHead } from '#imports'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import App from '@/app.vue'
 

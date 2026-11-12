@@ -1,18 +1,46 @@
 import { nextTick } from 'vue'
-import { describe, it, beforeEach, expect } from 'vitest'
+import { afterEach, describe, it, beforeEach, expect } from 'vitest'
+import { enableAutoUnmount } from '@vue/test-utils'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import LangSwitcher from '@/components/LangSwitcher.vue'
 
+enableAutoUnmount(afterEach)
+
 describe('LangSwitcher component', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear()
     document.documentElement.removeAttribute('dir')
+
+    const i18n = useNuxtApp().$i18n
+
+    await i18n.loadLocaleMessages('fr')
+
+    i18n.locale.value = 'en'
   })
 
   it('renders correctly', async () => {
     const wrapper = await mountSuspended(LangSwitcher)
 
     expect(wrapper.exists()).toBe(true)
+  })
+
+  it.each([
+    ['fr', 'Changer de langue'],
+    ['en', 'Change language'],
+  ] as const)('translates language labels in %s', async (locale, label) => {
+    const i18n = useNuxtApp().$i18n
+    const wrapper = await mountSuspended(LangSwitcher)
+
+    i18n.locale.value = locale
+
+    await nextTick()
+
+    expect(wrapper.find('a[href="/fr"]').attributes('aria-label')).toBe(
+      `${label} Français`
+    )
+    expect(wrapper.find('a[href="/en"]').attributes('aria-label')).toBe(
+      `${label} English`
+    )
   })
 
   it('renders all locale links with current locale marked as active', async () => {
@@ -62,6 +90,7 @@ describe('LangSwitcher component', () => {
     expect(localStorage.getItem('preferredLanguage')).toBe('fr')
 
     // Remount: onMounted reads 'fr' from localStorage and sets locale
+    wrapper.unmount()
     wrapper = await mountSuspended(LangSwitcher)
     links = wrapper.findAll('a')
 
@@ -77,8 +106,8 @@ describe('LangSwitcher component', () => {
     const wrapper = await mountSuspended(LangSwitcher)
     const links = wrapper.findAll('a')
 
-    const frLink = links.find(l => l.text() === 'FR')
-    await frLink?.trigger('click')
+    const enLink = links.find(l => l.text() === 'EN')
+    await enLink?.trigger('click')
     expect(localStorage.getItem('preferredLanguage')).toBeNull()
   })
 
@@ -96,7 +125,7 @@ describe('LangSwitcher component', () => {
     const wrapper = await mountSuspended(LangSwitcher)
     await nextTick()
 
-    expect(wrapper.vm.$i18n.locale).toBe('fr')
+    expect(wrapper.vm.$i18n.locale).toBe('en')
     expect(document.documentElement.getAttribute('dir')).toBe('ltr')
   })
 
