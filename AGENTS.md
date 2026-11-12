@@ -79,6 +79,9 @@ Consult [package.json](package.json) for current versions.
 | `jszip`                                                                                  | Bulk download of successful image results                                                 |
 | `sass`                                                                                   | SCSS compilation                                                                          |
 | `rolldown`                                                                               | Build tooling satisfying Nuxt's Rolldown peer dependency                                  |
+| `vite`                                                                                   | Explicit Vite peer dependency required by Vitest 5 with Yarn                              |
+| `vue`                                                                                    | Shared Vue runtime satisfying Nuxt Test Utils and Vue Test Utils peer dependencies        |
+| `@vue/compiler-dom`                                                                      | Vue template compiler satisfying Vue Test Utils' peer dependency                          |
 | `@nuxt/eslint`, `eslint`, `eslint-config-prettier`, `eslint-plugin-prettier`, `prettier` | Flat lint configuration and formatting; Nuxt supplies its config and globals transitively |
 | `typescript`, `vue-tsc`, `@types/node`                                                   | Nuxt, Vue and Node type checking                                                          |
 | `@nuxt/test-utils`, `@vue/test-utils`, `happy-dom`, `vitest`                             | Nuxt runtime mounting, component assertions, DOM environment and runner                   |
