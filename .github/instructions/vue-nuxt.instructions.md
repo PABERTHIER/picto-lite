@@ -12,6 +12,8 @@ Read the affected implementation before choosing a new abstraction.
 
 - Keep SFC order: `<template>`, `<script setup lang="ts">`, then scoped SCSS.
   Preserve the default layout's intentional unscoped global styles.
+  Nuxt's `css` option loads `default.scss` once; do not import it again in layouts or components.
+  Vite injects only `variables.scss` tokens.
 - Prefer Nuxt auto-imports for registered composables and components.
   Import project types and external library APIs explicitly; tests may also need explicit imports.
 - Use braces for conditionals and blank lines between guards, state changes, derived values and returns.

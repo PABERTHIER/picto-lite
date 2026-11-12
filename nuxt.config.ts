@@ -1,19 +1,40 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { robotsContent } from './app/data/seo'
+import { siteName } from './app/data/site'
+
+// Production can override the Vercel fallback with NUXT_SITE_URL at build time
+const prodUrl = (
+  process.env.NUXT_SITE_URL || 'https://pictolite.vercel.app'
+).replace(/\/$/, '')
+
+const siteUrl =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000'
+    : process.env.VERCEL_ENV === 'production'
+      ? prodUrl
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : prodUrl
+
+const indexable =
+  process.env.NODE_ENV !== 'development' &&
+  (!process.env.VERCEL_ENV || process.env.VERCEL_ENV === 'production')
+
 export default defineNuxtConfig({
   app: {
     head: {
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-      title: 'PictoLite',
+      title: siteName,
       meta: [
         {
           name: 'viewport',
           content: 'width=device-width, initial-scale=1, viewport-fit=cover',
         },
-        { name: 'application-name', content: 'PictoLite' },
+        { name: 'application-name', content: siteName },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
-        { name: 'apple-mobile-web-app-title', content: 'PictoLite' },
+        { name: 'apple-mobile-web-app-title', content: siteName },
       ],
       templateParams: {
         separator: '-',
@@ -21,12 +42,6 @@ export default defineNuxtConfig({
     },
   },
   ssr: true,
-  nitro: {
-    prerender: {
-      crawlLinks: true,
-      routes: ['/'],
-    },
-  },
   components: [
     {
       path: '~/components',
@@ -55,10 +70,7 @@ export default defineNuxtConfig({
     public: {
       apiBase: '',
       i18n: {
-        baseUrl:
-          process.env.NODE_ENV !== 'production'
-            ? 'http://localhost:3000'
-            : 'https://pictolite.vercel.app',
+        baseUrl: siteUrl,
       },
     },
   },
@@ -68,6 +80,9 @@ export default defineNuxtConfig({
     },
   },
   icon: {
+    clientBundle: {
+      includeCustomCollections: true,
+    },
     customCollections: [
       {
         prefix: 'pl-icon',
@@ -76,6 +91,7 @@ export default defineNuxtConfig({
     ],
   },
   i18n: {
+    baseUrl: siteUrl,
     defaultLocale: 'fr',
     langDir: 'locales',
     strategy: 'prefix',
@@ -89,6 +105,7 @@ export default defineNuxtConfig({
       redirectOn: 'root',
     },
   },
+  css: ['~/styles/default.scss'],
   vite: {
     css: {
       preprocessorOptions: {
@@ -107,29 +124,31 @@ export default defineNuxtConfig({
     },
     plugins: [],
   },
-  compatibilityDate: '2025-04-19',
+  compatibilityDate: '2026-10-28',
   devtools: {
     enabled: true,
   },
   site: {
-    url: 'https://pictolite.vercel.app',
-    name: 'PictoLite',
-    identity: {
-      type: 'Person',
-    },
-    indexable: true,
-    robots: {
-      index: true,
-      follow: true,
-    },
+    url: siteUrl,
+    name: siteName,
+    defaultLocale: 'fr-FR',
+    trailingSlash: false,
+    indexable,
   },
+  robots: {
+    robotsEnabledValue: robotsContent.indexable,
+    robotsDisabledValue: robotsContent.blocked,
+  },
+  aiReady: false, // The browser optimizer does not publish AI content endpoints
+  skewProtection: false, // Vercel builds do not share the local asset cache required by this module
   schemaOrg: {
+    reactive: true,
     identity: {
       type: 'Person',
-      name: 'PictoLite',
-      url: 'https://pictolite.vercel.app',
-      logo: 'https://pictolite.vercel.app/logo.png',
-      image: 'https://pictolite.vercel.app/logo.png',
+      name: siteName,
+      url: siteUrl,
+      logo: `${siteUrl}/logo.png`,
+      image: `${siteUrl}/logo.png`,
     },
   },
   ogImage: {
