@@ -76,6 +76,11 @@ export default defineVitestConfig({
     environmentOptions: {
       nuxt: {
         domEnvironment: 'happy-dom',
+        overrides: {
+          // Runtime component tests render on the client and are never indexed
+          debug: false,
+          site: { indexable: false },
+        },
       },
     },
   },
