@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://pictolite.vercel.app/sitemap.xml
+Content-Usage: train-ai=n

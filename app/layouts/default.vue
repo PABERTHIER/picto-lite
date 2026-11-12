@@ -34,8 +34,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss">
-@use '~/styles/default.scss' as *;
-
 * {
   box-sizing: border-box;
 }

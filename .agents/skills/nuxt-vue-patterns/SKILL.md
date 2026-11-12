@@ -104,7 +104,8 @@ Prefer reactive values for new metadata rather than copying setup-time URL or lo
 Vite injects `variables.scss` through `additionalData`.
 Use its existing tokens without repeating their import in component styles.
 Sass built-ins still need their own `@use` when used.
-`default.scss` contains base link rules imported by the default layout, which owns the remaining global rules.
+Nuxt's `css` option loads `default.scss` once for base link rules; the default layout owns the remaining global and shell rules.
+Keep CSS-emitting base rules out of repeated layout or component imports; Vite injects only `variables.scss` tokens.
 Keep static appearance in scoped SCSS and allow inline bindings for dynamic progress or preview geometry.
 
 | Token group | Current examples                                                            |

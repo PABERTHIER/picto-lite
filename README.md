@@ -107,6 +107,7 @@ Consult [package.json](package.json) for current versions.
 | Concern                        | Source                                                         |
 | ------------------------------ | -------------------------------------------------------------- |
 | Root and page metadata         | [app.vue](app/app.vue), [index.vue](app/pages/index.vue)       |
+| Site name and robots policy    | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)         |
 | Shared layout                  | [default.vue](app/layouts/default.vue)                         |
 | Uploads, results and downloads | [ImageUploader.vue](app/components/ImageUploader.vue)          |
 | Original/optimized comparison  | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)  |
@@ -139,9 +140,30 @@ Vercel hosts the application.
 Use Node.js 24, the pinned Yarn launcher and immutable dependency installation.
 Keep deployment settings aligned with the selected Nuxt build or static-generation mode and check the resulting output.
 
-[nuxt.config.ts](nuxt.config.ts) defines the production origin as `https://pictolite.vercel.app` and the development I18n origin as `http://localhost:3000`.
-The root and page head blocks build metadata from that configuration.
-Verify deployed canonical/alternate links and public assets when changing origins or delivery.
+[nuxt.config.ts](nuxt.config.ts) resolves one origin for Site Config, I18n, root/page metadata consumers and schema identity.
+The production origin defaults to `https://pictolite.vercel.app`; build-time `NUXT_SITE_URL` overrides it with any final slash removed.
+
+| Environment                                     | Metadata origin                                           | Indexing |
+| ----------------------------------------------- | --------------------------------------------------------- | -------- |
+| Development                                     | `http://localhost:3000`                                   | Disabled |
+| Vercel production                               | `NUXT_SITE_URL` or production fallback                    | Enabled  |
+| Vercel preview/development                      | `https://${VERCEL_URL}`, or production fallback if absent | Disabled |
+| Local production build without Vercel variables | `NUXT_SITE_URL` or production fallback                    | Enabled  |
+
+Set `NUXT_SITE_URL` in Vercel's Production environment only.
+Leave it unset in Preview, Development and local development `.env` files: Site Config also reads it independently with higher priority than `site.url`.
+Keep Vercel system variables enabled; `VERCEL_URL` is a hostname without a protocol.
+Do not override only I18n's origin at runtime.
+
+Nuxt Robots uses the directive values in [seo.ts](app/data/seo.ts) for SSR metadata and HTTP policy.
+It merges [public/_robots.txt](public/_robots.txt), which allows crawling and declares `Content-Usage: train-ai=n`; preview/development indexing is disabled by the environment policy.
+Localized sitemap routes remain automatically discovered.
+The existing root and page head blocks continue to own page metadata, and OG image generation remains disabled.
+
+SEO v6 bundles AI Ready and Skew Protection; PictoLite explicitly disables both.
+The browser optimizer does not need AI content endpoints, and Vercel builds do not share Skew Protection's local asset cache.
+See the [upstream v6 migration guide](https://nuxtseo.com/docs/nuxt-seo/migration-guide/v5-to-v6) for the bundled module changes.
+Verify generated and deployed canonical/alternate links, robots policy, sitemaps and public assets when changing origins or delivery.
 
 ## Code Coverage
 

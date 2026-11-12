@@ -115,9 +115,12 @@ picto-lite/
 │   │   ├── LangSwitcher.vue
 │   │   └── OgImage/              # Component directory; generation is disabled
 │   ├── composables/useImageOptimizer.ts
+│   ├── data/
+│   │   ├── site.ts               # Site name shared by configuration
+│   │   └── seo.ts                # Robots directive values
 │   ├── styles/
 │   │   ├── variables.scss        # Injected Sass tokens
-│   │   └── default.scss          # Base link rules imported by the layout
+│   │   └── default.scss          # Base link rules loaded by Nuxt's css option
 │   ├── types/
 │   │   ├── result.ts             # ResultItem and FileResult
 │   │   ├── file-picker.ts        # Native picker contracts
@@ -151,26 +154,28 @@ picto-lite/
 └── .editorconfig
 ```
 
-| Concern             | Source                                                                                                 | Contract                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| Application root    | [app.vue](app/app.vue)                                                                                 | Global metadata, canonical/alternate links and font links                 |
-| Main page           | [index.vue](app/pages/index.vue)                                                                       | Uploader and page-level metadata                                          |
-| Shared shell        | [default.vue](app/layouts/default.vue)                                                                 | Header, main landmark, footer, global styles and viewport-height listener |
-| Upload and results  | [ImageUploader.vue](app/components/ImageUploader.vue)                                                  | File batches, progress, result IDs, preview, download and ZIP export      |
-| Image comparison    | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)                                          | Original/optimized previews, dimensions, zoom and object-URL cleanup      |
-| Optimizer           | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)                                           | Browser decode/encode and original-file fallback                          |
-| Shared types        | [app/types](app/types/)                                                                                | `ResultItem`, `FileResult`, file-picker contracts and locale codes        |
-| Language control    | [LangSwitcher.vue](app/components/LangSwitcher.vue)                                                    | Corresponding-route links, stored preference and document direction       |
-| Sass tokens         | [variables.scss](app/styles/variables.scss)                                                            | Colors, layers, dimensions and breakpoints injected through Vite          |
-| Global base rules   | [default.scss](app/styles/default.scss), [default layout](app/layouts/default.vue)                     | Base link rules imported by the layout and layout-owned global rules      |
-| Messages            | [fr-FR.json](i18n/locales/fr-FR.json), [en-US.json](i18n/locales/en-US.json)                           | French source copy and natural English equivalents                        |
-| Tests               | [app/tests](app/tests/), [vitest.config.mts](vitest.config.mts)                                        | Nuxt runtime, Happy DOM, browser mocks, coverage and reports              |
-| Modules and tooling | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json), [eslint.config.mjs](eslint.config.mjs) | Installed capabilities and actual commands                                |
+| Concern             | Source                                                                                                               | Contract                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Application root    | [app.vue](app/app.vue)                                                                                               | Global metadata, canonical/alternate links and font links                 |
+| Main page           | [index.vue](app/pages/index.vue)                                                                                     | Uploader and page-level metadata                                          |
+| Shared shell        | [default.vue](app/layouts/default.vue)                                                                               | Header, main landmark, footer, global styles and viewport-height listener |
+| Upload and results  | [ImageUploader.vue](app/components/ImageUploader.vue)                                                                | File batches, progress, result IDs, preview, download and ZIP export      |
+| Image comparison    | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)                                                        | Original/optimized previews, dimensions, zoom and object-URL cleanup      |
+| Optimizer           | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)                                                         | Browser decode/encode and original-file fallback                          |
+| Shared types        | [app/types](app/types/)                                                                                              | `ResultItem`, `FileResult`, file-picker contracts and locale codes        |
+| Language control    | [LangSwitcher.vue](app/components/LangSwitcher.vue)                                                                  | Corresponding-route links, stored preference and document direction       |
+| Sass tokens         | [variables.scss](app/styles/variables.scss)                                                                          | Colors, layers, dimensions and breakpoints injected through Vite          |
+| Global base rules   | [default.scss](app/styles/default.scss), [nuxt.config.ts](nuxt.config.ts), [default layout](app/layouts/default.vue) | Nuxt loads base link rules once; the layout owns remaining global rules   |
+| Site constants      | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)                                                               | Site name and robots directive values used by configuration               |
+| Messages            | [fr-FR.json](i18n/locales/fr-FR.json), [en-US.json](i18n/locales/en-US.json)                                         | French source copy and natural English equivalents                        |
+| Tests               | [app/tests](app/tests/), [vitest.config.mts](vitest.config.mts)                                                      | Nuxt runtime, Happy DOM, browser mocks, coverage and reports              |
+| Modules and tooling | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json), [eslint.config.mjs](eslint.config.mjs)               | Installed capabilities and actual commands                                |
 
 The layout supplies `<main id="page-container">`; pages using it should not add a nested main.
 Component registration uses `pathPrefix: false`, so avoid colliding component basenames.
 Components and pages use `<template>`, `<script setup lang="ts">`, then scoped SCSS.
 The default layout intentionally has unscoped SCSS for global and shell rules.
+Nuxt's `css` option loads `default.scss` once for base link rules; do not repeat its import in layouts or components.
 Vite injects `variables.scss`; component styles can use its tokens without repeating the import.
 Follow the actual [TypeScript configuration](tsconfig.json), [.editorconfig](.editorconfig) and [.prettierrc](.prettierrc).
 
@@ -179,6 +184,20 @@ Follow the actual [TypeScript configuration](tsconfig.json), [.editorconfig](.ed
 I18n uses `prefix`, so French and English home routes are `/fr` and `/en`.
 The root `/` is configured for browser-language detection and is explicitly included in Nitro's prerender routes.
 Verify generated and deployed redirect behavior when changing routing.
+
+`nuxt.config.ts` resolves one origin for Site Config, I18n, existing root/page metadata consumers and schema identity.
+Production and local production builds use build-time `NUXT_SITE_URL`, falling back to `https://pictolite.vercel.app`, without a trailing slash.
+Development uses `http://localhost:3000`; Vercel previews use `https://${VERCEL_URL}`, falling back to the production origin if the hostname is absent.
+Indexing is disabled in development and Vercel preview/development environments, including when `VERCEL_URL` is absent.
+A production build without `VERCEL_ENV` allows indexing.
+Scope `NUXT_SITE_URL` to Vercel Production; leave it unset in Preview, Development and local development `.env` files because Site Config reads it independently with higher priority than `site.url`.
+Keep Vercel system variables enabled and do not override only I18n's origin at runtime.
+
+Site name and robots directive values live in `app/data/site.ts` and `app/data/seo.ts`.
+Nuxt Robots owns the SSR/HTTP indexing policy and merges `public/_robots.txt`, including its `Content-Usage: train-ai=n` preference.
+Keep automatic localized sitemap discovery.
+SEO v6 bundles AI Ready and Skew Protection; both are explicitly disabled here because the browser optimizer needs no AI content endpoints and Vercel builds do not share Skew Protection's local asset cache.
+OG image generation remains disabled; the existing root and page metadata blocks remain the owners of social metadata.
 
 | Area               | Route or owner                                           | Contract                                                                      |
 | ------------------ | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
