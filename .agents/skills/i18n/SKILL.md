@@ -74,9 +74,11 @@ Use `localePath('/')` for internal page destinations and `switchLocalePath(code)
 Do not localize public-asset paths or external URLs.
 Keep visible language codes within meaningful accessible names.
 
-[LangSwitcher.vue](../../../app/components/LangSwitcher.vue) also stores `preferredLanguage` in localStorage and sets document direction.
-It can assign the stored locale during mount, while Nuxt I18n separately handles its cookie.
-When changing this behavior, check the URL, rendered language, direction, localStorage and cookie together.
+[LangSwitcher.vue](../../../app/components/LangSwitcher.vue) renders a translated navigation landmark with corresponding-route links, language attributes and an active-locale indicator.
+Nuxt I18n owns locale navigation and the `i18n_redirected` preference cookie; the component has no storage, mounted locale override or document-direction side effects.
+French and English use the browser's default left-to-right direction.
+When changing this behavior, check the URL, rendered language and cookie together.
+The [component tests](../../../app/tests/components/langSwitcher.test.ts) exercise real Nuxt I18n navigation and cookie persistence in both directions, including direct localized URLs taking precedence over a previous cookie.
 A changed locale ref alone does not prove that navigation or head metadata followed.
 Read root and page head blocks when changing localized SEO.
 

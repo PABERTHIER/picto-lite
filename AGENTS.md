@@ -157,22 +157,22 @@ picto-lite/
 └── .editorconfig
 ```
 
-| Concern             | Source                                                                                                               | Contract                                                                  |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Application root    | [app.vue](app/app.vue)                                                                                               | Global metadata, canonical/alternate links and font links                 |
-| Main page           | [index.vue](app/pages/index.vue)                                                                                     | Uploader and page-level metadata                                          |
-| Shared shell        | [default.vue](app/layouts/default.vue)                                                                               | Header, main landmark, footer, global styles and viewport-height listener |
-| Upload and results  | [ImageUploader.vue](app/components/ImageUploader.vue)                                                                | File batches, progress, result IDs, preview, download and ZIP export      |
-| Image comparison    | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)                                                        | Original/optimized previews, dimensions, zoom and object-URL cleanup      |
-| Optimizer           | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)                                                         | Browser decode/encode and original-file fallback                          |
-| Shared types        | [app/types](app/types/)                                                                                              | `ResultItem`, `FileResult`, file-picker contracts and locale codes        |
-| Language control    | [LangSwitcher.vue](app/components/LangSwitcher.vue)                                                                  | Corresponding-route links, stored preference and document direction       |
-| Sass tokens         | [variables.scss](app/styles/variables.scss)                                                                          | Colors, layers, dimensions and breakpoints injected through Vite          |
-| Global base rules   | [default.scss](app/styles/default.scss), [nuxt.config.ts](nuxt.config.ts), [default layout](app/layouts/default.vue) | Nuxt loads base link rules once; the layout owns remaining global rules   |
-| Site constants      | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)                                                               | Site name and robots directive values used by configuration               |
-| Messages            | [fr-FR.json](i18n/locales/fr-FR.json), [en-US.json](i18n/locales/en-US.json)                                         | French source copy and natural English equivalents                        |
-| Tests               | [app/tests](app/tests/), [vitest.config.mts](vitest.config.mts)                                                      | Nuxt runtime, Happy DOM, browser mocks, coverage and reports              |
-| Modules and tooling | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json), [eslint.config.mjs](eslint.config.mjs)               | Installed capabilities and actual commands                                |
+| Concern             | Source                                                                                                               | Contract                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Application root    | [app.vue](app/app.vue)                                                                                               | Global metadata, canonical/alternate links and font links                  |
+| Main page           | [index.vue](app/pages/index.vue)                                                                                     | Uploader and page-level metadata                                           |
+| Shared shell        | [default.vue](app/layouts/default.vue)                                                                               | Header, main landmark, footer, global styles and viewport-height listener  |
+| Upload and results  | [ImageUploader.vue](app/components/ImageUploader.vue)                                                                | File batches, progress, result IDs, preview, download and ZIP export       |
+| Image comparison    | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)                                                        | Original/optimized previews, dimensions, zoom and object-URL cleanup       |
+| Optimizer           | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)                                                         | Browser decode/encode and original-file fallback                           |
+| Shared types        | [app/types](app/types/)                                                                                              | `ResultItem`, `FileResult`, file-picker contracts and locale codes         |
+| Language control    | [LangSwitcher.vue](app/components/LangSwitcher.vue)                                                                  | Accessible corresponding-route links; Nuxt I18n owns the preference cookie |
+| Sass tokens         | [variables.scss](app/styles/variables.scss)                                                                          | Colors, layers, dimensions and breakpoints injected through Vite           |
+| Global base rules   | [default.scss](app/styles/default.scss), [nuxt.config.ts](nuxt.config.ts), [default layout](app/layouts/default.vue) | Nuxt loads base link rules once; the layout owns remaining global rules    |
+| Site constants      | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)                                                               | Site name and robots directive values used by configuration                |
+| Messages            | [fr-FR.json](i18n/locales/fr-FR.json), [en-US.json](i18n/locales/en-US.json)                                         | French source copy and natural English equivalents                         |
+| Tests               | [app/tests](app/tests/), [vitest.config.mts](vitest.config.mts)                                                      | Nuxt runtime, Happy DOM, browser mocks, coverage and reports               |
+| Modules and tooling | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json), [eslint.config.mjs](eslint.config.mjs)               | Installed capabilities and actual commands                                 |
 
 The layout supplies `<main id="page-container">`; pages using it should not add a nested main.
 Component registration uses `pathPrefix: false`, so avoid colliding component basenames.
@@ -205,7 +205,7 @@ OG image generation remains disabled; the existing root and page metadata blocks
 | Area               | Route or owner                                           | Contract                                                                      |
 | ------------------ | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Localized home     | `/fr`, `/en`; [index.vue](app/pages/index.vue)           | Same uploader workflow with translated labels and metadata                    |
-| Language change    | [LangSwitcher.vue](app/components/LangSwitcher.vue)      | Corresponding-route links plus stored preference and document direction       |
+| Language change    | [LangSwitcher.vue](app/components/LangSwitcher.vue)      | Accessible corresponding-route links; Nuxt I18n persists `i18n_redirected`    |
 | Global metadata    | [app.vue](app/app.vue), [nuxt.config.ts](nuxt.config.ts) | Canonical/alternate links, site identity, font links and module configuration |
 | Main-page metadata | [index.vue](app/pages/index.vue)                         | Page head values that currently overlap root metadata                         |
 
