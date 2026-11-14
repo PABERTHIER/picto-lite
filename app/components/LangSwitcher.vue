@@ -1,63 +1,26 @@
 <template>
-  <div class="lang-switcher">
+  <nav class="lang-switcher" :aria-label="changeLanguageLabel">
     <NuxtLink
-      v-for="availableLocale in availableLocales"
+      v-for="availableLocale in locales"
       :key="availableLocale.code"
       :class="['btn', { active: availableLocale.code === locale }]"
       :to="switchLocalePath(availableLocale.code)"
+      :lang="availableLocale.language"
+      :hreflang="availableLocale.language"
       :aria-label="changeLanguageLabel + ' ' + availableLocale.name"
-      :aria-current="availableLocale.code === locale ? 'true' : 'false'"
-      @click="setLanguagePreference(availableLocale.code)">
+      :aria-current="availableLocale.code === locale ? 'true' : undefined">
       {{ availableLocale.code.toUpperCase() }}
     </NuxtLink>
-  </div>
+  </nav>
 </template>
 
 <script setup lang="ts">
-import type { localesType } from '~/types/locales'
-
 const { locale, locales, t } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 
-const availableLocales = computed(() =>
-  (locales.value as Array<{ code: localesType; name: string }>).map(l => ({
-    code: l.code,
-    name: l.name,
-  }))
-)
 const changeLanguageLabel = computed(() =>
   t('components.lang_switcher.change_language_label')
 )
-
-const setLanguagePreference = (code: localesType) => {
-  if (code === locale.value) {
-    return
-  }
-
-  localStorage.setItem('preferredLanguage', code)
-}
-
-const updateDirAttribute = (newLocale: string) => {
-  const currentLocale = locales.value.find(l => l.code === newLocale)
-  document.documentElement.setAttribute('dir', currentLocale?.dir || 'ltr')
-}
-
-watch(locale, newLocale => {
-  updateDirAttribute(newLocale)
-})
-
-onMounted(() => {
-  const savedLanguage = localStorage.getItem('preferredLanguage') as localesType
-
-  if (
-    savedLanguage &&
-    locales.value.some(locale => locale.code === savedLanguage)
-  ) {
-    locale.value = savedLanguage
-  }
-
-  updateDirAttribute(locale.value)
-})
 </script>
 
 <style lang="scss" scoped>

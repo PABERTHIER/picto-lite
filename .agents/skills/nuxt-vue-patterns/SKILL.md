@@ -17,7 +17,7 @@ Read the affected implementation, [nuxt.config.ts](../../../nuxt.config.ts) and 
 | File processing UI | [ImageUploader.vue](../../../app/components/ImageUploader.vue)         | Sequential batch processing, progress, result IDs, preview and downloads         |
 | Image comparison   | [ImagePreviewModal.vue](../../../app/components/ImagePreviewModal.vue) | Required `item: ResultItem`, `close` event, independent panel zoom and blob URLs |
 | Compression        | [useImageOptimizer.ts](../../../app/composables/useImageOptimizer.ts)  | Auto-imported `optimizeImage(file, shouldConvertToWebp)` returning `FileResult`  |
-| Language links     | [LangSwitcher.vue](../../../app/components/LangSwitcher.vue)           | Corresponding-route links, localStorage preference and direction updates         |
+| Language links     | [LangSwitcher.vue](../../../app/components/LangSwitcher.vue)           | Accessible corresponding-route links; Nuxt I18n owns the preference cookie       |
 | Shared types       | [app/types](../../../app/types/)                                       | Explicitly imported result, picker and locale contracts                          |
 | Sass tokens        | [variables.scss](../../../app/styles/variables.scss)                   | Colors, layers, heights and `$sm`/`$md`/`$lg` breakpoints                        |
 

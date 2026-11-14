@@ -1,21 +1,26 @@
 import { nextTick } from 'vue'
-import { afterEach, describe, it, beforeEach, expect } from 'vitest'
+import { RouterLink } from 'vue-router'
+import { afterEach, describe, it, beforeEach, expect, vi } from 'vitest'
 import { enableAutoUnmount } from '@vue/test-utils'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import LangSwitcher from '@/components/LangSwitcher.vue'
 
 enableAutoUnmount(afterEach)
 
+const mountSwitcher = (route = '/en') =>
+  mountSuspended(LangSwitcher, {
+    route,
+    global: { components: { RouterLink } }, // Use real navigation: mountSuspended's RouterLink prevents default clicks
+  })
+
 describe('LangSwitcher component', () => {
   beforeEach(async () => {
-    localStorage.clear()
-    document.documentElement.removeAttribute('dir')
+    const nuxt = useNuxtApp()
 
-    const i18n = useNuxtApp().$i18n
+    await nuxt.$i18n.loadLocaleMessages('fr')
+    await nuxt.$router.push('/en')
 
-    await i18n.loadLocaleMessages('fr')
-
-    i18n.locale.value = 'en'
+    nuxt.$i18n.setLocaleCookie('en')
   })
 
   it('renders correctly', async () => {
@@ -27,117 +32,93 @@ describe('LangSwitcher component', () => {
   it.each([
     ['fr', 'Changer de langue'],
     ['en', 'Change language'],
-  ] as const)('translates language labels in %s', async (locale, label) => {
-    const i18n = useNuxtApp().$i18n
-    const wrapper = await mountSuspended(LangSwitcher)
+  ] as const)(
+    'renders accessible locale links in %s',
+    async (locale, label) => {
+      const wrapper = await mountSwitcher(`/${locale}`)
+      const navigation = wrapper.get('nav.lang-switcher')
 
-    i18n.locale.value = locale
+      expect(navigation.attributes('aria-label')).toBe(label)
+      expect(navigation.findAll('a')).toHaveLength(2)
 
+      for (const [code, language, name] of [
+        ['fr', 'fr-FR', 'Français'],
+        ['en', 'en-US', 'English'],
+      ] as const) {
+        const link = navigation.get(`a[href="/${code}"]`)
+
+        expect(link.text()).toBe(code.toUpperCase())
+        expect(link.attributes('lang')).toBe(language)
+        expect(link.attributes('hreflang')).toBe(language)
+        expect(link.attributes('aria-label')).toBe(`${label} ${name}`)
+        expect(link.classes().includes('active')).toBe(code === locale)
+        expect(link.attributes('aria-current')).toBe(
+          code === locale ? 'true' : undefined
+        )
+      }
+    }
+  )
+
+  it('updates translated labels and the active link without remounting', async () => {
+    const wrapper = await mountSwitcher()
+
+    await useNuxtApp().$router.push('/fr')
     await nextTick()
 
-    expect(wrapper.find('a[href="/fr"]').attributes('aria-label')).toBe(
-      `${label} Français`
-    )
-    expect(wrapper.find('a[href="/en"]').attributes('aria-label')).toBe(
-      `${label} English`
-    )
-  })
-
-  it('renders all locale links with current locale marked as active', async () => {
-    const wrapper = await mountSuspended(LangSwitcher)
     const changeLanguageLabel = useNuxtApp().$i18n.t(
       'components.lang_switcher.change_language_label'
     )
-    const links = wrapper.findAll('a')
 
-    expect(links).toHaveLength(2)
-
-    expect(links[0]?.text()).toBe('FR')
-    expect(links[0]?.attributes('href')).toBe('/fr')
-    expect(links[1]?.text()).toBe('EN')
-    expect(links[1]?.attributes('href')).toBe('/en')
-
-    const frLink = links.find(l => l.text() === 'FR')
-    const enLink = links.find(l => l.text() === 'EN')
-
-    expect(frLink?.classes()).not.toContain('active')
-    expect(frLink?.attributes('aria-current')).toBe('false')
-    expect(frLink?.attributes('aria-label')).toBe(
+    expect(wrapper.attributes('aria-label')).toBe(changeLanguageLabel)
+    expect(wrapper.get('a[href="/fr"]').attributes('aria-label')).toBe(
       `${changeLanguageLabel} Français`
     )
-
-    expect(enLink?.classes()).toContain('active')
-    expect(enLink?.attributes('aria-current')).toBe('true')
-    expect(enLink?.attributes('aria-label')).toBe(
+    expect(wrapper.get('a[href="/en"]').attributes('aria-label')).toBe(
       `${changeLanguageLabel} English`
     )
+    expect(wrapper.get('a.active').text()).toBe('FR')
   })
 
-  it('clicking a locale link saves preference', async () => {
-    let wrapper = await mountSuspended(LangSwitcher)
-    let links = wrapper.findAll('a')
+  it('switches routes and persists the locale in the i18n cookie in both directions', async () => {
+    const nuxt = useNuxtApp()
+    const wrapper = await mountSwitcher()
 
-    expect(links).toHaveLength(2)
+    for (const locale of ['fr', 'en']) {
+      await wrapper.get(`a[href="/${locale}"]`).trigger('click')
 
-    expect(links[0]?.text()).toBe('FR')
-    expect(links[0]?.attributes('href')).toBe('/fr')
-    expect(links[1]?.text()).toBe('EN')
-    expect(links[1]?.attributes('href')).toBe('/en')
-
-    // Current locale is 'en', click FR to switch
-    const frLink = links.find(l => l.text() === 'FR')
-    await frLink?.trigger('click')
-    expect(localStorage.getItem('preferredLanguage')).toBe('fr')
-
-    // Remount: onMounted reads 'fr' from localStorage and sets locale
-    wrapper.unmount()
-    wrapper = await mountSuspended(LangSwitcher)
-    links = wrapper.findAll('a')
-
-    expect(links).toHaveLength(2)
-
-    // Now locale is 'fr', click EN to switch back
-    const enLink = links.find(l => l.text() === 'EN')
-    await enLink?.trigger('click')
-    expect(localStorage.getItem('preferredLanguage')).toBe('en')
+      await vi.waitFor(() => {
+        expect(nuxt.$router.currentRoute.value.path).toBe(`/${locale}`)
+        expect(nuxt.$i18n.locale.value).toBe(locale)
+        expect(nuxt.$i18n.getLocaleCookie()).toBe(locale)
+        expect(document.cookie.split('; ')).toContain(
+          `i18n_redirected=${locale}`
+        )
+        expect(wrapper.get('a.active').text()).toBe(locale.toUpperCase())
+      })
+    }
   })
 
-  it('clicking the active locale does nothing', async () => {
-    const wrapper = await mountSuspended(LangSwitcher)
-    const links = wrapper.findAll('a')
+  it('keeps the current route and cookie when clicking the active locale', async () => {
+    const nuxt = useNuxtApp()
+    const wrapper = await mountSwitcher()
 
-    const enLink = links.find(l => l.text() === 'EN')
-    await enLink?.trigger('click')
-    expect(localStorage.getItem('preferredLanguage')).toBeNull()
+    await wrapper.get('a[href="/en"]').trigger('click')
+
+    expect(nuxt.$router.currentRoute.value.path).toBe('/en')
+    expect(nuxt.$i18n.locale.value).toBe('en')
+    expect(nuxt.$i18n.getLocaleCookie()).toBe('en')
   })
 
-  it('applies valid saved preference on mount', async () => {
-    localStorage.setItem('preferredLanguage', 'fr')
-    const wrapper = await mountSuspended(LangSwitcher)
-    await nextTick()
+  it('respects a direct localized URL over an existing preference cookie', async () => {
+    const nuxt = useNuxtApp()
 
-    expect(wrapper.vm.$i18n.locale).toBe('fr')
-    expect(document.documentElement.getAttribute('dir')).toBe('ltr')
-  })
+    expect(nuxt.$i18n.getLocaleCookie()).toBe('en')
 
-  it('does not apply invalid saved preference on mount', async () => {
-    localStorage.setItem('preferredLanguage', 'de')
-    const wrapper = await mountSuspended(LangSwitcher)
-    await nextTick()
+    const wrapper = await mountSwitcher('/fr')
 
-    expect(wrapper.vm.$i18n.locale).toBe('en')
-    expect(document.documentElement.getAttribute('dir')).toBe('ltr')
-  })
-
-  it('updates dir attribute when locale changes', async () => {
-    const wrapper = await mountSuspended(LangSwitcher)
-    wrapper.vm.$i18n.locale = 'fr'
-
-    await nextTick()
-    expect(document.documentElement.getAttribute('dir')).toBe('ltr')
-
-    wrapper.vm.$i18n.locale = 'en'
-    await nextTick()
-    expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+    expect(nuxt.$router.currentRoute.value.path).toBe('/fr')
+    expect(nuxt.$i18n.locale.value).toBe('fr')
+    expect(nuxt.$i18n.getLocaleCookie()).toBe('fr')
+    expect(wrapper.get('a.active').text()).toBe('FR')
   })
 })
