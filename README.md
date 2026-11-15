@@ -109,18 +109,20 @@ Consult [package.json](package.json) for current versions.
 
 ## Project Map
 
-| Concern                        | Source                                                         |
-| ------------------------------ | -------------------------------------------------------------- |
-| Root and page metadata         | [app.vue](app/app.vue), [index.vue](app/pages/index.vue)       |
-| Site name and robots policy    | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)         |
-| Shared layout                  | [default.vue](app/layouts/default.vue)                         |
-| Uploads, results and downloads | [ImageUploader.vue](app/components/ImageUploader.vue)          |
-| Original/optimized comparison  | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)  |
-| Compression pipelines          | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)   |
-| French and English messages    | [i18n/locales](i18n/locales/)                                  |
-| Styles and shared types        | [app/styles](app/styles/), [app/types](app/types/)             |
-| Tests and browser mocks        | [app/tests](app/tests/)                                        |
-| Modules and scripts            | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json) |
+| Concern                             | Source                                                                                                |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Root and page metadata              | [app.vue](app/app.vue), [index.vue](app/pages/index.vue)                                              |
+| Site name and robots policy         | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)                                                |
+| Shared layout                       | [default.vue](app/layouts/default.vue)                                                                |
+| Uploads, results and downloads      | [ImageUploader.vue](app/components/ImageUploader.vue)                                                 |
+| Original/optimized comparison       | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)                                         |
+| Compression pipelines               | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)                                          |
+| Theme control and preference        | [ThemeToggle.vue](app/components/ThemeToggle.vue), [useSiteTheme.ts](app/composables/useSiteTheme.ts) |
+| Theme attributes and browser chrome | [useThemeHead.ts](app/composables/useThemeHead.ts)                                                    |
+| French and English messages         | [i18n/locales](i18n/locales/)                                                                         |
+| Styles and shared types             | [app/styles](app/styles/), [app/types](app/types/)                                                    |
+| Tests and browser mocks             | [app/tests](app/tests/)                                                                               |
+| Modules and scripts                 | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json)                                        |
 
 Image processing relies on browser Canvas and ImageBitmap support.
 The native save picker has a browser-download fallback.
@@ -128,12 +130,13 @@ Mocked fixture tests verify pipeline control flow; actual image fidelity and bro
 
 ## Images And Icons
 
-| Consumer                  | Delivery                                      | What to preserve                                                     |
-| ------------------------- | --------------------------------------------- | -------------------------------------------------------------------- |
-| Selected source images    | Browser File/Blob objects and Canvas encoding | Original bytes, actual returned MIME and no-larger-output fallback   |
-| Comparison panels         | Native images with object URLs                | Original/optimized dimensions, complete images, zoom and URL cleanup |
-| Public logo and app icons | Files under `public/`                         | Actual filenames, root-relative paths and metadata consistency       |
-| Footer icon               | `pl-icon:github-mark` from `app/assets/svg/`  | Custom SVG collection and a meaningful link name                     |
+| Consumer                  | Delivery                                                | What to preserve                                                     |
+| ------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| Selected source images    | Browser File/Blob objects and Canvas encoding           | Original bytes, actual returned MIME and no-larger-output fallback   |
+| Comparison panels         | Native images with object URLs                          | Original/optimized dimensions, complete images, zoom and URL cleanup |
+| Public logo and app icons | Files under `public/`                                   | Actual filenames, root-relative paths and metadata consistency       |
+| Footer icon               | `pl-icon:github-mark` from `app/assets/svg/`            | Custom SVG collection and a meaningful link name                     |
+| Theme icons               | `pl-icon:moon` and `pl-icon:sun` from `app/assets/svg/` | Decorative SVGs, inherited colors and CSS-selected visibility        |
 
 The [developer walkthrough](docs/IMAGE_OPTIMIZER.md) includes diagrams for each compression path and metadata handling.
 The [agent reference](.agents/docs/IMAGE_OPTIMIZER.md) records review criteria and known source limitations.

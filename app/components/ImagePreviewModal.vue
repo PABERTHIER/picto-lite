@@ -316,7 +316,7 @@ onBeforeUnmount(() => {
     height: 90vh;
     display: flex;
     flex-direction: column;
-    background: $white-color;
+    background: var(--color-surface);
     border-radius: 8px;
     overflow: hidden;
 
@@ -325,7 +325,7 @@ onBeforeUnmount(() => {
       justify-content: space-between;
       align-items: center;
       padding: 12px 16px;
-      border-bottom: 1px solid $light-grey-color;
+      border-bottom: 1px solid var(--color-border);
       flex-shrink: 0;
 
       .modal-title {
@@ -383,12 +383,12 @@ onBeforeUnmount(() => {
 
           .panel-dims {
             font-size: 14px;
-            color: $grey-blue-color;
+            color: var(--color-info);
           }
 
           .panel-size {
             font-size: 14px;
-            color: $grey-blue-color;
+            color: var(--color-info);
           }
         }
 
@@ -399,7 +399,7 @@ onBeforeUnmount(() => {
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid $light-grey-color;
+          border: 1px solid var(--color-border);
           border-radius: 4px;
           overscroll-behavior: contain;
 
@@ -425,7 +425,7 @@ onBeforeUnmount(() => {
         .zoom-button {
           margin-top: 8px;
           padding: 4px 12px;
-          background-color: $blue-color;
+          background-color: var(--color-button);
           color: $white-color;
           border: none;
           border-radius: 4px;
@@ -434,7 +434,7 @@ onBeforeUnmount(() => {
           flex-shrink: 0;
 
           &:hover {
-            background-color: $blue-color-2;
+            background-color: var(--color-button-hover);
           }
         }
       }

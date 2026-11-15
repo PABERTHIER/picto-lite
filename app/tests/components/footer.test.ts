@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { afterEach, describe, it, expect } from 'vitest'
+import { enableAutoUnmount } from '@vue/test-utils'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import Footer from '@/components/Footer.vue'
 import LangSwitcher from '@/components/LangSwitcher.vue'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 import { Icon } from '#components'
+
+enableAutoUnmount(afterEach)
 
 describe('Footer component', () => {
   it('renders correctly', async () => {
@@ -33,6 +37,14 @@ describe('Footer component', () => {
     expect(langSwitcher.exists()).toBe(true)
   })
 
+  it('renders the theme control beside the language control', async () => {
+    const wrapper = await mountSuspended(Footer)
+
+    expect(wrapper.get('.left-part').findComponent(ThemeToggle).exists()).toBe(
+      true
+    )
+  })
+
   it('renders a NuxtLink pointing to the GitHub repo with the Icon inside', async () => {
     const wrapper = await mountSuspended(Footer)
     const githubLinkLabel = useNuxtApp().$i18n.t(
@@ -54,7 +66,7 @@ describe('Footer component', () => {
     expect(iconWrapper.exists()).toBe(true)
     expect(iconWrapper.props()).toMatchObject({
       name: 'pl-icon:github-mark',
-      size: '30px',
+      size: '34px',
       mode: 'svg',
     })
     expect(iconWrapper.attributes('aria-hidden')).toBe('true')
@@ -62,7 +74,8 @@ describe('Footer component', () => {
     const svg = iconWrapper.find('svg')
 
     expect(svg.exists()).toBe(true)
-    expect(svg.element.style.color).toBe('black')
+    expect(svg.element.style.color).toBe('')
+    expect(svg.find('[fill="currentColor"]').exists()).toBe(true)
   })
 
   it('displays the translated author name and current year in the right part', async () => {

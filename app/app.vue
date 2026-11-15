@@ -6,6 +6,9 @@
 
 <script setup lang="ts">
 const { t, locale, locales } = useI18n()
+
+useThemeHead()
+
 const runtimeConfig = useRuntimeConfig()
 const baseUrl = ref(runtimeConfig.public.i18n.baseUrl)
 const ogImageEndPath = 'logo.png'

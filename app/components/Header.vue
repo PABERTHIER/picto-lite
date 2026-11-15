@@ -11,7 +11,7 @@ const { t } = useI18n()
 <style lang="scss" scoped>
 .header-container {
   padding: 10px;
-  background-color: $header-background-color;
+  background-color: var(--color-shell);
   border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 

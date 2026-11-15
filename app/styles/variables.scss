@@ -1,40 +1,40 @@
 // colors
 $primary-text-color: #000000;
-$white-color: #FFFFFF;
-$red-color: #FF0000;
-$dark-red-color: #A00000;
+$white-color: #ffffff;
+$red-color: #ff0000;
+$dark-red-color: #a00000;
 $green-color: #008000;
-$light-grey-color: #CBD5E0;
+$light-grey-color: #cbd5e0;
 $grey-color: #808080;
 $grey-color-2: #718096;
-$dark-grey-color: #4A5568;
-$light-blue-color: #63B3ED;
-$blue-color: #3B82F6;
-$blue-color-2: #2563EB;
-$grey-blue-color: #7A9FF0;
-
+$dark-grey-color: #4a5568;
+$light-blue-color: #63b3ed;
+$blue-color: #3b82f6;
+$blue-color-2: #2563eb;
+$grey-blue-color: #7a9ff0;
 
 // background-color
-$background: linear-gradient(45deg, $grey-blue-color 0%, $dark-red-color 50%, $grey-blue-color 100%);
+$background: linear-gradient(
+  45deg,
+  $grey-blue-color 0%,
+  $dark-red-color 50%,
+  $grey-blue-color 100%
+);
 $background-color: $white-color;
-$header-background-color: #F5F5F5;
-$footer-background-color: #F5F5F5;
-
+$header-background-color: #f5f5f5;
+$footer-background-color: #f5f5f5;
 
 // border-color
 $drop-zone-border-color: $dark-grey-color;
-
 
 // z-index
 $header-z-index: 30;
 $footer-z-index: 30;
 $modal-z-index: 50;
 
-
 // height
 $header-height: 74px;
 $footer-height: 44px;
-
 
 // breakpoints
 $sm: 640px;

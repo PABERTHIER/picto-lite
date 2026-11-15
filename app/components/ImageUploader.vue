@@ -332,12 +332,12 @@ defineExpose({ previewItem })
     padding: 50px 0px;
     margin-bottom: 15px;
     text-align: center;
-    border: 2px dashed $drop-zone-border-color;
+    border: 2px dashed var(--color-drop-border);
     border-radius: 8px;
     cursor: pointer;
 
     .supported-formats {
-      color: $blue-color;
+      color: var(--color-accent);
     }
 
     &:hover,
@@ -365,7 +365,7 @@ defineExpose({ previewItem })
 
     .progress-bar-container {
       height: 8px;
-      background: $light-grey-color;
+      background: var(--color-border);
       border-radius: 4px;
       margin-bottom: 5px;
       position: relative;
@@ -403,7 +403,7 @@ defineExpose({ previewItem })
       align-items: center;
       gap: 8px;
       padding: 8px;
-      border: 1px solid $light-grey-color;
+      border: 1px solid var(--color-border);
       border-radius: 4px;
       margin-bottom: 8px;
 
@@ -422,19 +422,19 @@ defineExpose({ previewItem })
 
         .item-size {
           font-size: 14px;
-          color: $grey-blue-color;
+          color: var(--color-info);
 
           &.reduction-good {
-            color: $green-color;
+            color: var(--color-success);
           }
 
           &.reduction-none {
-            color: $grey-color;
+            color: var(--color-muted);
           }
         }
 
         .unsupported-format {
-          color: $dark-red-color;
+          color: var(--color-error);
         }
       }
 
@@ -466,14 +466,14 @@ defineExpose({ previewItem })
 
       .download-button {
         padding: 4px 12px;
-        background-color: $blue-color;
+        background-color: var(--color-button);
         color: $white-color;
         border: none;
         border-radius: 4px;
         cursor: pointer;
 
         &:hover {
-          background-color: $blue-color-2;
+          background-color: var(--color-button-hover);
         }
       }
 
@@ -500,14 +500,14 @@ defineExpose({ previewItem })
 
     .download-all-button {
       padding: 6px 14px;
-      background-color: $blue-color;
+      background-color: var(--color-button);
       color: $white-color;
       border: none;
       border-radius: 4px;
       cursor: pointer;
 
       &:hover {
-        background-color: $blue-color-2;
+        background-color: var(--color-button-hover);
       }
     }
 
