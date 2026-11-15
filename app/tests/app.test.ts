@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { enableAutoUnmount } from '@vue/test-utils'
-import { injectHead } from '#imports'
+import { clearNuxtState, injectHead, useSiteTheme, useState } from '#imports'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import App from '@/app.vue'
 
@@ -32,6 +32,99 @@ describe('App component', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    clearNuxtState('site-theme')
+    document.cookie = 'pictolite-theme=; Max-Age=0; Path=/'
+  })
+
+  afterEach(() => {
+    clearNuxtState('site-theme')
+    document.cookie = 'pictolite-theme=; Max-Age=0; Path=/'
+  })
+
+  it('follows the OS in head metadata until a theme is chosen', async () => {
+    await mountApp()
+
+    await vi.waitFor(() => {
+      expect(document.documentElement.hasAttribute('data-theme')).toBe(false)
+
+      expect(
+        document
+          .querySelector(
+            'meta[name="theme-color"][media="(prefers-color-scheme: light)"]'
+          )
+          ?.getAttribute('content')
+      ).toBe('#ffffff')
+
+      expect(
+        document
+          .querySelector(
+            'meta[name="theme-color"][media="(prefers-color-scheme: dark)"]'
+          )
+          ?.getAttribute('content')
+      ).toBe('#111827')
+    })
+
+    for (const [theme, color] of [
+      ['dark', '#111827'],
+      ['light', '#ffffff'],
+    ] as const) {
+      useSiteTheme().setTheme(theme)
+
+      await vi.waitFor(() => {
+        expect(document.documentElement.getAttribute('data-theme')).toBe(theme)
+
+        expect(
+          document
+            .querySelector('meta[name="theme-color"][media="all"]')
+            ?.getAttribute('content')
+        ).toBe(color)
+
+        expect(
+          document.querySelectorAll('meta[name="theme-color"]')
+        ).toHaveLength(2)
+
+        expect(
+          document.querySelector('meta[name="theme-color"][media="not all"]')
+        ).not.toBeNull()
+      })
+    }
+  })
+
+  it.each(['light', 'dark'] as const)(
+    'restores %s in the document head from its cookie',
+    async theme => {
+      document.cookie = `pictolite-theme=${theme}; Path=/`
+      await mountApp()
+
+      await vi.waitFor(() => {
+        expect(document.documentElement.getAttribute('data-theme')).toBe(theme)
+        expect(
+          document
+            .querySelector('meta[name="theme-color"][media="all"]')
+            ?.getAttribute('content')
+        ).toBe(theme === 'dark' ? '#111827' : '#ffffff')
+      })
+    }
+  )
+
+  it('restores the visitor preference after hydrating an automatic prerendered state', async () => {
+    useState('site-theme', () => null)
+    document.cookie = 'pictolite-theme=dark; Path=/'
+    await mountApp()
+
+    await vi.waitFor(() => {
+      expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
+    })
+  })
+
+  it('keeps a choice made before the root mounts', async () => {
+    useSiteTheme().setTheme('light')
+    document.cookie = 'pictolite-theme=dark; Path=/'
+    await mountApp()
+
+    await vi.waitFor(() => {
+      expect(document.documentElement.getAttribute('data-theme')).toBe('light')
+    })
   })
 
   it('renders correctly', async () => {

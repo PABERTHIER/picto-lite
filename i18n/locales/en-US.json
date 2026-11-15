@@ -31,6 +31,10 @@
     },
     "lang_switcher": {
       "change_language_label": "Change language"
+    },
+    "theme_toggle": {
+      "light": "Light mode",
+      "dark": "Dark mode"
     }
   },
   "pages": {

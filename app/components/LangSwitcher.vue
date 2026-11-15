@@ -30,13 +30,13 @@ const changeLanguageLabel = computed(() =>
   gap: 0.25rem;
   padding: 0.2rem;
   border-radius: 20px;
-  border: 1px solid rgba($grey-blue-color, 0.4);
-  background: rgba($white-color, 0.8);
+  border: 1px solid var(--color-control-border);
+  background: var(--color-surface);
 
   .btn {
     display: inline-block;
     text-decoration: none;
-    color: rgba($primary-text-color, 0.6);
+    color: var(--color-muted);
     padding: 0.35rem 0.7rem;
     font-size: 0.75rem;
     font-weight: 600;
@@ -48,7 +48,7 @@ const changeLanguageLabel = computed(() =>
       background 0.2s ease;
 
     &:hover {
-      color: $primary-text-color;
+      color: var(--color-text);
     }
 
     &.active {

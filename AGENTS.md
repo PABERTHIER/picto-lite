@@ -116,14 +116,18 @@ picto-lite/
 │   │   ├── Header.vue
 │   │   ├── Footer.vue
 │   │   ├── LangSwitcher.vue
+│   │   ├── ThemeToggle.vue       # Translated light/dark action and OS listener
 │   │   └── OgImage/              # Component directory; generation is disabled
-│   ├── composables/useImageOptimizer.ts
+│   ├── composables/
+│   │   ├── useImageOptimizer.ts
+│   │   ├── useSiteTheme.ts       # Cookie-backed request-scoped theme state
+│   │   └── useThemeHead.ts       # Document theme and browser chrome
 │   ├── data/
 │   │   ├── site.ts               # Site name shared by configuration
 │   │   └── seo.ts                # Robots directive values
 │   ├── styles/
 │   │   ├── variables.scss        # Injected Sass tokens
-│   │   └── default.scss          # Base link rules loaded by Nuxt's css option
+│   │   └── default.scss          # Runtime theme palette, links and focus rules
 │   ├── types/
 │   │   ├── result.ts             # ResultItem and FileResult
 │   │   ├── file-picker.ts        # Native picker contracts
@@ -157,30 +161,38 @@ picto-lite/
 └── .editorconfig
 ```
 
-| Concern             | Source                                                                                                               | Contract                                                                   |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Application root    | [app.vue](app/app.vue)                                                                                               | Global metadata, canonical/alternate links and font links                  |
-| Main page           | [index.vue](app/pages/index.vue)                                                                                     | Uploader and page-level metadata                                           |
-| Shared shell        | [default.vue](app/layouts/default.vue)                                                                               | Header, main landmark, footer, global styles and viewport-height listener  |
-| Upload and results  | [ImageUploader.vue](app/components/ImageUploader.vue)                                                                | File batches, progress, result IDs, preview, download and ZIP export       |
-| Image comparison    | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)                                                        | Original/optimized previews, dimensions, zoom and object-URL cleanup       |
-| Optimizer           | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)                                                         | Browser decode/encode and original-file fallback                           |
-| Shared types        | [app/types](app/types/)                                                                                              | `ResultItem`, `FileResult`, file-picker contracts and locale codes         |
-| Language control    | [LangSwitcher.vue](app/components/LangSwitcher.vue)                                                                  | Accessible corresponding-route links; Nuxt I18n owns the preference cookie |
-| Sass tokens         | [variables.scss](app/styles/variables.scss)                                                                          | Colors, layers, dimensions and breakpoints injected through Vite           |
-| Global base rules   | [default.scss](app/styles/default.scss), [nuxt.config.ts](nuxt.config.ts), [default layout](app/layouts/default.vue) | Nuxt loads base link rules once; the layout owns remaining global rules    |
-| Site constants      | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)                                                               | Site name and robots directive values used by configuration                |
-| Messages            | [fr-FR.json](i18n/locales/fr-FR.json), [en-US.json](i18n/locales/en-US.json)                                         | French source copy and natural English equivalents                         |
-| Tests               | [app/tests](app/tests/), [vitest.config.mts](vitest.config.mts)                                                      | Nuxt runtime, Happy DOM, browser mocks, coverage and reports               |
-| Modules and tooling | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json), [eslint.config.mjs](eslint.config.mjs)               | Installed capabilities and actual commands                                 |
+| Concern             | Source                                                                                                               | Contract                                                                            |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Application root    | [app.vue](app/app.vue)                                                                                               | Global metadata, canonical/alternate links and font links                           |
+| Main page           | [index.vue](app/pages/index.vue)                                                                                     | Uploader and page-level metadata                                                    |
+| Shared shell        | [default.vue](app/layouts/default.vue)                                                                               | Header, main landmark, footer, global styles and viewport-height listener           |
+| Upload and results  | [ImageUploader.vue](app/components/ImageUploader.vue)                                                                | File batches, progress, result IDs, preview, download and ZIP export                |
+| Image comparison    | [ImagePreviewModal.vue](app/components/ImagePreviewModal.vue)                                                        | Original/optimized previews, dimensions, zoom and object-URL cleanup                |
+| Optimizer           | [useImageOptimizer.ts](app/composables/useImageOptimizer.ts)                                                         | Browser decode/encode and original-file fallback                                    |
+| Shared types        | [app/types](app/types/)                                                                                              | `ResultItem`, `FileResult`, file-picker contracts and locale codes                  |
+| Language control    | [LangSwitcher.vue](app/components/LangSwitcher.vue)                                                                  | Accessible corresponding-route links; Nuxt I18n owns the preference cookie          |
+| Sass tokens         | [variables.scss](app/styles/variables.scss)                                                                          | Colors, layers, dimensions and breakpoints injected through Vite                    |
+| Global base rules   | [default.scss](app/styles/default.scss), [nuxt.config.ts](nuxt.config.ts), [default layout](app/layouts/default.vue) | Nuxt loads theme, link and focus rules once; the layout owns remaining global rules |
+| Site constants      | [site.ts](app/data/site.ts), [seo.ts](app/data/seo.ts)                                                               | Site name and robots directive values used by configuration                         |
+| Messages            | [fr-FR.json](i18n/locales/fr-FR.json), [en-US.json](i18n/locales/en-US.json)                                         | French source copy and natural English equivalents                                  |
+| Tests               | [app/tests](app/tests/), [vitest.config.mts](vitest.config.mts)                                                      | Nuxt runtime, Happy DOM, browser mocks, coverage and reports                        |
+| Modules and tooling | [nuxt.config.ts](nuxt.config.ts), [package.json](package.json), [eslint.config.mjs](eslint.config.mjs)               | Installed capabilities and actual commands                                          |
 
 The layout supplies `<main id="page-container">`; pages using it should not add a nested main.
 Component registration uses `pathPrefix: false`, so avoid colliding component basenames.
 Components and pages use `<template>`, `<script setup lang="ts">`, then scoped SCSS.
 The default layout intentionally has unscoped SCSS for global and shell rules.
-Nuxt's `css` option loads `default.scss` once for base link rules; do not repeat its import in layouts or components.
+Nuxt's `css` option loads `default.scss` once for theme, link and focus rules; do not repeat its import in layouts or components.
 Vite injects `variables.scss`; component styles can use its tokens without repeating the import.
 Follow the actual [TypeScript configuration](tsconfig.json), [.editorconfig](.editorconfig) and [.prettierrc](.prettierrc).
+
+## Appearance
+
+Keep theme-dependent surfaces, text and borders in the runtime CSS palette in `app/styles/default.scss`.
+Preserve OS appearance when `data-theme` is absent and explicit light/dark choices in the `pictolite-theme` cookie.
+Keep `useThemeHead()` at the application root and theme state request-scoped through Nuxt.
+Do not filter source or optimized images to change their colors.
+The footer groups `LangSwitcher` and `ThemeToggle`, wraps at narrow widths and grows with its content; do not restore a fixed footer height.
 
 ## Routes And Page Workflow
 

@@ -3,6 +3,13 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 export default defineVitestConfig({
   test: {
     environment: 'nuxt',
+    css: {
+      // Load the real theme styles for computed icon-visibility assertions
+      include: [
+        /app[/\\]styles[/\\]default\.scss/,
+        /app[/\\]components[/\\]ThemeToggle\.vue/,
+      ],
+    },
     setupFiles: ['app/tests/setup.ts'],
     globals: true,
     name: { label: 'PictoLite Tests', color: 'red' },

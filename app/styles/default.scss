@@ -1,4 +1,76 @@
+// Runtime colors share the existing Sass palette
+// Artwork and colors on fixed decorative backgrounds keep their original values
+:root {
+  color-scheme: light;
+  --color-page: #{$background-color};
+  --color-shell: #{$footer-background-color};
+  --color-surface: #{$white-color};
+  --color-text: #{$primary-text-color};
+  --color-muted: #{$dark-grey-color};
+  --color-border: #{$light-grey-color};
+  --color-control-border: #{rgba($grey-blue-color, 0.4)};
+  --color-drop-border: #{$drop-zone-border-color};
+  --color-accent: #{$blue-color-2};
+  --color-info: #315fab;
+  --color-success: #{$green-color};
+  --color-error: #{$dark-red-color};
+  --color-hover: #edf2f7;
+  --color-button: #{$blue-color-2};
+  --color-button-hover: #1d4ed8;
+  --color-scrollbar-track: #f1f1f1;
+  --color-scrollbar-thumb: #{$dark-red-color};
+  --theme-moon-visibility: visible;
+  --theme-sun-visibility: hidden;
+}
+
+@mixin dark-colors {
+  color-scheme: dark;
+  --color-page: #111827;
+  --color-shell: #1f2937;
+  --color-surface: #1f2937;
+  --color-text: #f3f4f6;
+  --color-muted: #cbd5e1;
+  --color-border: #64748b;
+  --color-control-border: var(--color-border);
+  --color-drop-border: #94a3b8;
+  --color-accent: #93c5fd;
+  --color-info: #a5c8ff;
+  --color-success: #86efac;
+  --color-error: #fca5a5;
+  --color-hover: #334155;
+  --color-scrollbar-track: #1f2937;
+  --color-scrollbar-thumb: #fca5a5;
+  --theme-moon-visibility: hidden;
+  --theme-sun-visibility: visible;
+}
+
+:root[data-theme='dark'] {
+  @include dark-colors;
+}
+
+// Also respect the OS preference before scripting and when JS is disabled
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    @include dark-colors;
+  }
+}
+
 a {
   text-decoration: none;
   color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .lang-switcher .btn {
+    transition: none;
+  }
 }

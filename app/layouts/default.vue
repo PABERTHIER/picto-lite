@@ -47,20 +47,20 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  color: $primary-text-color;
+  color: var(--color-text);
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
-  background-color: $background-color;
+  background-color: var(--color-page);
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: $background-color;
+  background-color: var(--color-page);
 
   #__nuxt,
   #__layout {
-    background-color: $background-color;
+    background-color: var(--color-page);
   }
 }
 
@@ -72,18 +72,25 @@ body {
 
 ::-webkit-scrollbar-track {
   border-radius: 10px;
-  border: 1px solid #caca;
-  background-color: #f1f1f1;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-scrollbar-track);
   box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, $grey-blue-color, $dark-red-color);
+  background: linear-gradient(
+    45deg,
+    $grey-blue-color,
+    var(--color-scrollbar-thumb)
+  );
   border-radius: 10px;
 }
 
 #layoutContainer {
-  background-color: $background-color;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(var(--vh, 1vh) * 100);
+  background-color: var(--color-page);
 
   #header-container {
     max-height: $header-height;
@@ -91,35 +98,31 @@ body {
     padding: 20px 20px 0px 20px;
     top: 0;
     z-index: $header-z-index;
-    background-color: $background-color;
+    background-color: var(--color-page);
   }
 
   #page-container {
-    min-height: calc(
-      var(--vh, 1vh) * 100 - #{$header-height} - #{$footer-height}
-    );
-    height: 100%;
-    background-color: $background-color;
+    flex: 1;
+    min-width: 0;
+    background-color: var(--color-page);
 
     .page-content {
-      height: 100%;
-      min-height: calc(
-        var(--vh, 1vh) * 100 - #{$header-height} - #{$footer-height}
-      );
       padding: 20px;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     }
   }
 
   #footer-container {
+    container: footer / inline-size;
     width: 100%;
-    height: $footer-height;
+    flex-shrink: 0;
+    min-height: $footer-height;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: $footer-z-index;
-    background-color: $background-color;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--color-shell);
+    border-top: 1px solid var(--color-border);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
   }
 }
@@ -128,7 +131,6 @@ body {
 @supports (padding: max(0px)) {
   #layoutContainer {
     #footer-container {
-      height: calc(#{$footer-height} + max(env(safe-area-inset-bottom), 0px));
       padding-bottom: max(env(safe-area-inset-bottom), 0px);
     }
 
